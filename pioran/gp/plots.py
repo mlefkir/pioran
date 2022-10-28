@@ -39,7 +39,7 @@ def plot_prediction(GP: GaussianProcess,filename,figsize,confidence_bands=True,t
     fig,ax = plt.subplots(1,1,figsize=figsize)
      
     # get predictions from GP
-    posterior_mean, posterior_covariance = GP.computePosteriorDistributions()
+    posterior_mean, posterior_covariance = GP.compute_predictive_distribution()
     
     ax.errorbar(GP.training_indexes.flatten() , GP.training_observables.flatten(), yerr=GP.training_errors, fmt='.', label='Observation')
     ax.plot(GP.prediction_indexes,posterior_mean, label='GP Prediction')
