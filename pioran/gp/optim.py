@@ -37,6 +37,8 @@ class Optimizer:
     def __init__(self, GP: GaussianProcess, method="ML", x0=None,bounds=None):
         """Constructor method for the Optimizer class.
 
+        Instantiate the Optimizer class.
+
         Parameters
         ----------
         GP : GaussianProcess

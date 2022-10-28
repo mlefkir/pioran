@@ -26,7 +26,7 @@ class Exponential(CovarianceFunction):
 
     Methods
     -------
-    get_cov_matrix
+    get_cov_matrix:
         Compute the covariance matrix between two arrays.
     """
 
@@ -88,7 +88,7 @@ class SquareExponential(CovarianceFunction):
 
     Methods
     -------
-    get_cov_matrix
+    get_cov_matrix:
         Compute the covariance matrix between two arrays.
     """
 
@@ -150,13 +150,13 @@ class Matern32(CovarianceFunction):
 
     Methods
     -------
-    get_cov_matrix
+    get_cov_matrix:
         Compute the covariance matrix between two arrays.
     """
 
     def __init__(self, parameters_values, **kwargs):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
-
+        
         Parameters
         ----------
         parameters_values : list of float or ParametersCovFunction
@@ -211,7 +211,7 @@ class Matern52(CovarianceFunction):
 
     Methods
     -------
-    get_cov_matrix
+    get_cov_matrix:
         Compute the covariance matrix between two arrays.
     """
 
@@ -274,7 +274,7 @@ class RationalQuadratic(CovarianceFunction):
 
     Methods
     -------
-    get_cov_matrix
+    get_cov_matrix:
         Compute the covariance matrix between two arrays.
     """
     
