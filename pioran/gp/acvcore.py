@@ -2,7 +2,6 @@
 """
 import numpy as np
 from .parameters import ParametersCovFunction
-from .utils import EuclideanDistance
 
 class CovarianceFunction:
     """ Master class for covariance functions.
@@ -59,7 +58,13 @@ class CovarianceFunction:
 
     @classmethod
     def __classname(cls):
-        """Return the name of the class."""
+        """Return the name of the class.
+        
+        Returns
+        -------
+        str
+            Name of the class.
+        """
         return cls.__name__
 
     def __str__(self):

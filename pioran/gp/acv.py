@@ -9,7 +9,9 @@
 """
 
 import numpy as np
-from .acvcore import CovarianceFunction, EuclideanDistance
+from .acvcore import CovarianceFunction
+from .utils import EuclideanDistance
+
 
 
 class Exponential(CovarianceFunction):
@@ -39,12 +41,6 @@ class Exponential(CovarianceFunction):
             Arguments for the ParametersCovFunction class.
             free_parameters : list of bool
                 List of bool to indicate if the parameters are free or not.
-        
-        Raises
-        ------
-        TypeError
-            If the parameters_values is not a list of float or a ParametersCovFunction.
-
         """
         assert len(parameters_values) == 2, 'The number of parameters for this  covariance function must be 2'
         free_parameters = kwargs.get('free_parameters', [True, True])
@@ -107,12 +103,6 @@ class SquareExponential(CovarianceFunction):
             Arguments for the ParametersCovFunction class.
             free_parameters : list of bool
                 List of bool to indicate if the parameters are free or not.
-        
-        Raises
-        ------
-        TypeError
-            If the parameters_values is not a list of float or a ParametersCovFunction.
-
         """
         assert len(parameters_values) == 2, 'The number of parameters for this covariance function must be 2'
 
@@ -175,12 +165,6 @@ class Matern32(CovarianceFunction):
             Arguments for the ParametersCovFunction class.
             free_parameters : list of bool
                 List of bool to indicate if the parameters are free or not.
-        
-        Raises
-        ------
-        TypeError
-            If the parameters_values is not a list of float or a ParametersCovFunction.
-
         """
         assert len(parameters_values) == 2, 'The number of parameters for this covariance function must be 2'
         free_parameters = kwargs.get('free_parameters', [True, True])
@@ -242,12 +226,6 @@ class Matern52(CovarianceFunction):
             Arguments for the ParametersCovFunction class.
             free_parameters : list of bool
                 List of bool to indicate if the parameters are free or not.
-        
-        Raises
-        ------
-        TypeError
-            If the parameters_values is not a list of float or a ParametersCovFunction.
-
         """
         assert len(parameters_values) == 2, 'The number of parameters for this covariance function must be 2'
         free_parameters = kwargs.get('free_parameters', [True, True])
@@ -311,12 +289,6 @@ class RationalQuadratic(CovarianceFunction):
             Arguments for the ParametersCovFunction class.
             free_parameters : list of bool
                 List of bool to indicate if the parameters are free or not.
-        
-        Raises
-        ------
-        TypeError
-            If the parameters_values is not a list of float or a ParametersCovFunction.
-
         """
         free_parameters = kwargs.get('free_parameters', [True, True, True])
         # initialise the parameters

@@ -10,9 +10,10 @@ def EuclideanDistance(xq, xp):
 
     Parameters
     ----------
-    xq : array of shape (n, 1)
-
-    xp : array of shape (m, 1)
+    xq : array 
+        First array of shape (n, 1)
+    xp : array 
+        Second array of shape (m, 1)
 
     Returns
     -------
@@ -21,11 +22,24 @@ def EuclideanDistance(xq, xp):
     return cdist(xq, xp, metric='euclidean')
 
 
-# ---- Code from Ahmed Fasih - https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd
+# ---- Code from Ahmed Fasih ---- https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd
 def nearest_positive_definite(A):
     """Find the nearest positive-definite matrix to input
     A Python/Numpy port of John D'Errico's `nearestSPD` MATLAB code [1], which
     credits [2].
+    
+    Parameters
+    ----------
+    A : array
+        Matrix.
+    
+    Returns
+    -------
+    array
+        Nearest positive-definite matrix to A.  
+    
+    Notes
+    -----
     [1] https://www.mathworks.com/matlabcentral/fileexchange/42885-nearestspd
     [2] N.J. Higham, "Computing a nearest symmetric positive semidefinite
     matrix" (1988): https://doi.org/10.1016/0024-3795(88)90223-6
@@ -64,7 +78,18 @@ def nearest_positive_definite(A):
 
 
 def isPD(B):
-    """Returns true when input is positive-definite, via Cholesky"""
+    """Returns true when input is positive-definite, via Cholesky
+    
+    Parameters
+    ----------
+    B : array
+        Matrix to test.
+        
+    Returns
+    -------
+    bool
+        True if B is positive-definite. False otherwise.
+    """
     try:
         _ = la.cholesky(B)
         return True
@@ -76,14 +101,13 @@ def isPD(B):
 
 # from scipy.linalg import eigh
 # EPSILON = np.finfo(float).eps
-# 
+#
 # def nearest_positive_definite(A):
-#     """Find the nearest positive-definite matrix 
+#     """Find the nearest positive-definite matrix
 #     """
-    
+
 #     B = (A.T + A)/2
 #     w, v = eigh(B)
 #     D = np.diag(np.maximum(w,EPSILON))
 #     APD = v@D@v.T
 #     return APD
-

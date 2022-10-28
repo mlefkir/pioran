@@ -1,4 +1,4 @@
-"""Tools for checking the type of objects."""
+""" Various tools for the Gaussian Process module."""
 
 
 def check_instance(list_of_obj, classinfo):
@@ -10,11 +10,6 @@ def check_instance(list_of_obj, classinfo):
         List of objects to check.
     classinfo : class
         Class to check.
-        
-    Raises
-    ------
-    TypeError
-        If one of the object is not an instance of the class.
     
     Returns
     -------

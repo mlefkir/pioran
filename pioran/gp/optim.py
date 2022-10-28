@@ -34,7 +34,7 @@ class Optimizer:
     
     """
     
-    def __init__(self, GP: GaussianProcess, method="L-BFGS-B", x0=None,bounds=None):
+    def __init__(self, GP: GaussianProcess, method="ML", x0=None,bounds=None):
         """Constructor method for the Optimizer class.
 
         Parameters
@@ -43,12 +43,17 @@ class Optimizer:
             Gaussian Process object.
         method : str, optional
             Method to maximise the marginal likelihood, by default "L-BFGS-B"
-            - "L-BFGS-B" : using scipy.optimize.minimize
-            - "nested" : using nested sampling via ultranest
+            - "ML : using scipy.optimize.minimize
+            - "NS" : using nested sampling via ultranest
         x0 : list of floats, optional
             Initial guess for the (hyper)parameters, by default None (it will select the free parameters in GP.acvf.parameters.values)
         bounds : list of tuple, optional
             Bounds for the (hyper)parameters, by default None (it will select the free parameters in GP.acvf.parameters.boundaries)
+            
+        Raises
+        ------
+        TypeError
+            If the method is not a string, if x0 is not a list of floats or if bounds is not a list of tuple.
         """
         
         self.GP = GP
@@ -84,23 +89,111 @@ class Optimizer:
             self.bounds = self.GP.acvf.parameters.boundaries
         
         # set the method
-        self.method = method
+        if isinstance(method, str):
+            self.method = method
+        else:
+            raise TypeError("method must be a string.")   
+         
+    def run(self, priors=None, verbose=True, **kwargs):
+        """ Optimize the (hyper)parameters of the Gaussian Process.
         
-
-    def optimize_ML(self, verbose=False, **options):
-        """ Optimize the (hyper)parameters of the Gaussian Process with scipy.optimize.minimize.
+        
+        Parameters
+        ----------
+        priors : function, optional, by default None
+            Function to define the priors for the (hyper)parameters.
+        verbose : bool, optional
+            Print the results of the optimization, by default False
+        **kwargs : dict
+            Additional arguments for the optimization method.
+                For ML: see 'optimize_ML' docstring
+                For NS: see 'nested_sampling' docstring
+        
+        Raises
+        ------
+        ValueError
+            If the method is not "ML" or "NS".
+        
+        Returns
+        -------
+        results : dict
+            Results of the optimization. Different keys depending on the method.
         """
-        res = minimize(self.GP.wrapper_log_marginal_likelihood, self.initial_guess, method=self.method, bounds=self.bounds,options={'gtol': 1e-16,'ftol':1e-16, 'disp': True})
-        self.GP.acvf.parameters.values =  res.x
-        print(self.GP.acvf.parameters.values)
-        print(res)
+        if self.method == "ML":
+            results = self.optimize_ML(verbose=verbose, **kwargs)
+        elif self.method == "NS":
+            if priors is None:
+                raise ValueError("Priors must be provided for nested sampling.")
+            results = self.nested_sampling(priors=priors,verbose=verbose,**kwargs)
+        else:
+            raise ValueError("The method must be either 'ML' or 'NS'.")
+        print("\n>>>>>> Optimization done.")
         print(self.GP)
-        print("Optimization terminated successfully." if res.success else "/!\/!\/!\  Optimization failed! /!\/!\/!\ ")
+        return results
+
+
+    def optimize_ML(self, verbose=True, **kwargs):
+        """ Optimize the (hyper)parameters of the Gaussian Process with scipy.optimize.minimize.
         
-    def nested_sampling(self,priors,resume=True,logdir=None):
-        nested = ultranest.ReactiveNestedSampler(self.GP.acvf.parameters.names, self.GP.wrapper_neg_log_marginal_likelihood,priors,resume=resume,log_dir=logdir)
-        results = nested.run()
-        nested.plot()
+        Parameters
+        ----------
+        verbose : bool, optional
+            Print the results of the optimization, by default True
+        **kwargs : dict
+            Keyword arguments for scipy.optimize.minimize.
+                gtol : float
+                ftol : float
+                maxiter : int
+                
+        Returns
+        -------
+        results : dict
+            Results of the optimization. For details https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
+        """
+        options = {'gtol': kwargs.get('gtol',1e-16),'ftol':kwargs.get('ftol',1e-16), 'disp': verbose}
+        if 'maxiter' in kwargs :
+            options['maxiter'] = kwargs['maxiter']
+        method = kwargs.get('method', 'L-BFGS-B')
+        
+        res = minimize(self.GP.wrapper_neg_log_marginal_likelihood, self.initial_guess, method=method, bounds=self.bounds,options=options)
+        self.GP.acvf.parameters.values =  res.x
+        print("Optimization terminated successfully." if res.success else "/!\/!\/!\  Optimization failed! /!\/!\/!\ ")
+        return res
+        
+    def nested_sampling(self,priors,verbose=True,**kwargs,):
+        """ Optimize the (hyper)parameters of the Gaussian Process with nested sampling via ultranest.
+
+        Parameters
+        ----------
+        priors : function
+            Function to define the priors for the (hyper)parameters.
+        verbose : bool, optional
+            Print the results of the optimization and the progress of the sampling, by default True
+        **kwargs : dict
+            Keyword arguments for ultranest.
+                resume : bool
+                log_dir : str
+                run_kwargs : dict
+                    Dictionary of arguments for ReactiveNestedSampler.run()
+                        see https://johannesbuchner.github.io/UltraNest/ultranest.html#module-ultranest.integrator
+        
+        Returns
+        -------
+        results : dict
+            Dictionary of results from the nested sampling. 
+        """
+        
+        resume = kwargs.get('resume',True)
+        log_dir = kwargs.get('log_dir','GP_ultranest')
+        run_kwargs = kwargs.get('run_kwargs',{})
+        viz = {} if verbose else  {'show_status': False , 'viz_callback': void}
+        
+        sampler = ultranest.ReactiveNestedSampler(self.GP.acvf.parameters.names, self.GP.wrapper_log_marginal_likelihood,priors,resume=resume,log_dir=log_dir)
+        results = sampler.run(**run_kwargs, **viz)
+        sampler.plot()
         self.GP.acvf.parameters.values =  results['posterior']['median']
         return results 
     
+def void(*args, **kwargs):
+    """ Void function to avoid printing the status of the nested sampling."""
+    pass

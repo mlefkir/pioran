@@ -42,11 +42,11 @@ class Parameter:
             Name of the parameter.
         value : float
             Value of the parameter.
-        bounds : tuple
+        bounds : list
             Bounds of the parameter.
         free : bool
             If the parameter is free or fixed.
-        hyper : bool, optional
+        hyperpar : bool, optional
             If the parameter is an hyperparameter of the covariance function or not. The default is True.
         """
         self.name = name
@@ -56,8 +56,13 @@ class Parameter:
         self.hyperpar = hyperpar
     
     def __str__(self):
-        """Print the parameter in a pretty formatting.
+        """String representation of the Parameter class.
 
+        Returns
+        -------
+        str
+            String representation of the Parameter class.
+            In the form of {name value min max statut type}
         """
         return HEADER_PARAMETERS.format(Name=self.name,
                              Value=f"{self.value:5.7e}" if len(str(self.value)) > 14 else self.value,  
@@ -117,11 +122,6 @@ class ParametersCovFunction():
                 Boundaries of the parameters.
             free_parameters : list of bool
                 True if the parameter is free, False otherwise.
-        Raises
-        ------
-        ValueError
-            When the number of parameters or boundaries is not the same as the number of names.
-
         """
         # sanity checks
         assert len(param_values) == len(names), "The number of parameters is not the same as the number of names."
@@ -154,14 +154,20 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        parameter : Parameter object
+        parameter : Parameter
             Parameter to add to the object.
 
         """
         self.all[parameter.name] = parameter
         
     def __len__(self) -> int:
-        """Length of the object."""
+        """Length of the object.
+        
+        Returns
+        -------
+        int
+            Total number of parameters.
+        """
         return len(self.all)
     
     @property
@@ -183,9 +189,8 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        boundaries : list of (list of float or list of None)
+        new_boundaries : list of (list of float or list of None)
             Boundaries of the parameters.
-
         """
         assert len(new_boundaries) == len(self.all), "The number of boundaries is not the same as the number of parameters."
         # also update the boundaries of the parameters
@@ -260,8 +265,15 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        values : list of float or list of Parameter objects
+        new_values : list of float or list of Parameter objects
             Values of the parameters.
+            
+        Raises
+        ------
+        TypeError
+            When the new values are not a list of floats or Parameter objects.
+        ValueError
+            When the number of new values is not the same as the number of parameters.
         """
         if len(new_values) == len(self.all):
             if check_instance(new_values, Parameter):
@@ -295,7 +307,7 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        free_parameters : list of bool
+        new_free_parameters : list of bool
             True if the parameter is free, False otherwise.
         """
         assert len(new_free_parameters) == len(self.all), "The number of free parameters is not the same as the number of parameters."
@@ -317,6 +329,11 @@ class ParametersCovFunction():
         -------
         parameter : Parameter object
             Parameter with name "key".
+            
+        Raises
+        ------
+        KeyError
+            When the parameter is not in the list of parameters.
         """
         if key in self.all.keys():
             return self.all[key]
@@ -330,7 +347,7 @@ class ParametersCovFunction():
         ----------
         key : str
             Name of the parameter.
-        value : Parameter object
+        value : Parameter
             Value of the parameter with name "key".
 
         """
@@ -339,7 +356,13 @@ class ParametersCovFunction():
         self.free_parameters = [p.free for p in self.all.values()]
 
     def __str__(self):
-        """ Print the parameters. """
+        """ String representation of the Parameters object.
+        
+        Returns
+        -------
+        str 
+            Pretty table with the info on all parameters.
+        """
         s = "\n"+TABLE_LENGTH*"="+"\n"
         s += HEADER_PARAMETERS.format(Name="Name", Value="Value", Min="Min", Max="Max", Status="Status", Type="Type")
         s += "\n"+TABLE_LENGTH*"_"+"\n\n"
