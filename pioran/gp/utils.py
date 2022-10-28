@@ -1,5 +1,25 @@
 from numpy import linalg as la
+from scipy.spatial.distance import cdist
 import numpy as np
+
+
+def EuclideanDistance(xq, xp):
+    """Compute the Euclidian distance between two arrays.
+
+    using scipy.spatial.distance.cdist as it seems faster than a homemade version
+
+    Parameters
+    ----------
+    xq : array of shape (n, 1)
+
+    xp : array of shape (m, 1)
+
+    Returns
+    -------
+    array of shape (n, m)
+    """
+    return cdist(xq, xp, metric='euclidean')
+
 
 # ---- Code from Ahmed Fasih - https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd
 def nearest_positive_definite(A):

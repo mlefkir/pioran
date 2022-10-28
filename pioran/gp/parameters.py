@@ -4,7 +4,10 @@
 import numpy as np
 from .tools import check_instance
 
+# constants
 TYPE_NUMBER = (float,int,np.number)
+TABLE_LENGTH = 80
+HEADER_PARAMETERS = " {Name:<15} {Value:<14} {Min:<10} {Max:<10} {Status:<9} {Type:<15} "
 
 
 class Parameter:
@@ -20,7 +23,8 @@ class Parameter:
         Bounds of the parameter.
     free : bool
         If the parameter is free or fixed.
-
+    hyper : bool, optional
+            If the parameter is an hyperparameter of the covariance function or not. The default is True.
 
     Methods
     -------
@@ -29,7 +33,7 @@ class Parameter:
     
     """
     
-    def __init__(self, name: str, value: float, bounds: list, free: bool = True):
+    def __init__(self, name: str, value: float, bounds: list, free: bool = True, hyperpar = True):
         """Constructor method for the Parameter class.
         
         Parameters
@@ -42,23 +46,28 @@ class Parameter:
             Bounds of the parameter.
         free : bool
             If the parameter is free or fixed.
-        
+        hyper : bool, optional
+            If the parameter is an hyperparameter of the covariance function or not. The default is True.
         """
         self.name = name
         self.value = value
         self.bounds = bounds
         self.free = free
-        
+        self.hyperpar = hyperpar
     
     def __str__(self):
         """Print the parameter in a pretty formatting.
 
         """
-        bnd = lambda x : f"{self.bounds[x]:3.2e}" if self.bounds[x] is not None else " ... "
-        return f" {self.name:<15}{self.value:4e}\t({bnd(0)} , {bnd(1)})\t{'Free' if self.free else 'Fixed'}"
+        return HEADER_PARAMETERS.format(Name=self.name,
+                             Value=f"{self.value:5.7e}" if len(str(self.value)) > 14 else self.value,  
+                             Min=self.bounds[0] if self.bounds[0] is not None else "None", 
+                             Max=self.bounds[1] if self.bounds[0] is not None else "None", 
+                             Status='Free' if self.free else 'Fixed',
+                             Type='Hyper-parameter' if self.hyperpar else 'Model parameter')
 
 
-class ParametersCovFunction(dict):
+class ParametersCovFunction():
     """ Class for the parameters of a covariance function. 
 
     Initialised with a list of values for the parameters.
@@ -72,7 +81,7 @@ class ParametersCovFunction(dict):
         Names of the parameters.
     values : list of float
         Values of the parameters.
-    boundaries : list of tuples
+    boundaries : list of (list of float or list of None)
         Boundaries of the parameters.
     free_parameters : list of bool
         True if the parameter is free, False otherwise.
@@ -106,7 +115,8 @@ class ParametersCovFunction(dict):
         **kwargs : dict
             boundaries : list of float or list of None
                 Boundaries of the parameters.
-        
+            free_parameters : list of bool
+                True if the parameter is free, False otherwise.
         Raises
         ------
         ValueError
@@ -118,18 +128,24 @@ class ParametersCovFunction(dict):
         if "boundaries" in kwargs.keys():
             assert len(kwargs["boundaries"]) == len(names), "The number of boundaries is not the same as the number of names."
             boundaries = kwargs["boundaries"]
+        if "free_parameters" in kwargs.keys():
+            assert len(kwargs["free_parameters"]) == len(names), "The number of free parameters is not the same as the number of names."
+            free_parameters = kwargs["free_parameters"]
             
         # check if the parameters are given as a list of Parameter objects
         if check_instance(param_values, Parameter):
             self.all = dict(zip([p.name for p in param_values],param_values))
         elif check_instance(param_values, TYPE_NUMBER):
+            self.all = {key: Parameter(name=key, value=value, bounds=[None,None]) for (key, value) in zip(names, param_values)}
             if "boundaries" in kwargs.keys():
-                self.all = {key: Parameter(name=key, value=value, bounds=bounds) for (key, value,bounds) in zip(names, param_values, boundaries)}
-            else :
-                self.all = {key: Parameter(name=key, value=value, bounds=[None,None]) for (key, value) in zip(names, param_values)}
+                for i, key in enumerate(self.all.keys()):
+                    self.all[key].bounds = boundaries[i]
+            if "free_parameters" in kwargs.keys():
+                for i, key in enumerate(self.all.keys()):
+                    self.all[key].free = free_parameters[i]
 
         self.names = names
-        self.values = self.all.values() 
+        self.values = self.all.values()
         self.free_parameters = [p.free for p in self.all.values()]
         self.boundaries = [p.bounds for p in self.all.values()]
 
@@ -324,59 +340,10 @@ class ParametersCovFunction(dict):
 
     def __str__(self):
         """ Print the parameters. """
-        s = f"=======================================================\n"
-
-        s += f" name\t       value\t\t( min , max )\tstatus\n"
-        s +=f"-------------------------------------------------------\n"
+        s = "\n"+TABLE_LENGTH*"="+"\n"
+        s += HEADER_PARAMETERS.format(Name="Name", Value="Value", Min="Min", Max="Max", Status="Status", Type="Type")
+        s += "\n"+TABLE_LENGTH*"_"+"\n\n"
         for p in self.all.values():
-            s += p.__str__() + "\n"
-        s +=f"======================================================="
+            s += p.__str__() + "\n\n"
+        s += TABLE_LENGTH*"="+"\n"
         return s
-    
-        
-    # def update_boundaries(self, boundaries):
-    #     """ Update the boundaries of the parameters
-
-    #     Parameters
-    #     ----------
-    #     boundaries : list of tuples
-    #     """
-
-    #     assert len(boundaries) == len(
-    #         self.values), "The number of boundaries is not the same as the number of parameters."
-    #     self.boundaries = {}
-
-    #     for i, b in enumerate(boundaries):
-    #         assert len(b) == 2, "The boundaries must be a list of 2 elements."
-    #         self.boundaries[self.names[i]] = b
-
-    # def add_parameter(self, name, value, boundaries):
-    #     """ Add a parameter to the object.
-
-    #     Parameters
-    #     ----------
-    #     name : str
-    #         Name of the parameter.
-    #     value : float
-    #         Value of the parameter.
-    #     boundaries : tuple
-    #         Boundaries of the parameter.
-    #     """
-    #     self.names.append(name)
-    #     self.values.append(value)
-    #     self.boundaries[name] = boundaries
-
-
-    # def check_boundaries(self):
-    #     """ Check if the parameters are within the boundaries. 
-
-    #     Returns
-    #     -------
-    #     bool : True if the parameters are within the boundaries, False otherwise.
-    #     """
-    #     for i in range(len(self.names)):
-    #         if self.values[i] < self.boundaries[self.names[i]][0] or self.values[i] > self.boundaries[self.names[i]][1]:
-    #             return False
-    #     return True
-
-

@@ -13,6 +13,7 @@ from scipy.linalg import solve_triangular
 
 from .utils import nearest_positive_definite
 from .acvcore import CovarianceFunction
+from .parameters import Parameter
 
 
 class GaussianProcess:
@@ -21,7 +22,7 @@ class GaussianProcess:
         
     Attributes
     ----------
-    acf : CovarianceFunction
+    acvf : CovarianceFunction
         Autocovariance function associated to the Gaussian Process.
     training_indexes : array of shape (n,1)
         Indexes of the training data.
@@ -38,13 +39,13 @@ class GaussianProcess:
     -------
     get_cov
         Compute the covariance matrix between two arrays.
-    computePosteriorDistributions
+    compute_posterior_distributions
         Compute the posterior distributions for the training data.
-    computeLogMarginalLikelihood
+    compute_log_marginal_likelihood
         Compute the log marginal likelihood.
-    wrapperLogMarginalLikelihood
+    wrapper_log_marginal_likelihood
         Wrapper to compute the log marginal likelihood.
-    wrapperNegLogMarginalLikelihood
+    wrapper_neg_log_marginal_likelihood
         Wrapper to compute the negative log marginal likelihood.
     """
 
@@ -73,11 +74,11 @@ class GaussianProcess:
                 Estimate the mean of the training data, by default True.
         """
         
-        self.acf = covariance_function
+        self.acvf = covariance_function
         # add a factor to scale the errors
         self.scale_errors = kwargs.get("scale_errors",True)
         if self.scale_errors:
-            self.acf.parameters.add_parameter("nu", 1.0,(0.0, 100.0))
+            self.acvf.parameters.append(Parameter(name="nu", value=1.0,bounds=[0.0, 100.0],free=True,hyperpar=False))
         
         # Check if the training arrays have the same shape
         if training_errors is None:
@@ -94,7 +95,8 @@ class GaussianProcess:
         # add the mean of the observed data as a parameter
         self.estimate_mean = kwargs.get("estimate_mean",True)
         if self.estimate_mean:
-            self.acf.parameters.add_parameter("mu", np.mean(self.training_observables),(np.min(self.training_observables), np.max(self.training_observables)))
+            self.acvf.parameters.append(Parameter(name="mu", value=np.mean(self.training_observables),bounds=[np.min(self.training_observables), np.max(self.training_observables)],free=True,hyperpar=False))
+
         else :
             print("The mean of the training data is not estimated. Be careful of the data included in the training set.")
        
@@ -151,12 +153,12 @@ class GaussianProcess:
         """
         # if not errors return the covariance matrix
         if errors is None:
-            return self.acf.get_cov_matrix(xt, xp)
+            return self.acvf.get_cov_matrix(xt, xp)
         # if errors and we want to scale them 
         if self.scale_errors:
-            return self.acf.get_cov_matrix(xt, xp) + self.acf.parameters["nu"] * np.diag(errors**2)
+            return self.acvf.get_cov_matrix(xt, xp) + self.acvf.parameters["nu"].value * np.diag(errors**2)
         # if we do not want to scale the errors
-        return self.acf.get_cov_matrix(xt, xp) + np.diag(errors**2)
+        return self.acvf.get_cov_matrix(xt, xp) + np.diag(errors**2)
 
     def get_cov_training(self):
         
@@ -164,12 +166,12 @@ class GaussianProcess:
         Cov_xx = self.get_cov(self.training_indexes, self.training_indexes,errors = self.training_errors)
         Cov_inv = np.linalg.inv(Cov_xx)#solve(Cov_xx,np.eye(len(self.training_indexes)))
         if self.estimate_mean:
-            alpha = Cov_inv@(self.training_observables-self.acf.parameters["mu"])
+            alpha = Cov_inv@(self.training_observables-self.acvf.parameters["mu"].value)
         else :
             alpha = Cov_inv@(self.training_observables)
         return Cov_xx, Cov_inv, alpha
         
-    def computePosteriorDistributions(self):
+    def compute_posterior_distributions(self):
         """ Compute the posterior distribution for a given query and training set. 
         
         
@@ -183,7 +185,7 @@ class GaussianProcess:
         
         # Compute the posterior mean 
         if self.estimate_mean:
-            posterior_mean = Cov_xxp.T@alpha + self.acf.parameters["mu"]
+            posterior_mean = Cov_xxp.T@alpha + self.acvf.parameters["mu"].value
         else :
             posterior_mean = Cov_xxp.T@alpha
         # Compute the posterior covariance
@@ -191,7 +193,7 @@ class GaussianProcess:
         
         return posterior_mean, posterior_covariance
 
-    def computeLogMarginalLikelihood(self):
+    def compute_log_marginal_likelihood(self):
         """ Compute the log marginal likelihood. 
         
         
@@ -205,13 +207,13 @@ class GaussianProcess:
             L = cholesky(nearest_positive_definite(Cov_xx),lower=True)
         
         if self.estimate_mean:
-            z = solve_triangular(L,self.training_observables-self.acf.parameters["mu"],lower=True)
+            z = solve_triangular(L,self.training_observables-self.acvf.parameters["mu"].value,lower=True)
         else :
             z = solve_triangular(L,self.training_observables,lower=True)
             
         return -( (np.sum(np.log(np.diagonal(L))) + 0.5 * len(self.training_indexes) * np.log(2*np.pi) + 0.5 * (z.T@z) ).flatten()[0])
 
-    def wrapperLogMarginalLikelihood(self, parameters):
+    def wrapper_log_marginal_likelihood(self, parameters):
         """ Wrapper to compute the log marginal likelihood in function of the (hyper)parameters. 
         
         Parameters
@@ -219,10 +221,10 @@ class GaussianProcess:
         parameters : array of shape (n)
             (Hyper)parameters of the covariance function.
         """
-        self.acf.parameters.values = parameters
-        return -self.computeLogMarginalLikelihood()
+        self.acvf.parameters.values = parameters
+        return -self.compute_log_marginal_likelihood()
     
-    def wrapperNegLogMarginalLikelihood(self, parameters):
+    def wrapper_neg_log_marginal_likelihood(self, parameters):
         """ Wrapper to compute the negative log marginal likelihood in function of the (hyper)parameters. 
         
         Parameters
@@ -230,6 +232,13 @@ class GaussianProcess:
         parameters : array of shape (n)
             (Hyper)parameters of the covariance function.
         """
-        self.acf.parameters.values = parameters
-        return self.computeLogMarginalLikelihood()
+        self.acvf.parameters.values = parameters
+        return self.compute_log_marginal_likelihood()
     
+    def __str__(self) -> str:
+        """String representation of the GP object."""
+        s = "----- Gaussian Process object -----\n"
+        s += "Estimate mean \n" if self.estimate_mean else "Do not estimate mean \n"
+        s += "Scale errors \n" if self.scale_errors else "Do not scale errors \n"
+        s +=  self.acvf.__str__()
+        return s
