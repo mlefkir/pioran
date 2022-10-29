@@ -5,14 +5,12 @@
 - Matern 3/2
 - Matern 5/2
 - Rational Quadratic
-
 """
 
 import numpy as np
 from .acvcore import CovarianceFunction
 from .utils import EuclideanDistance
-
-
+ 
 
 class Exponential(CovarianceFunction):
     """ Class for the exponential covariance function.
@@ -45,8 +43,7 @@ class Exponential(CovarianceFunction):
         assert len(parameters_values) == 2, 'The number of parameters for this  covariance function must be 2'
         free_parameters = kwargs.get('free_parameters', [True, True])
         # initialise the parameters and check
-        CovarianceFunction.__init__(self, parameters_values, names=[
-                                    'variance', 'lengthscale'], boundaries=[[0, np.inf], [0, np.inf]], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, parameters_values, names=['variance', 'lengthscale'], boundaries=[[0, np.inf], [0, np.inf]], free_parameters=free_parameters)
 
     def get_cov_matrix(self, xq, xp):
         """Compute the covariance matrix between two arrays for the exponential covariance function.
@@ -70,8 +67,7 @@ class Exponential(CovarianceFunction):
         # Compute the Euclidean distance between the query and the points
         dist = EuclideanDistance(xq, xp)
         # Compute the covariance matrix
-        covMat = self.parameters['variance'].value * \
-            np.exp(- dist / self.parameters['lengthscale'].value)
+        covMat = self.parameters['variance'].value * np.exp(- dist / self.parameters['lengthscale'].value)
 
         return covMat
 
@@ -108,8 +104,7 @@ class SquareExponential(CovarianceFunction):
 
         free_parameters = kwargs.get('free_parameters', [True, True])
         # initialise the parameters and check
-        CovarianceFunction.__init__(self, parameters_values, names=[
-                                    'variance', 'lengthscale'], boundaries=[[0, np.inf], [0, np.inf]], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, parameters_values, names=['variance', 'lengthscale'], boundaries=[[0, np.inf], [0, np.inf]], free_parameters=free_parameters)
 
     def get_cov_matrix(self, xq, xp):
         """Compute the covariance matrix between two arrays for the square exponential covariance function.
@@ -133,8 +128,7 @@ class SquareExponential(CovarianceFunction):
         # Compute the Euclidean distance between the query and the points
         dist = EuclideanDistance(xq, xp)
         # Compute the covariance matrix
-        covMat = self.parameters['variance'].value * \
-            np.exp(-0.5 * dist**2 / self.parameters['lengthscale'].value**2)
+        covMat = self.parameters['variance'].value *  np.exp(-0.5 * dist**2 / self.parameters['lengthscale'].value**2)
         return covMat
 
 
@@ -169,8 +163,7 @@ class Matern32(CovarianceFunction):
         assert len(parameters_values) == 2, 'The number of parameters for this covariance function must be 2'
         free_parameters = kwargs.get('free_parameters', [True, True])
         # initialise the parameters and check
-        CovarianceFunction.__init__(self, parameters_values, names=[
-                                    'variance', 'lengthscale'], boundaries=[[0, np.inf], [0, np.inf]], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, parameters_values, names=['variance', 'lengthscale'], boundaries=[[0, np.inf], [0, np.inf]], free_parameters=free_parameters)
 
     def get_cov_matrix(self, xq, xp):
         """Compute the covariance matrix between two arrays for the Matern 3/2 covariance function.
@@ -194,8 +187,7 @@ class Matern32(CovarianceFunction):
         # Compute the Euclidean distance between the query and the points
         dist = EuclideanDistance(xq, xp)
         # Compute the covariance matrix
-        covMat = self.parameters['variance'].value * (1 + np.sqrt(3) * dist / self.parameters['lengthscale'].value ) * \
-            np.exp(- np.sqrt(3) * dist / self.parameters['lengthscale'].value )
+        covMat = self.parameters['variance'].value * (1 + np.sqrt(3) * dist / self.parameters['lengthscale'].value ) * np.exp(-np.sqrt(3) * dist / self.parameters['lengthscale'].value )
         return covMat
 
 
@@ -230,8 +222,7 @@ class Matern52(CovarianceFunction):
         assert len(parameters_values) == 2, 'The number of parameters for this covariance function must be 2'
         free_parameters = kwargs.get('free_parameters', [True, True])
         # initialise the parameters and check
-        CovarianceFunction.__init__(self, parameters_values, names=[
-                                    'variance', 'lengthscale'], boundaries=[[0, np.inf], [0, np.inf]], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, parameters_values, names=['variance', 'lengthscale'], boundaries=[[0, np.inf], [0, np.inf]], free_parameters=free_parameters)
 
     def get_cov_matrix(self, xq, xp):
         """Compute the covariance matrix between two arrays for the Matern 5/2 covariance function.
@@ -255,8 +246,7 @@ class Matern52(CovarianceFunction):
         # Compute the Euclidean distance between the query and the points
         dist = EuclideanDistance(xq, xp)
         # Compute the covariance matrix
-        covMat = self.parameters['variance'].value * (1 + np.sqrt(5) * dist / self.parameters['lengthscale'].value + 5 * dist**2 / (
-            3 * self.parameters['lengthscale'].value)) * np.exp( - np.sqrt(3) * dist / self.parameters['lengthscale'].value )
+        covMat = self.parameters['variance'].value * (1 + np.sqrt(5) * dist / self.parameters['lengthscale'].value + 5 * dist**2 / ( 3 * self.parameters['lengthscale'].value**2) ) * np.exp( - np.sqrt(5) * dist / self.parameters['lengthscale'].value )
         return covMat
 
 
@@ -293,8 +283,7 @@ class RationalQuadratic(CovarianceFunction):
         free_parameters = kwargs.get('free_parameters', [True, True, True])
         # initialise the parameters
         assert len(parameters_values) == 3, 'The number of parameters for the rational quadratic covariance function is 3.'
-        CovarianceFunction.__init__(self, parameters_values, names=[
-                                    'variance', 'alpha', 'lengthscale'], boundaries=[[0, np.inf], [0, np.inf], [0, np.inf]], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, parameters_values, names=[ 'variance', 'alpha', 'lengthscale'], boundaries=[[0, np.inf], [0, np.inf], [0, np.inf]], free_parameters=free_parameters)
 
     def get_cov_matrix(self, xq, xp):
         """Compute the covariance matrix between two arrays for the rational quadratic covariance function.
