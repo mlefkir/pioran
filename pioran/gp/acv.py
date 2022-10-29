@@ -318,6 +318,5 @@ class RationalQuadratic(CovarianceFunction):
         # Compute the Euclidean distance between the query and the points
         dist = EuclideanDistance(xq, xp)
         # Compute the covariance matrix
-        covMat = self.parameters['variance'].value* (1 + dist**2 / (
-            2 * self.parameters['alpha'].value* self.parameters['lengthscale'].value**2) ** (- self.parameter['alpha'].value))
+        covMat = self.parameters['variance'].value * (1 + dist**2 / ( 2 * self.parameters['alpha'].value * self.parameters['lengthscale'].value**2) ) ** ( - self.parameters['alpha'].value)
         return covMat
