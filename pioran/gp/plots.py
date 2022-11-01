@@ -5,12 +5,84 @@
 import numpy as np
 import matplotlib.pyplot as plt    
 from matplotlib.ticker import AutoMinorLocator
+import plotly.graph_objects as go
 
 from .core import GaussianProcess
 
 
 plt.style.use("https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs.mplstyle")
 
+def plot_prediction_plotly(gp, name, figsize=(18, 5), title="flux", xlabel="Time", ylabel="Flux"):
+    predict_mean, predict_var = gp.compute_predictive_distribution()
+
+    std = np.sqrt(np.diag(predict_var))
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=gp.training_indexes.flatten(), 
+        y=gp.training_observables.flatten(),
+        mode='markers',
+        name='observations',
+        error_y=dict(
+            array=gp.training_errors.flatten(),
+            symmetric=True,
+            thickness=1.5,
+            width=3,
+        ),
+        marker=dict( size=8)
+    ))
+    fig.add_trace(go.Scatter(
+        x=gp.prediction_indexes.flatten(), y=predict_mean.flatten(),
+        name='GP'
+    ))
+    fig.add_trace(go.Scatter(
+            name = r'$\pm 1\sigma$',
+            x = gp.prediction_indexes.flatten(),
+            y = (predict_mean.T+std).flatten(),
+            mode='lines',
+            marker=dict(color="#444"),
+            line=dict(width=0),
+            showlegend=True
+        ))
+    fig.add_trace(go.Scatter(
+            name='Lower Bound',
+            x=gp.prediction_indexes.flatten(),
+            y=(predict_mean.T-std).flatten(),
+            marker=dict(color="#444"),
+            line=dict(width=0),
+            mode='lines',
+            fillcolor='rgba(68, 68, 68, 0.3)',
+            fill='tonexty',
+            showlegend=False
+    ))
+    fig.add_trace(go.Scatter(
+            name = r'$\pm 2\sigma$',
+            x = gp.prediction_indexes.flatten(),
+            y = (predict_mean.T+2*std).flatten(),
+            mode='lines',
+            marker=dict(color="#444"),
+            line=dict(width=0),
+            showlegend=True
+        ))
+    fig.add_trace(go.Scatter(
+            name='Lower Bound',
+            x=gp.prediction_indexes.flatten(),
+            y=(predict_mean.T-2*std).flatten(),
+            marker=dict(color="#444"),
+            line=dict(width=0),
+            mode='lines',
+            fillcolor='rgba(34, 23, 223, 0.3)',
+            fill='tonexty',
+            showlegend=False
+    ))
+    fig.update_layout(
+        yaxis_title='Flux',
+        xaxis_title='Time',
+        title='Light curve of FAIRALL 9',
+        hovermode="x"
+    )
+    fig.write_html(f"{name}.html")
+
+    fig.show()
 
 def plot_prediction(GP: GaussianProcess,filename,figsize,confidence_bands=True,title=None,xlabel=None,ylabel=None,xlim=None,ylim=None):
     """Plot the prediction of the Gaussian Process.

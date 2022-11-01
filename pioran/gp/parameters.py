@@ -64,10 +64,22 @@ class Parameter:
             String representation of the Parameter class.
             In the form of {name value min max statut type}
         """
+        
+        bnd_str = []
+        for bnd in self.bounds:
+            if bnd is not None:
+                if len(str(bnd)) > 9:
+                    bnd_str.append(f"{bnd:5.3e}")
+                else:
+                    bnd_str.append(f"{bnd}")
+            else :
+                bnd_str.append("None")
+        
+        self.bounds[0] if self.bounds[0] is not None else "None", 
         return HEADER_PARAMETERS.format(Name=self.name,
                              Value=f"{self.value:5.7e}" if len(str(self.value)) > 14 else self.value,  
-                             Min=self.bounds[0] if self.bounds[0] is not None else "None", 
-                             Max=self.bounds[1] if self.bounds[0] is not None else "None", 
+                             Min=bnd_str[0], 
+                             Max=bnd_str[1], 
                              Status='Free' if self.free else 'Fixed',
                              Type='Hyper-parameter' if self.hyperpar else 'Model parameter')
 
