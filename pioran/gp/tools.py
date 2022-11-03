@@ -6,9 +6,9 @@ def check_instance(list_of_obj, classinfo):
     
     Parameters
     ----------
-    list_of_obj : list of objects
+    list_of_obj: list of objects
         List of objects to check.
-    classinfo : class
+    classinfo: class
         Class to check.
     
     Returns
