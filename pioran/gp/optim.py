@@ -15,22 +15,28 @@ class Optimizer:
     
     Attributes
     ----------
-    GP : GaussianProcess
+    GP: GaussianProcess
         Gaussian Process object.
-    initial_guess : list of float
+    initial_guess: list of float
         Initial guess for the (hyper)parameters.
-    bounds : list of tuple
+    bounds: list of tuple
         Bounds for the (hyper)parameters.
-    method : str
+    method: str
         Method to maximise the marginal likelihood.
-        - "L-BFGS-B" : using scipy.optimize.minimize
-        - "nested" : using nested sampling via ultranest
+        - "L-BFGS-B": using scipy.optimize.minimize
+        - "nested": using nested sampling via ultranest
     
-    results : dict
+    results: dict
         Results of the optimization.
     
     Methods
     -------
+    run:
+        Optimize the (hyper)parameters of the Gaussian Process.
+    Optimize_ML:
+        Optimize the (hyper)parameters of the Gaussian Process using scipy.optimize.minimize.
+    nested_sampling:
+        Optimize the (hyper)parameters of the Gaussian Process using nested sampling via ultranest.
     
     """
     
@@ -39,15 +45,15 @@ class Optimizer:
 
         Parameters
         ----------
-        GP : GaussianProcess
+        GP: GaussianProcess
             Gaussian Process object.
-        method : str, optional
+        method: str, optional
             Method to maximise the marginal likelihood, by default "L-BFGS-B"
-            - "ML : using scipy.optimize.minimize
-            - "NS" : using nested sampling via ultranest
-        x0 : list of floats, optional
+            - "ML: using scipy.optimize.minimize
+            - "NS": using nested sampling via ultranest
+        x0: list of floats, optional
             Initial guess for the (hyper)parameters, by default None (it will select the free parameters in GP.acvf.parameters.values)
-        bounds : list of tuple, optional
+        bounds: list of tuple, optional
             Bounds for the (hyper)parameters, by default None (it will select the free parameters in GP.acvf.parameters.boundaries)
             
         Raises
@@ -59,29 +65,29 @@ class Optimizer:
         self.GP = GP
         
         # set values for the (hyper)parameters to optimize
-        if x0 is not None :
+        if x0 is not None:
             # check if x0 is a list or a numpy array
             if isinstance(x0, list) or isinstance(x0, np.ndarray):
                 self.initial_guess = x0 
                 # add the initial guess of nu and mu if they are not in x0
                 if  len(self.initial_guess) != len(self.GP.acvf.parameters.free_parameters):
-                    if self.GP.estimate_mean : self.initial_guess.append(self.GP.acvf.parameters["nu"].value)
-                    if self.GP.estimate_mean :  self.initial_guess.append(self.GP.acvf.parameters["mu"].value)   
+                    if self.GP.estimate_mean: self.initial_guess.append(self.GP.acvf.parameters["nu"].value)
+                    if self.GP.estimate_mean:  self.initial_guess.append(self.GP.acvf.parameters["mu"].value)   
                     assert len(self.initial_guess) == len(self.GP.acvf.parameters.free_parameters), f"The number of initial guesses ({len(self.initial_guess)}) is not the same as the number of free parameters ({len(self.GP.acvf.parameters.free_parameters)}) to optimize."
             else:
                 raise TypeError("x0 must be a list or a numpy array.")
         # if x0 is None, use the values of the (hyper)parameters in GP.acvf.parameters.values
-        else :
+        else:
             self.initial_guess = [val for (val, free) in zip(self.GP.acvf.parameters.values, self.GP.acvf.parameters.free_parameters) if free]
         
         # set the boundaries
-        if bounds is not None :
+        if bounds is not None:
             if isinstance(bounds, list) or isinstance(bounds, np.ndarray):
                 self.bounds = bounds
                 if not len(self.bounds) == len(self.GP.acvf.parameters.free_parameters):
                     # add the boundaries of nu and mu
-                    if self.GP.scale_errors : self.bounds.append(self.GP.acvf.parameters["nu"].bounds)
-                    if self.GP.estimate_mean : self.bounds.append(self.GP.acvf.parameters["mu"].bounds)
+                    if self.GP.scale_errors: self.bounds.append(self.GP.acvf.parameters["nu"].bounds)
+                    if self.GP.estimate_mean: self.bounds.append(self.GP.acvf.parameters["mu"].bounds)
                     assert len(self.bounds) == len(self.GP.acvf.parameters.free_parameters), f"The number of boundaries ({len(self.bounds)}) is not the same as the number of free parameters  ({len(self.GP.acvf.parameters.free_parameters)}) to optimize."
             else:
                 raise TypeError("bounds must be a list or a numpy array.")
@@ -100,11 +106,11 @@ class Optimizer:
         
         Parameters
         ----------
-        priors : function, optional, by default None
+        priors: function, optional, by default None
             Function to define the priors for the (hyper)parameters.
-        verbose : bool, optional
+        verbose: bool, optional
             Print the results of the optimization, by default False
-        **kwargs : dict
+        **kwargs: dict
             Additional arguments for the optimization method.
                 For ML: see 'optimize_ML' docstring
                 For NS: see 'nested_sampling' docstring
@@ -116,7 +122,7 @@ class Optimizer:
         
         Returns
         -------
-        results : dict
+        results: dict
             Results of the optimization. Different keys depending on the method.
         """
         if self.method == "ML":
@@ -137,21 +143,21 @@ class Optimizer:
         
         Parameters
         ----------
-        verbose : bool, optional
+        verbose: bool, optional
             Print the results of the optimization, by default True
-        **kwargs : dict
+        **kwargs: dict
             Keyword arguments for scipy.optimize.minimize.
-                gtol : float
-                ftol : float
-                maxiter : int
+                gtol: float
+                ftol: float
+                maxiter: int
                 
         Returns
         -------
-        results : dict
+        results: dict
             Results of the optimization. For details https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
         """
         options = {'gtol': kwargs.get('gtol',1e-16),'ftol':kwargs.get('ftol',1e-16), 'disp': verbose}
-        if 'maxiter' in kwargs :
+        if 'maxiter' in kwargs:
             options['maxiter'] = kwargs['maxiter']
         method = kwargs.get('method', 'L-BFGS-B')
         
@@ -165,21 +171,20 @@ class Optimizer:
 
         Parameters
         ----------
-        priors : function
+        priors: function
             Function to define the priors for the (hyper)parameters.
-        verbose : bool, optional
+        verbose: bool, optional
             Print the results of the optimization and the progress of the sampling, by default True
-        **kwargs : dict
-            Keyword arguments for ultranest.
-                resume : bool
-                log_dir : str
-                run_kwargs : dict
-                    Dictionary of arguments for ReactiveNestedSampler.run()
-                        see https://johannesbuchner.github.io/UltraNest/ultranest.html#module-ultranest.integrator
+        **kwargs: dict
+            Keyword arguments for ultranest
+                - resume: bool
+                - log_dir: str
+                - run_kwargs: dict
+                - Dictionary of arguments for ReactiveNestedSampler.run() see https://johannesbuchner.github.io/UltraNest/ultranest.html#module-ultranest.integrator
         
         Returns
         -------
-        results : dict
+        results: dict
             Dictionary of results from the nested sampling. 
         """
         

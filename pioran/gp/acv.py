@@ -19,12 +19,12 @@ class Exponential(CovarianceFunction):
 
     Attributes
     ----------
-    parameters : ParametersCovFunction
+    parameters: ParametersCovFunction
         Parameters of the covariance function.
 
     Methods
     -------
-    get_cov_matrix
+    get_cov_matrix:
         Compute the covariance matrix between two arrays.
     """
 
@@ -33,11 +33,11 @@ class Exponential(CovarianceFunction):
 
         Parameters
         ----------
-        parameters_values : list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersCovFunction
             Values of the parameters of the covariance function.
-        **kwargs : dict
+        **kwargs: dict
             Arguments for the ParametersCovFunction class.
-            free_parameters : list of bool
+            free_parameters: list of bool
                 List of bool to indicate if the parameters are free or not.
         """
         assert len(parameters_values) == 2, 'The number of parameters for this  covariance function must be 2'
@@ -54,14 +54,14 @@ class Exponential(CovarianceFunction):
 
         Parameters
         ----------
-        xq : array of shape (n,1)
+        xq: array of shape (n,1)
             First array.
-        xp : array  of shape (m,1)
+        xp: array  of shape (m,1)
             Second array.
 
         Returns
         -------
-        K : array of shape (n,m)
+        K: array of shape (n,m)
             Covariance matrix.
         """
         # Compute the Euclidean distance between the query and the points
@@ -79,12 +79,12 @@ class SquareExponential(CovarianceFunction):
 
     Attributes
     ----------
-    parameters : ParametersCovFunction
+    parameters: ParametersCovFunction
         Parameters of the covariance function.
 
     Methods
     -------
-    get_cov_matrix
+    get_cov_matrix:
         Compute the covariance matrix between two arrays.
     """
 
@@ -93,11 +93,11 @@ class SquareExponential(CovarianceFunction):
 
         Parameters
         ----------
-        parameters_values : list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersCovFunction
             Values of the parameters of the covariance function.
-        **kwargs : dict
+        **kwargs: dict
             Arguments for the ParametersCovFunction class.
-            free_parameters : list of bool
+            free_parameters: list of bool
                 List of bool to indicate if the parameters are free or not.
         """
         assert len(parameters_values) == 2, 'The number of parameters for this covariance function must be 2'
@@ -115,14 +115,14 @@ class SquareExponential(CovarianceFunction):
 
         Parameters
         ----------
-        xq : array of shape (n,1)
+        xq: array of shape (n,1)
             First array.
-        xp : array  of shape (m,1)
+        xp: array  of shape (m,1)
             Second array.
 
         Returns
         -------
-        K : array of shape (n,m)
+        K: array of shape (n,m)
             Covariance matrix.
         """
         # Compute the Euclidean distance between the query and the points
@@ -139,12 +139,12 @@ class Matern32(CovarianceFunction):
 
     Attributes
     ----------
-    parameters : ParametersCovFunction
+    parameters: ParametersCovFunction
         Parameters of the covariance function.
 
     Methods
     -------
-    get_cov_matrix
+    get_cov_matrix:
         Compute the covariance matrix between two arrays.
     """
 
@@ -153,11 +153,11 @@ class Matern32(CovarianceFunction):
 
         Parameters
         ----------
-        parameters_values : list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersCovFunction
             Values of the parameters of the covariance function.
-        **kwargs : dict
+        **kwargs: dict
             Arguments for the ParametersCovFunction class.
-            free_parameters : list of bool
+            free_parameters: list of bool
                 List of bool to indicate if the parameters are free or not.
         """
         assert len(parameters_values) == 2, 'The number of parameters for this covariance function must be 2'
@@ -174,14 +174,14 @@ class Matern32(CovarianceFunction):
 
         Parameters
         ----------
-        xq : array of shape (n,1)
+        xq: array of shape (n,1)
             First array.
-        xp : array  of shape (m,1)
+        xp: array  of shape (m,1)
             Second array.
 
         Returns
         -------
-        K : array of shape (n,m)
+        K: array of shape (n,m)
             Covariance matrix.
         """
         # Compute the Euclidean distance between the query and the points
@@ -198,12 +198,12 @@ class Matern52(CovarianceFunction):
 
     Attributes
     ----------
-    parameters : ParametersCovFunction
+    parameters: ParametersCovFunction
         Parameters of the covariance function.
 
     Methods
     -------
-    get_cov_matrix
+    get_cov_matrix:
         Compute the covariance matrix between two arrays.
     """
 
@@ -212,11 +212,11 @@ class Matern52(CovarianceFunction):
 
         Parameters
         ----------
-        parameters_values : list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersCovFunction
             Values of the parameters of the covariance function.
-        **kwargs : dict
+        **kwargs: dict
             Arguments for the ParametersCovFunction class.
-            free_parameters : list of bool
+            free_parameters: list of bool
                 List of bool to indicate if the parameters are free or not.
         """
         assert len(parameters_values) == 2, 'The number of parameters for this covariance function must be 2'
@@ -233,14 +233,14 @@ class Matern52(CovarianceFunction):
 
         Parameters
         ----------
-        xq : array of shape (n,1)
+        xq: array of shape (n,1)
             First array.
-        xp : array  of shape (m,1)
+        xp: array  of shape (m,1)
             Second array.
 
         Returns
         -------
-        K : array of shape (n,m)
+        K: array of shape (n,m)
             Covariance matrix.
         """
         # Compute the Euclidean distance between the query and the points
@@ -259,12 +259,12 @@ class RationalQuadratic(CovarianceFunction):
 
     Attributes
     ----------
-    parameters : ParametersCovFunction
+    parameters: ParametersCovFunction
         Parameters of the covariance function.
 
     Methods
     -------
-    get_cov_matrix
+    get_cov_matrix:
         Compute the covariance matrix between two arrays.
     """
     
@@ -273,11 +273,11 @@ class RationalQuadratic(CovarianceFunction):
 
         Parameters
         ----------
-        parameters_values : list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersCovFunction
             Values of the parameters of the covariance function.
-        **kwargs : dict
+        **kwargs: dict
             Arguments for the ParametersCovFunction class.
-            free_parameters : list of bool
+            free_parameters: list of bool
                 List of bool to indicate if the parameters are free or not.
         """
         free_parameters = kwargs.get('free_parameters', [True, True, True])
@@ -294,14 +294,14 @@ class RationalQuadratic(CovarianceFunction):
 
         Parameters
         ----------
-        xq : array of shape (n,1)
+        xq: array of shape (n,1)
             First array.
-        xp : array  of shape (m,1)
+        xp: array  of shape (m,1)
             Second array.
 
         Returns
         -------
-        K : array of shape (n,m)
+        K: array of shape (n,m)
             Covariance matrix.
         """
         # Compute the Euclidean distance between the query and the points

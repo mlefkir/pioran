@@ -15,20 +15,22 @@ class Parameter:
     
     Attributes
     ----------
-    name : str
+    name: str
         Name of the parameter.
-    value : float
+    value: float
         Value of the parameter.
-    bounds : tuple
+    bounds: list
         Bounds of the parameter.
-    free : bool
+    free: bool
         If the parameter is free or fixed.
-    hyper : bool, optional
+    hyper: bool, optional
             If the parameter is an hyperparameter of the covariance function or not. The default is True.
 
     Methods
     -------
-    __str__(self)
+    __init__:
+        Constructor method for the Parameter class.
+    __str__:
         Print the parameters.
     
     """
@@ -38,15 +40,15 @@ class Parameter:
         
         Parameters
         ----------
-        name : str
+        name: str
             Name of the parameter.
-        value : float
+        value: float
             Value of the parameter.
-        bounds : list
+        bounds: list
             Bounds of the parameter.
-        free : bool
+        free: bool
             If the parameter is free or fixed.
-        hyperpar : bool, optional
+        hyperpar: bool, optional
             If the parameter is an hyperparameter of the covariance function or not. The default is True.
         """
         self.name = name
@@ -72,7 +74,7 @@ class Parameter:
                     bnd_str.append(f"{bnd:5.3e}")
                 else:
                     bnd_str.append(f"{bnd}")
-            else :
+            else:
                 bnd_str.append("None")
         
         self.bounds[0] if self.bounds[0] is not None else "None", 
@@ -92,30 +94,30 @@ class ParametersCovFunction():
 
     Attributes
     ----------
-    all : dict of Parameter objects
+    all: dict of Parameter objects
         Dictionary with the name of the parameter as key and the Parameter object as value.
-    names : list of str
+    names: list of str
         Names of the parameters.
-    values : list of float
+    values: list of float
         Values of the parameters.
-    boundaries : list of (list of float or list of None)
+    boundaries: list of (list of float or list of None)
         Boundaries of the parameters.
-    free_parameters : list of bool
+    free_parameters: list of bool
         True if the parameter is free, False otherwise.
 
     Methods
     -------
-    update_names
+    update_names:
         Update the parameters names.
-    update_boundaries
+    update_boundaries:
         Update the boundaries of the parameters.
-    add_parameter
+    add_parameter:
         Add a parameter to the object.
-    check_boundaries
+    check_boundaries:
         Check if the parameters are within the boundaries.
-    print_parameters
+    print_parameters:
         Print the parameters.
-    __getitem__
+    __getitem__:
         Get the value of a parameter using the name of the parameter in square brackets.
 
     """
@@ -125,14 +127,14 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        param_values : list of float or list of Parameter objects
+        param_values: list of float or list of Parameter objects
             Values of the parameters.
-        names : list of str
+        names: list of str
             Names of the parameters.
-        **kwargs : dict
-            boundaries : list of float or list of None
+        **kwargs: dict
+            boundaries: list of float or list of None
                 Boundaries of the parameters.
-            free_parameters : list of bool
+            free_parameters: list of bool
                 True if the parameter is free, False otherwise.
         """
         # sanity checks
@@ -166,7 +168,7 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        parameter : Parameter
+        parameter: Parameter
             Parameter to add to the object.
 
         """
@@ -188,7 +190,7 @@ class ParametersCovFunction():
 
         Returns
         -------
-        boundaries : list of tuples
+        boundaries: list of lists
             Boundaries of the parameters.
         """
         # update the list of boundaries if the boundaries of the parameters have changed
@@ -201,7 +203,7 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        new_boundaries : list of (list of float or list of None)
+        new_boundaries: list of (list of float or list of None)
             Boundaries of the parameters.
         """
         assert len(new_boundaries) == len(self.all), "The number of boundaries is not the same as the number of parameters."
@@ -212,7 +214,7 @@ class ParametersCovFunction():
             # check the boundaries
             if (b[0] is not None and  b[1] is not None):
                 assert b[0] < b[1], "The lower boundary must be smaller than the upper boundary."
-            else :
+            else:
                 assert b[0] is None or b[1] is None, "The boundaries must be None or a number."            
             self.all[self.names[i]].bounds = b
             
@@ -237,7 +239,7 @@ class ParametersCovFunction():
         
         Parameters
         ----------
-        new_names : list of str
+        new_names: list of str
             New names of the parameters.
             
         Raises
@@ -264,7 +266,7 @@ class ParametersCovFunction():
 
         Returns
         -------
-        values : list of float
+        values: list of float
             Values of the parameters.
         """
         # update the values in case they have changed since the last call
@@ -277,7 +279,7 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        new_values : list of float or list of Parameter objects
+        new_values: list of float or list of Parameter objects
             Values of the parameters.
             
         Raises
@@ -319,7 +321,7 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        new_free_parameters : list of bool
+        new_free_parameters: list of bool
             True if the parameter is free, False otherwise.
         """
         assert len(new_free_parameters) == len(self.all), "The number of free parameters is not the same as the number of parameters."
@@ -334,12 +336,12 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        key : str
+        key: str
             Name of the parameter.
 
         Returns
         -------
-        parameter : Parameter object
+        parameter: Parameter object
             Parameter with name "key".
             
         Raises
@@ -357,9 +359,9 @@ class ParametersCovFunction():
 
         Parameters
         ----------
-        key : str
+        key: str
             Name of the parameter.
-        value : Parameter
+        value: Parameter
             Value of the parameter with name "key".
 
         """

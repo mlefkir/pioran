@@ -10,15 +10,15 @@ class CovarianceFunction:
 
     Attributes
     ----------
-    parameters : ParametersCovFunction
+    parameters: ParametersCovFunction
         Parameters of the covariance function.
 
 
     Methods
     -------
-    __init__(parameters_values, names, boundaries)
+    __init__:
         Constructor of the covariance function class.
-    __str__()
+    __str__:
         String representation of the covariance function.
         Include the representation of the parameters.
 
@@ -30,13 +30,13 @@ class CovarianceFunction:
 
         Parameters
         ----------
-        parameters_values : list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersCovFunction
             Values of the parameters of the covariance function.
-        names : list of str
+        names: list of str
             Names of the parameters of the covariance function.
-        boundaries : list of (list of float or list of None)
+        boundaries: list of (list of float or list of None)
             Boundaries of the parameters of the covariance function.    
-        free_parameters : list of bool
+        free_parameters: list of bool
             List of bool to indicate if the parameters are free or not.
 
         Raises

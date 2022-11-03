@@ -16,30 +16,30 @@ class GaussianProcess:
 
     Attributes
     ----------
-    acvf : CovarianceFunction
+    acvf: CovarianceFunction
         Autocovariance function associated to the Gaussian Process.
-    training_indexes : array of shape (n,1)
+    training_indexes: array of shape (n,1)
         Indexes of the training data.
-    training_observables : array of shape (n,1)
+    training_observables: array of shape (n,1)
         Observabled training data.
-    training_errors : array of shape (n,1)
+    training_errors: array of shape (n,1)
         Errors on the training observed data.
-    scale_errors : bool
+    scale_errors: bool
         Scale the errors on the training data by adding a constant, by default True.
-    estimate_mean : bool
+    estimate_mean: bool
         Estimate the mean of the training data, by default True.
 
     Methods
     -------
-    get_cov
+    get_cov:
         Compute the covariance matrix between two arrays.
-    compute_predictive_distribution
+    compute_predictive_distribution:
         Compute the predictive mean and predictive covariance given prediction indexes.
-    compute_log_marginal_likelihood
+    compute_log_marginal_likelihood:
         Compute the log marginal likelihood.
-    wrapper_log_marginal_likelihood
+    wrapper_log_marginal_likelihood:
         Wrapper to compute the log marginal likelihood.
-    wrapper_neg_log_marginal_likelihood
+    wrapper_neg_log_marginal_likelihood:
         Wrapper to compute the negative log marginal likelihood.
     """
 
@@ -48,22 +48,22 @@ class GaussianProcess:
 
         Parameters
         ----------
-        covariance_function : CovarianceFunction
+        covariance_function: CovarianceFunction
             Covariance function associated to the Gaussian Process.
-        training_indexes : 1D array
+        training_indexes: 1D array
             Indexes of the training data, in this case it is the time.
-        training_observables : 1D array
+        training_observables: 1D array
             Observables of the training data, in this it is flux, count-rate or intensity, etc.
-        training_errors : 1D array, optional
+        training_errors: 1D array, optional
             Errors on the observables, by default None
-        **kwargs : dict
-            nb_prediction_points : int, optional
+        **kwargs: dict
+            nb_prediction_points: int, optional
                 Number of points to predict, by default 5 * length(training(indexes)).
-            prediction_indexes : 1D array, optional
+            prediction_indexes: 1D array, optional
                 Indexes of the prediction data, by default np.linspace(np.min(training_indexes),np.max(training_indexes),nb_prediction_points)
-            scale_errors : bool, optional
+            scale_errors: bool, optional
                 Scale the errors on the training data by adding a constant, by default True.
-            estimate_mean : bool, optional
+            estimate_mean: bool, optional
                 Estimate the mean of the training data, by default True.
         """
 
@@ -110,11 +110,11 @@ class GaussianProcess:
 
         Parameters
         ----------
-        array : 1D array
+        array: 1D array
         
         Returns
         -------
-        array : 2D array
+        array: 2D array
             Reshaped array.
 
         """
@@ -125,9 +125,9 @@ class GaussianProcess:
 
         Parameters
         ----------
-        array_A : array of shape (n,1)
+        array_A: array of shape (n,1)
             First array.
-        array_B : array  of shape (m,1)
+        array_B: array  of shape (m,1)
             Second array.
         """
         assert np.shape(array_A) == np.shape(
@@ -138,11 +138,11 @@ class GaussianProcess:
 
         Parameters
         ----------
-        xt : array of shape (n,1)
+        xt: array of shape (n,1)
             First array.
-        xp : array  of shape (m,1)
+        xp: array  of shape (m,1)
             Second array.
-        errors : array of shape (n)
+        errors: array of shape (n)
             Errors on the observed data, default is None.
             If errors is not None, then the covariance matrix is computed for the training dataset, i.e. with observed 
             data as input (xt=xp=training data) and the errors is the "standard deviation". The total covariance matrix is computed as:
@@ -172,11 +172,11 @@ class GaussianProcess:
 
         Returns
         -------
-        Cov_xx : array of shape (n,n)
+        Cov_xx: array of shape (n,n)
             Covariance matrix for the training data.
-        Cov_inv : array of shape (n,n)
+        Cov_inv: array of shape (n,n)
             Inverse of Cov_xx.
-        alpha : array of shape (n,1)
+        alpha: array of shape (n,1)
             alpha = Cov_inv * training_observables (- mu if mu is estimated)
         """
 
@@ -205,15 +205,15 @@ class GaussianProcess:
 
         Parameters
         ----------
-        **kwargs : dict
-            prediction_indexes : array of length m, optional
+        **kwargs: dict
+            prediction_indexes: array of length m, optional
                 Indexes of the prediction data, by default np.linspace(np.min(training_indexes),np.max(training_indexes),nb_prediction_points)
 
         Returns
         -------
-        predictive_mean : array of shape (m,1)
+        predictive_mean: array of shape (m,1)
             Predictive mean of the GP.
-        predictive_cov : array of shape (m,m)
+        predictive_cov: array of shape (m,m)
             Predictive covariance of the GP.
         """
         # if we want to change the prediction indexes
@@ -254,7 +254,7 @@ class GaussianProcess:
 
         Returns
         -------
-        log_marginal_likelihood : float
+        log_marginal_likelihood: float
             Log marginal likelihood of the GP.
 
         """
@@ -279,7 +279,7 @@ class GaussianProcess:
 
         Parameters
         ----------
-        parameters : array of shape (n)
+        parameters: array of shape (n)
             (Hyper)parameters of the covariance function.
             
         Returns
@@ -295,7 +295,7 @@ class GaussianProcess:
 
         Parameters
         ----------
-        parameters : array of shape (n)
+        parameters: array of shape (n)
             (Hyper)parameters of the covariance function.
             
         Returns
@@ -315,6 +315,6 @@ class GaussianProcess:
             String representation of the GP object.        
         """
         s = 31*"=" +" Gaussian Process "+31*"="+"\n\n"
-        s += f"Marginal log likelihood : {self.compute_log_marginal_likelihood():.5f}\n"
+        s += f"Marginal log likelihood: {self.compute_log_marginal_likelihood():.5f}\n"
         s += self.acvf.__str__()
         return s

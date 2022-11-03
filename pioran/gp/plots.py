@@ -89,23 +89,23 @@ def plot_prediction(GP: GaussianProcess,filename,figsize,confidence_bands=True,t
 
     Parameters
     ----------
-    GP : GaussianProcess
+    GP: GaussianProcess
         Gaussian Process object.
-    filename : str
+    filename: str
         Name of the file to save the figure.
-    figsize : tuple
+    figsize: tuple
         Size of the figure.
-    confidence_bands : bool, optional
+    confidence_bands: bool, optional
         Plot the confidence bands, by default True
-    title : str, optional
+    title: str, optional
         Title of the plot, by default None
-    xlabel : str, optional
+    xlabel: str, optional
         Label for the x-axis, by default None
-    ylabel : str, optional
+    ylabel: str, optional
         Label for the y-axis, by default None
-    xlim : tuple of floats, optional
+    xlim: tuple of floats, optional
         Limits of the x-axis, by default None
-    ylim : tuple of floats, optional
+    ylim: tuple of floats, optional
         Limits of the y-axis, by default None
     """  
     fig,ax = plt.subplots(1,1,figsize=figsize)
