@@ -1,6 +1,6 @@
-from numpy import linalg as la
+from jax.numpy import linalg as la
 from scipy.spatial.distance import cdist
-import numpy as np
+import jax.numpy as jnp
 
 
 def EuclideanDistance(xq, xp):
@@ -48,7 +48,7 @@ def nearest_positive_definite(A):
     B = (A + A.T) / 2
     _, s, V = la.svd(B)
 
-    H = np.dot(V.T, np.dot(np.diag(s), V))
+    H = jnp.dot(V.T, jnp.dot(jnp.diag(s), V))
 
     A2 = (B + H) / 2
 
@@ -57,7 +57,7 @@ def nearest_positive_definite(A):
     if isPD(A3):
         return A3
 
-    spacing = np.spacing(la.norm(A))
+    spacing = jnp.spacing(la.norm(A))
     # The above is different from [1]. It appears that MATLAB's `chol` Cholesky
     # decomposition will accept :es with exactly 0-eigenvalue, whereas
     # Numpy's will not. So where [1] uses `eps(mineig)` (where `eps` is Matlab
@@ -67,10 +67,10 @@ def nearest_positive_definite(A):
     # `spacing` will, for Gaussian random :es of small dimension, be on
     # othe order of 1e-16. In practice, both ways converge, as the unit test
     # below suggests.
-    I = np.eye(A.shape[0])
+    I = jnp.eye(A.shape[0])
     k = 1
     while not isPD(A3):
-        mineig = np.min(np.real(la.eigvals(A3)))
+        mineig = jnp.min(jnp.real(la.eigvals(A3)))
         A3 += I * (-mineig * k**2 + spacing)
         k += 1
 

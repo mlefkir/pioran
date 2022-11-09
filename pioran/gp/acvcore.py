@@ -1,6 +1,6 @@
 """Generic class and functions for the covariance functions
 """
-import numpy as np
+import jax.numpy as jnp
 from .parameters import ParametersCovFunction
 
 class CovarianceFunction:
@@ -49,12 +49,12 @@ class CovarianceFunction:
         # initialise the parameters
         if isinstance(parameters_values, ParametersCovFunction):
             self.parameters = parameters_values
-        elif isinstance(parameters_values, list) or isinstance(parameters_values, np.ndarray):
+        elif isinstance(parameters_values, list) or isinstance(parameters_values, jnp.ndarray):
             self.parameters = ParametersCovFunction(
                 parameters_values, names=names, boundaries=boundaries, free_parameters=free_parameters)
         else:
             raise TypeError(
-                "The parameters of the covariance function must be a list of floats or np.ndarray or a ParametersCovFunction object.")
+                "The parameters of the covariance function must be a list of floats or jnp.ndarray or a ParametersCovFunction object.")
 
     @classmethod
     def __classname(cls):

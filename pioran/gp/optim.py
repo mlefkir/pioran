@@ -3,7 +3,7 @@
 """
 
 # modules for optimising the (hyper)parameters
-import numpy as np
+import jax.numpy as jnp
 from scipy.optimize import minimize
 import ultranest
 
@@ -69,7 +69,7 @@ class Optimizer:
         # set values for the (hyper)parameters to optimize
         if x0 is not None:
             # check if x0 is a list or a numpy array
-            if isinstance(x0, list) or isinstance(x0, np.ndarray):
+            if isinstance(x0, list) or isinstance(x0, jnp.ndarray):
                 self.initial_guess = x0 
                 # add the initial guess of nu and mu if they are not in x0
                 if  len(self.initial_guess) != len(self.GP.acvf.parameters.free_parameters):
@@ -84,7 +84,7 @@ class Optimizer:
         
         # set the boundaries
         if bounds is not None:
-            if isinstance(bounds, list) or isinstance(bounds, np.ndarray):
+            if isinstance(bounds, list) or isinstance(bounds, jnp.ndarray):
                 self.bounds = bounds
                 if not len(self.bounds) == len(self.GP.acvf.parameters.free_parameters):
                     # add the boundaries of nu and mu

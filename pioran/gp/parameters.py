@@ -1,11 +1,11 @@
 """Classes for the parameters of covariance functions
 
 """
-import numpy as np
+import jax.numpy as jnp
 from .tools import check_instance
 
 # constants
-TYPE_NUMBER = (float,int,np.number)
+TYPE_NUMBER = (float,int,jnp.number)
 TABLE_LENGTH = 80
 HEADER_PARAMETERS = " {Name:<15} {Value:<14} {Min:<10} {Max:<10} {Status:<9} {Type:<15} "
 

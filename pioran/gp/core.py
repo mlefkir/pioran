@@ -2,8 +2,8 @@
 
 """
 
-import numpy as np
-from scipy.linalg import cholesky, solve_triangular, solve
+import jax.numpy as jnp
+from jax.scipy.linalg import cholesky, solve_triangular, solve
 
 from .utils import nearest_positive_definite
 from .acvcore import CovarianceFunction
@@ -60,7 +60,7 @@ class GaussianProcess:
             nb_prediction_points: int, optional
                 Number of points to predict, by default 5 * length(training(indexes)).
             prediction_indexes: 1D array, optional
-                Indexes of the prediction data, by default np.linspace(np.min(training_indexes),np.max(training_indexes),nb_prediction_points)
+                Indexes of the prediction data, by default jnp.linspace(jnp.min(training_indexes),jnp.max(training_indexes),nb_prediction_points)
             scale_errors: bool, optional
                 Scale the errors on the training data by adding a constant, by default True.
             estimate_mean: bool, optional
@@ -93,8 +93,8 @@ class GaussianProcess:
         self.estimate_mean = kwargs.get("estimate_mean", True)
         if self.estimate_mean:
             self.acvf.parameters.append(Parameter(name="mu", 
-                                                  value=np.mean(self.training_observables), 
-                                                  bounds=[np.min(self.training_observables), np.max(self.training_observables)],
+                                                  value=jnp.mean(self.training_observables), 
+                                                  bounds=[jnp.min(self.training_observables), jnp.max(self.training_observables)],
                                                   free=True, 
                                                   hyperpar=False))
         else:
@@ -103,10 +103,10 @@ class GaussianProcess:
         # Prediction of data
         self.nb_predic_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
         self.prediction_indexes = kwargs.get('prediction_indexes', 
-                                    self.reshape_array(np.linspace(np.min(self.training_indexes), np.max(self.training_indexes), self.nb_predic_points)))
+                                    self.reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_predic_points)))
 
     def reshape_array(self, array):
-        """ Reshape the array to a 2D array with np.shape(array,(len(array),1).
+        """ Reshape the array to a 2D array with jnp.shape(array,(len(array),1).
 
         Parameters
         ----------
@@ -118,7 +118,7 @@ class GaussianProcess:
             Reshaped array.
 
         """
-        return np.reshape(array, (len(array), 1))
+        return jnp.reshape(array, (len(array), 1))
 
     def sanity_checks(self, array_A, array_B):
         """ Check if the lists are of the same shape 
@@ -130,7 +130,7 @@ class GaussianProcess:
         array_B: array  of shape (m,1)
             Second array.
         """
-        assert np.shape(array_A) == np.shape(
+        assert jnp.shape(array_A) == jnp.shape(
             array_B), "The training arrays must have the same shape."
 
     def get_cov(self, xt, xp, errors=None):
@@ -163,9 +163,9 @@ class GaussianProcess:
             return self.acvf.get_cov_matrix(xt, xp)
         # if errors and we want to scale them
         if self.scale_errors:
-            return self.acvf.get_cov_matrix(xt, xp) + self.acvf.parameters["nu"].value * np.diag(errors**2)
+            return self.acvf.get_cov_matrix(xt, xp) + self.acvf.parameters["nu"].value * jnp.diag(errors**2)
         # if we do not want to scale the errors
-        return self.acvf.get_cov_matrix(xt, xp) + np.diag(errors**2)
+        return self.acvf.get_cov_matrix(xt, xp) + jnp.diag(errors**2)
 
     def get_cov_training(self):
         """ Compute the covariance matrix and other vectors for the training data.
@@ -182,7 +182,7 @@ class GaussianProcess:
 
         Cov_xx = self.get_cov(
             self.training_indexes, self.training_indexes, errors=self.training_errors)
-        Cov_inv = solve(Cov_xx, np.eye(len(self.training_indexes)))
+        Cov_inv = solve(Cov_xx, jnp.eye(len(self.training_indexes)))
         if self.estimate_mean:
             alpha = Cov_inv@(self.training_observables -
                              self.acvf.parameters["mu"].value)
@@ -207,7 +207,7 @@ class GaussianProcess:
         ----------
         **kwargs: dict
             prediction_indexes: array of length m, optional
-                Indexes of the prediction data, by default np.linspace(np.min(training_indexes),np.max(training_indexes),nb_prediction_points)
+                Indexes of the prediction data, by default jnp.linspace(jnp.min(training_indexes),jnp.max(training_indexes),nb_prediction_points)
 
         Returns
         -------
@@ -272,7 +272,7 @@ class GaussianProcess:
         else:
             z = solve_triangular(L, self.training_observables, lower=True)
 
-        return -((np.sum(np.log(np.diagonal(L))) + 0.5 * len(self.training_indexes) * np.log(2*np.pi) + 0.5 * (z.T@z)).flatten()[0])
+        return -((jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.training_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z)).flatten()[0])
 
     def wrapper_log_marginal_likelihood(self, parameters):
         """ Wrapper to compute the log marginal likelihood in function of the (hyper)parameters. 
