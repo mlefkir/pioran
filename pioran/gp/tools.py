@@ -1,4 +1,10 @@
 """ Various tools for the Gaussian Process module."""
+import jax.numpy as jnp
+
+# constants
+TYPE_NUMBER = (float,int,jnp.number)
+TABLE_LENGTH = 80+30+4
+HEADER_PARAMETERS = "{ID:<4} {Name:<15} {Value:<14} {Min:<10} {Max:<10} {Status:<9} {Linked:<9} {Expression:<15} {Type:<15} "
 
 
 def check_instance(list_of_obj, classinfo):

@@ -8,7 +8,7 @@
 """
 
 import jax.numpy as jnp
-from .acvcore import CovarianceFunction
+from .acvf_base import CovarianceFunction
 from .utils import EuclideanDistance
  
 
@@ -19,7 +19,7 @@ class Exponential(CovarianceFunction):
 
     Attributes
     ----------
-    parameters: ParametersCovFunction
+    parameters: ParametersModel
         Parameters of the covariance function.
 
     Methods
@@ -33,10 +33,10 @@ class Exponential(CovarianceFunction):
 
         Parameters
         ----------
-        parameters_values: list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersModel
             Values of the parameters of the covariance function.
         **kwargs: dict
-            Arguments for the ParametersCovFunction class.
+            Arguments for the ParametersModel class.
             free_parameters: list of bool
                 List of bool to indicate if the parameters are free or not.
         """
@@ -79,7 +79,7 @@ class SquareExponential(CovarianceFunction):
 
     Attributes
     ----------
-    parameters: ParametersCovFunction
+    parameters: ParametersModel
         Parameters of the covariance function.
 
     Methods
@@ -93,10 +93,10 @@ class SquareExponential(CovarianceFunction):
 
         Parameters
         ----------
-        parameters_values: list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersModel
             Values of the parameters of the covariance function.
         **kwargs: dict
-            Arguments for the ParametersCovFunction class.
+            Arguments for the ParametersModel class.
             free_parameters: list of bool
                 List of bool to indicate if the parameters are free or not.
         """
@@ -139,7 +139,7 @@ class Matern32(CovarianceFunction):
 
     Attributes
     ----------
-    parameters: ParametersCovFunction
+    parameters: ParametersModel
         Parameters of the covariance function.
 
     Methods
@@ -153,10 +153,10 @@ class Matern32(CovarianceFunction):
         
         Parameters
         ----------
-        parameters_values: list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersModel
             Values of the parameters of the covariance function.
         **kwargs: dict
-            Arguments for the ParametersCovFunction class.
+            Arguments for the ParametersModel class.
             free_parameters: list of bool
                 List of bool to indicate if the parameters are free or not.
         """
@@ -198,7 +198,7 @@ class Matern52(CovarianceFunction):
 
     Attributes
     ----------
-    parameters: ParametersCovFunction
+    parameters: ParametersModel
         Parameters of the covariance function.
 
     Methods
@@ -212,10 +212,10 @@ class Matern52(CovarianceFunction):
 
         Parameters
         ----------
-        parameters_values: list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersModel
             Values of the parameters of the covariance function.
         **kwargs: dict
-            Arguments for the ParametersCovFunction class.
+            Arguments for the ParametersModel class.
             free_parameters: list of bool
                 List of bool to indicate if the parameters are free or not.
         """
@@ -259,7 +259,7 @@ class RationalQuadratic(CovarianceFunction):
 
     Attributes
     ----------
-    parameters: ParametersCovFunction
+    parameters: ParametersModel
         Parameters of the covariance function.
 
     Methods
@@ -273,10 +273,10 @@ class RationalQuadratic(CovarianceFunction):
 
         Parameters
         ----------
-        parameters_values: list of float or ParametersCovFunction
+        parameters_values: list of float or ParametersModel
             Values of the parameters of the covariance function.
         **kwargs: dict
-            Arguments for the ParametersCovFunction class.
+            Arguments for the ParametersModel class.
             free_parameters: list of bool
                 List of bool to indicate if the parameters are free or not.
         """

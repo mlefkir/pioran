@@ -6,8 +6,8 @@ import jax.numpy as jnp
 from jax.scipy.linalg import cholesky, solve_triangular, solve
 
 from .utils import nearest_positive_definite
-from .acvcore import CovarianceFunction
-from .parameters import Parameter
+from .acvf_base import CovarianceFunction
+from .parameter_base import Parameter
 
 
 class GaussianProcess:
