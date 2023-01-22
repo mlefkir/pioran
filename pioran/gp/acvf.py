@@ -67,10 +67,26 @@ class Exponential(CovarianceFunction):
         # Compute the Euclidean distance between the query and the points
         dist = EuclideanDistance(xq, xp)
         # Compute the covariance matrix
-        covMat = self.parameters['variance'].value * jnp.exp(- dist / self.parameters['lengthscale'].value)
+        covMat = self.calculate(dist)
 
         return covMat
+    
+    
+    def calculate(self,x):
+        """Compute the autocovariance for an array of lags
 
+        Parameters
+        ----------
+        x : _type_
+            _description_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
+        
+        return  self.parameters['variance'].value * jnp.exp(- jnp.abs(x) * self.parameters['lengthscale'].value)
 
 class SquareExponential(CovarianceFunction):
     """ Class for the squared exponential covariance function.
@@ -128,9 +144,26 @@ class SquareExponential(CovarianceFunction):
         # Compute the Euclidean distance between the query and the points
         dist = EuclideanDistance(xq, xp)
         # Compute the covariance matrix
-        covMat = self.parameters['variance'].value *  jnp.exp(-0.5 * dist**2 / self.parameters['lengthscale'].value**2)
+        covMat = self.calculate(dist)
+        
         return covMat
+    
+    def calculate(self,x):
+            """Compute the autocovariance for an array of lags
 
+            Parameters
+            ----------
+            x : _type_
+                _description_
+
+            Returns
+            -------
+            _type_
+                _description_
+            """
+            
+            # return  self.parameters['variance'].value * jnp.exp(-0.5 * x**2 / self.parameters['lengthscale'].value**2)
+            return  self.parameters['variance'].value * jnp.exp(-2 * jnp.pi**2 * x**2 * self.parameters['lengthscale'].value**2)
 
 class Matern32(CovarianceFunction):
     """ Class for the Matern 3/2 covariance function.

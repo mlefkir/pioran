@@ -14,8 +14,9 @@ class Lorentzian(PowerSpectralDensityComponent):
         # initialise the parameters and check
         PowerSpectralDensityComponent.__init__(self, parameters_values, names=["position",'amplitude', 'halfwidth'], boundaries=[[-jnp.inf, jnp.inf], [0, jnp.inf],[0,jnp.inf]], free_parameters=free_parameters)
     
-    def fun(self,x) -> jnp.ndarray:
-        return self.parameters['amplitude'].value / ( ( 1 + ( ( x - self.parameters['position'].value ) / self.parameters['halfwidth'].value )**2 ) )
+    def calculate(self,x) -> jnp.ndarray:
+        # return self.parameters['amplitude'].value / ( ( 1 + ( ( x - self.parameters['position'].value ) / self.parameters['halfwidth'].value )**2 ) )/jnp.pi/self.parameters['halfwidth'].value
+        return 2 * self.parameters['amplitude'].value * self.parameters['halfwidth'].value  /  ( self.parameters['halfwidth'].value**2 + 4 * jnp.pi**2 * ( x - self.parameters['position'].value )**2 )
 
 class Gaussian(PowerSpectralDensityComponent):
     componentname = 'gaussian'
@@ -30,8 +31,8 @@ class Gaussian(PowerSpectralDensityComponent):
         # initialise the parameters and check
         PowerSpectralDensityComponent.__init__(self, parameters_values, names=["position",'amplitude', 'sigma'], boundaries=[[-jnp.inf, jnp.inf], [0, jnp.inf],[0,jnp.inf]], free_parameters=free_parameters)
     
-    def fun(self,x) -> jnp.ndarray:
-        return self.parameters['amplitude'].value / (jnp.sqrt( 2*jnp.pi ) * self.parameters['sigma'].value ) * jnp.exp( 0.5 * (x - self.parameters['position'].value )**2 / self.parameters['sigma'].value**2 )
+    def calculate(self,x) -> jnp.ndarray:
+        return self.parameters['amplitude'].value / (jnp.sqrt( 2*jnp.pi ) * self.parameters['sigma'].value ) * jnp.exp( -0.5 * (x - self.parameters['position'].value )**2 / self.parameters['sigma'].value**2 )
 
 
 
@@ -68,7 +69,7 @@ class Rectangular(PowerSpectralDensityComponent):
         # initialise the parameters and check
         PowerSpectralDensityComponent.__init__(self, parameters_values, names=['min','max', 'amplitude'], boundaries=[[-jnp.inf, jnp.inf], [0, jnp.inf],[0,jnp.inf]], free_parameters=free_parameters)
     
-    def fun(self,x):
+    def calculate(self,x):
         return jnp.where((x>=self.parameters['min'].value)&(x<self.parameters['max'].value),self.parameters['amplitude'].value,0)
 
 class PowerLawLim(PowerSpectralDensityComponent):
@@ -84,7 +85,7 @@ class PowerLawLim(PowerSpectralDensityComponent):
         # initialise the parameters and check
         PowerSpectralDensityComponent.__init__(self, parameters_values, names=['min','max','freq','amplitude', 'index'], boundaries=[[0, jnp.inf], [0, jnp.inf],[0, jnp.inf], [0, jnp.inf],[0,jnp.inf]], free_parameters=free_parameters)
     
-    def fun(self,x):
+    def calculate(self,x):
         return jnp.where((x>=self.parameters['min'].value)&(x<self.parameters['max'].value),self.parameters['amplitude'].value * jnp.power( x / self.parameters['freq'].value , -self.parameters['index'].value ), 0)
     
 class Scalar(PowerSpectralDensityComponent):
@@ -98,7 +99,7 @@ class Scalar(PowerSpectralDensityComponent):
         free_parameters = kwargs.get('free_parameters', [True])
         # initialise the parameters and check
         PowerSpectralDensityComponent.__init__(self, parameters_values, names=['scalar'], boundaries=[[-jnp.inf, jnp.inf]], free_parameters=free_parameters)
-    def fun(self,x):
+    def calculate(self,x):
         return self.parameters['scalar'].value
 
 class PowerLaw(PowerSpectralDensityComponent):
@@ -114,6 +115,38 @@ class PowerLaw(PowerSpectralDensityComponent):
         # initialise the parameters and check
         PowerSpectralDensityComponent.__init__(self, parameters_values, names=['freq','amplitude', 'index'], boundaries=[[0, jnp.inf], [0, jnp.inf],[0,jnp.inf]], free_parameters=free_parameters)
     
-    def fun(self,x):
+    def calculate(self,x):
         return self.parameters['amplitude'].value * jnp.power( x / self.parameters['freq'].value , -self.parameters['index'].value )
     
+class MultipleBendingPowerLaw(PowerSpectralDensityComponent):
+    """Power spectrum model for the multiple bending power law
+    
+    P = A * (f/f0)^(-n) * Product (from i = 1 to N) (1 + (f/f_{B_i})^(alpha_{i+1}-alpha_i)))^{-1}
+
+    """
+    
+    
+    componentname = 'multiplebendingpowerlaw'
+    ID = 1
+    
+    
+    def __init__(self, parameters_values, **kwargs):
+        """
+        """
+        
+        assert len(parameters_values) %2 == 1 and len(parameters_values)>=4 , f'The number of parameters for {self.__classname__()} must be greater than 4 and even, not {len(parameters_values)}'
+        self.N = len(parameters_values)//2-1
+        free_parameters = kwargs.get('free_parameters', [True]*len(parameters_values))
+        # initialise the parameters and check
+        self.n_parameters = len(parameters_values)
+        names=['amplitude', 'freq_1', 'index_1']
+        
+        [(names.append(f'freq_{i+1}'),names.append(f'index_{i+1}')) for i in range(1,1+self.N)]
+        
+        PowerSpectralDensityComponent.__init__(self, parameters_values, names=names, boundaries=[[0,jnp.inf]]*self.n_parameters, free_parameters=free_parameters)
+                                    
+    def calculate(self,x):
+        P = self.parameters[f'amplitude'].value/ jnp.power( x / self.parameters[f'freq_1'].value , self.parameters[f'index_1'].value )
+        for i in range(1,1+self.N):
+            P /=   (1 + jnp.power( x / self.parameters[f'freq_{i+1}'].value , self.parameters[f'index_{i+1}'].value-self.parameters[f'index_{i}'].value ) )
+        return P
