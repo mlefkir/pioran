@@ -12,6 +12,7 @@ from .acvf_base import CovarianceFunction
 from .utils import EuclideanDistance
  
 
+
 class Exponential(CovarianceFunction):
     """ Class for the exponential covariance function.
 

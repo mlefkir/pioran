@@ -1,7 +1,7 @@
 from jax.numpy import linalg as la
 from scipy.spatial.distance import cdist
 import jax.numpy as jnp
-
+import numpy as np
 
 def EuclideanDistance(xq, xp):
     """Compute the Euclidean distance between two arrays.
@@ -57,7 +57,7 @@ def nearest_positive_definite(A):
     if isPD(A3):
         return A3
 
-    spacing = jnp.spacing(la.norm(A))
+    spacing = np.spacing(la.norm(A))
     # The above is different from [1]. It appears that MATLAB's `chol` Cholesky
     # decomposition will accept :es with exactly 0-eigenvalue, whereas
     # Numpy's will not. So where [1] uses `eps(mineig)` (where `eps` is Matlab

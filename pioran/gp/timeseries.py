@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from .utils import EuclideanDistance
 from jax.scipy.linalg import cholesky
-
+import numpy as np
 from jax.numpy.fft import irfft, rfft
-
+import jax.scipy as jsp
 
 class Simulations:
     
@@ -33,7 +33,7 @@ class Simulations:
         self.n_freq_grid = int(jnp.ceil(self.fN/self.f0)) + 1 
 
         self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0)
-        self.tau_max = 1/self.f0#0.5/self.f0
+        self.tau_max = .5/self.f0#0.5/self.f0
         self.dtau = self.tau_max/(self.n_freq_grid-1) 
         self.tau = jnp.arange(0,self.tau_max+self.dtau,self.dtau)
             
@@ -100,6 +100,13 @@ class Simulations:
         ts = self.triang.T@r
         return t_test,ts
         
+    def save_time_series(self,name,errors,seed=0):
+        t,ts = self.ACV_method(seed=0)
+        if errors is not None:
+            ts_err = np.sqrt(np.abs(ts)*self.duration)/self.duration
+            np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts,ts_err]).T)
+        else:
+            np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts]).T)
         
     def TimmerKonig(self,seed=0):
         key = random.PRNGKey(seed)
