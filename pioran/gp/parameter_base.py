@@ -344,7 +344,7 @@ class Parameter():
         bnd_str = []
         for bnd in self.bounds:
             if bnd is not None:
-                if len(str(bnd)) > 9:
+                if len(str(bnd)) > 6:
                     bnd_str.append(f"{bnd:5.3e}")
                 else:
                     bnd_str.append(f"{bnd}")
@@ -353,8 +353,8 @@ class Parameter():
 
         self.bounds[0] if self.bounds[0] is not None else "None",
         return HEADER_PARAMETERS.format(ID=self.ID,Name=self.name,
-                                        Value=f"{self.value:5.7e}" if len(
-                                            str(self.value)) > 14 else self.value,
+                                        Value=f"{self.value:5.5e}" if len(
+                                            str(self.value)) > 9 else self.value,
                                         Min=bnd_str[0],
                                         Max=bnd_str[1],
                                         Status='Free' if self.free else 'Fixed',

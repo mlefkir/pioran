@@ -253,6 +253,48 @@ class ParametersModel:
                 f"The number of values ({len(new_values)}) is not the same as the number of parameters ({len(self.all)}). ")
 
     @property
+    def free_values(self):
+        """ Get the values of the free parameters.
+
+        Returns
+        -------
+        values: list of float
+            Values of the free parameters.
+        """
+        return [p.value for p in self.all.values() if p.free]
+    
+    @free_values.setter
+    def free_values(self, new_free_values):
+        """ Set the values of the free parameters.
+
+        Parameters
+        ----------
+        new_free_values: list of float
+            Values of the free parameters.
+
+        Raises
+        ------
+        TypeError
+            When the new values are not a list of floats.
+        ValueError
+            When the number of new values is not the same as the number of free parameters.
+        """
+        if len(new_free_values) == sum(self.free_parameters):
+            if check_instance(new_free_values, TYPE_NUMBER):
+                # also update the values of the parameters of the Parameter objects
+                k = 0
+                for p in self.all.values():
+                    if p.free:
+                        p.value = new_free_values[k]
+                        k += 1
+            else:
+                raise TypeError(
+                    "The values must be a list of numbers.")
+        else:
+            raise ValueError(
+                f"The number of values ({len(new_free_values)}) is not the same as the number of free parameters ({len(self.free_parameters)}). ")
+    
+    @property
     def free_parameters(self):
         """ Get the list of bool, True if the parameter is free, False otherwise. 
 
