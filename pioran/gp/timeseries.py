@@ -104,6 +104,7 @@ class Simulations:
             np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts,ts_err]).T)
         else:
             np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts]).T)
+        return t,ts
         
     def TimmerKonig(self,seed=0):
         key = random.PRNGKey(seed)

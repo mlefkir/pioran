@@ -105,7 +105,8 @@ class GaussianProcess:
         # Reshape the arrays
         self.training_indexes = self.reshape_array(training_indexes)
         self.training_observables = self.reshape_array(training_observables)
-        self.training_errors = training_errors.flatten() if training_errors is not None else None
+        # add a small number to the errors to avoid singular matrices in the cholesky decomposition
+        self.training_errors = training_errors.flatten() if training_errors is not None else jnp.ones_like(self.training_observables)*jnp.sqrt(jnp.finfo(float).eps)
 
         # add the mean of the observed data as a parameter
         self.estimate_mean = kwargs.get("estimate_mean", True)

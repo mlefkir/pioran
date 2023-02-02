@@ -12,24 +12,33 @@ from .core import GaussianProcess
 
 plt.style.use("https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs.mplstyle")
 
-def plot_prediction_plotly(gp, name, figsize=(18, 5), title="flux", xlabel="Time", ylabel="Flux"):
+def plot_prediction_plotly(gp, name, figsize=(18, 5), xlabel="Time", ylabel="Flux",title="Light Curve",show=False):
     predict_mean, predict_var = gp.compute_predictive_distribution()
 
     std = np.sqrt(np.diag(predict_var))
     fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=gp.training_indexes.flatten(), 
-        y=gp.training_observables.flatten(),
-        mode='markers',
-        name='observations',
-        error_y=dict(
-            array=gp.training_errors.flatten(),
-            symmetric=True,
-            thickness=1.5,
-            width=3,
-        ),
-        marker=dict( size=8)
-    ))
+    if gp.training_errors is not None:
+        fig.add_trace(go.Scatter(
+            x=gp.training_indexes.flatten(), 
+            y=gp.training_observables.flatten(),
+            mode='markers',
+            name='observations',
+            error_y=dict(
+                array=gp.training_errors.flatten(),
+                symmetric=True,
+                thickness=1.5,
+                width=3,
+            ),
+            marker=dict( size=8)
+        ))
+    else:
+        fig.add_trace(go.Scatter(
+            x=gp.training_indexes.flatten(), 
+            y=gp.training_observables.flatten(),
+            mode='markers',
+            name='observations',
+            marker=dict( size=8)
+        ))
     fig.add_trace(go.Scatter(
         x=gp.prediction_indexes.flatten(), y=predict_mean.flatten(),
         name='GP'
@@ -77,12 +86,12 @@ def plot_prediction_plotly(gp, name, figsize=(18, 5), title="flux", xlabel="Time
     fig.update_layout(
         yaxis_title='Flux',
         xaxis_title='Time',
-        title='Light curve of FAIRALL 9',
+        title=title,
         hovermode="x"
     )
     fig.write_html(f"{name}.html")
-
-    fig.show()
+    if show:
+        fig.show()
 
 def plot_prediction(GP: GaussianProcess,filename,figsize,confidence_bands=True,title=None,xlabel=None,ylabel=None,xlim=None,ylim=None):
     """Plot the prediction of the Gaussian Process.
