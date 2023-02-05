@@ -1,5 +1,7 @@
 """General classes for operations on one parameter
+
 """
+
 
 from .tools import TYPE_NUMBER, HEADER_PARAMETERS
 
@@ -9,101 +11,77 @@ class Parameter():
     parameter.
 
     The object of this class is then used to create a list of
-    parameters with the ParameterList class.
+    parameters with the :obj:`ParametersModel` object.
+
+    Parameters
+    ----------
+    name : :obj:`str`
+        Name of the parameter.
+    value : :obj:`float`
+        Value of the parameter.
+    bounds : :obj:`list`
+        Bounds of the parameter.
+    ID : :obj:`int`, optional
+        ID of the parameter, default is 1.
+    free : :obj:`bool`
+        If the parameter is free or fixed.
+    hyperpar : :obj:`bool`, optional
+        If the parameter is an hyperparameter of the covariance function or not. The default is True.
+    linked : :obj:`bool`, optional
+        If the parameter is linked to another one. The default is False.
+    relation : :obj:`Parameter`, optional
+        Relation between the parameter and the linked one. The default is None.
+
 
     Attributes
     ----------
-    name: str
+    name : :obj:`str`
         Name of the parameter.
-    value: float
+    value : :obj:`float`
         Value of the parameter.
-    bounds: list
+    bounds : :obj:`list`
         Bounds of the parameter. Should be a list of two elements, the
         first one is the lower bound and the second one is the upper bound.
-    free: bool
+    free : :obj:`bool`
         If the parameter is free or fixed.
-    hyper: bool, optional
+    hyper : :obj:`bool`, optional
             If the parameter is an hyperparameter of the covariance function
             or not. The default is True.
-    ID: int, optional
-        ID of the parameter. The default is 1.
-    linked: bool, optional
+    ID : :obj:`int`, optional
+        ID of the parameter, default is 1.
+    linked : :obj:`bool`, optional
         If the parameter is linked to another one. The default is False.
-    relation: Parameter, optional
+    relation : :obj:`Parameter`, optional
         Relation between the parameter and the linked one. The default is None.
-    expression: str, optional
+    expression : :obj:`str`, optional
         Expression of the parameter. The default is ''.
-    fullname: str, optional
+    fullname : :obj:`str`, optional
         Full name of the parameter. The default is f"{name}[{ID}]"
 
-    Methods
-    -------
-    __init__:
-        Constructor method for the Parameter class.
-    __str__:
-        Print the parameter.
-    __add__:
-        Add two parameters.
-    __mul__:
-        Multiply two parameters.
-    __pow__:
-        Power two parameters.
-    __truediv__:
-        Divide two parameters.
-
     """
-    name: str
-    value: float
-    bounds: list[float]
-    ID: int = 1
-    free: bool = True
-    hyperpar: bool = True
-    linked: bool = False
-    relation: 'Parameter' = None
-    expression: str = ''
-    fullname: str
 
-    def __init__(self, name: str, value: float, bounds: list = [None, None],
-                 ID: int = 1, free: bool = True, hyperpar=True, linked=False, relation=None):
+    def __init__(self, name: str, value: float, bounds: list = [None, None], ID: int = 1, free: bool = True, hyperpar=True, linked=False, relation=None):
         """Constructor method for the Parameter class.
-
-        Parameters
-        ----------
-        name: str
-            Name of the parameter.
-        value: float
-            Value of the parameter.
-        bounds: list
-            Bounds of the parameter.
-        ID: int, optional
-            ID of the parameter. The default is 1.
-        free: bool
-            If the parameter is free or fixed.
-        hyperpar: bool, optional
-            If the parameter is an hyperparameter of the covariance function or not. The default is True.
-        linked: bool, optional
-            If the parameter is linked to another one. The default is False.
-        relation: Parameter, optional
-            Relation between the parameter and the linked one. The default is None.
-
         """
+        
+        self.linked = linked
         self.name = name
         self.value = value
         self.bounds = bounds
         self.free = free
         self.hyperpar = hyperpar
-        self.linked = linked
         self.ID = ID
         self.relation = relation
         self.expression = ''
         self.fullname = f"{name}[{ID}]"
+        self.relation = None
 
     def __eq__(self, other) -> bool:
         """Compare two parameters.
 
         Parameters
         ----------
-        other: Parameter
+        other : Parameter
             Parameter to compare.
 
         Returns
@@ -132,7 +110,7 @@ class Parameter():
 
         Parameters
         ----------
-        relation: Parameter or Operations
+        relation : Parameter or Operations
             Relation of the parameter.
         """
         if relation is not None:
@@ -179,7 +157,7 @@ class Parameter():
 
         Parameters
         ----------
-        other: Parameter or TYPE_NUMBER
+        other : Parameter or TYPE_NUMBER
             Parameter or number to add.
 
         Returns
@@ -220,7 +198,7 @@ class Parameter():
 
         Parameters
         ----------
-        other: Parameter or TYPE_NUMBER
+        other : Parameter or TYPE_NUMBER
             Parameter or number to subtract.
 
         Returns
@@ -247,7 +225,7 @@ class Parameter():
 
         Parameters
         ----------
-        other: Parameter or TYPE_NUMBER
+        other : Parameter or TYPE_NUMBER
             Parameter or number to multiply.
 
         Returns
@@ -274,7 +252,7 @@ class Parameter():
 
         Parameters
         ----------
-        other: Parameter or TYPE_NUMBER
+        other : Parameter or TYPE_NUMBER
             Parameter or number to use as the exponent.
 
         Returns
@@ -303,7 +281,7 @@ class Parameter():
 
         Parameters
         ----------
-        other: Parameter or TYPE_NUMBER
+        other : Parameter or TYPE_NUMBER
             Parameter or number to divide by.
 
         Returns
@@ -369,7 +347,8 @@ class Parameter():
 class Operations(Parameter):
     """Base class for operations on parameters.
 
-    Will be used to define the operations between parameters.
+    Will be used to define the operations between parameters such as
+    sum, product, exponentiation, subtraction and division.    
     """
 
     @property
@@ -391,23 +370,21 @@ class Operations(Parameter):
 
 
 class SumParameters(Operations, Parameter):
-    """Base class for the sum of parameters.
+    """Class for the sum of parameters.
+
+    Represents the mathematical operation: first+second.
 
     Attributes
     ----------
-    first: Parameter
-        First parameter to sum.
-    second: Parameter
-        Second parameter to sum.
-    is_scalar: bool
+    first : :obj:`Parameter`
+        First parameter.
+    second : :obj:`Parameter`
+        Second parameter
+    is_scalar : :obj:`bool`
         True if the second parameter is a scalar, False otherwise.
-    fullname: str
+    fullname : :obj:`str`
         Full name of the resulting parameter.
-
-    Methods
-    -------
-    value
-        Returns the value of the resulting parameter.
+        
     """
 
     def __init__(self, first: Parameter, second: Parameter, is_scalar=False):
@@ -415,12 +392,13 @@ class SumParameters(Operations, Parameter):
 
         Parameters
         ----------
-        first: Parameter
+        first : :obj:`Parameter`
             First parameter.
-        second: Parameter
+        second : :obj:`Parameter`
             Second parameter.
-        is_scalar: bool
+        is_scalar : :obj:`bool`
             True if the second parameter is a scalar, False otherwise.
+            
         """
 
         self.first = first
@@ -435,14 +413,11 @@ class SumParameters(Operations, Parameter):
 
     @property
     def value(self) -> TYPE_NUMBER:
-        """Get the value of the parameter.
-
-        Get the value of the parameter from the product of the two parameters values.
+        """Get the value of the parameter from the product of the two parameters values.
 
         Returns
         -------
-        float
-            Value of the parameter.
+        Value of the parameter.
         """
 
         self._value = self.first.value + self.second.value
@@ -450,36 +425,25 @@ class SumParameters(Operations, Parameter):
 
     @value.setter
     def value(self, value):
-        """Set the value of the parameter.
-
-        Will update the value of the parameter.
-
-        Parameters
-        ----------
-        value : float
-            Value of the parameter.
-        """
         self._value = value
 
 
 class SubtractionParameters(Operations, Parameter):
-    """Base class for the subtraction of parameters.
+    """Class for the subtraction of parameters.
+    
+    Represents the mathematical operation: first-second.
 
     Attributes
     ----------
-    first: Parameter
+    first : :obj:`Parameter`
         First parameter.
-    second: Parameter
+    second : :obj:`Parameter`
         Second parameter.
-    is_scalar: bool
+    is_scalar : :obj:`bool`
         True if the second parameter is a scalar, False otherwise.
-    fullname: str
+    fullname : :obj:`str`
         Full name of the resulting parameter.
 
-    Methods
-    -------
-    value
-        Returns the value of the resulting parameter.
     """
 
     def __init__(self, first: Parameter, second: Parameter, is_scalar=False):
@@ -487,11 +451,11 @@ class SubtractionParameters(Operations, Parameter):
 
         Parameters
         ----------
-        first: Parameter
+        first : :obj:`Parameter`
             First parameter.
-        second: Parameter
+        second : :obj:`Parameter`
             Second parameter.
-        is_scalar: bool
+        is_scalar : :obj:`bool`
             True if the second parameter is a scalar, False otherwise.
         """
 
@@ -507,9 +471,7 @@ class SubtractionParameters(Operations, Parameter):
 
     @property
     def value(self) -> TYPE_NUMBER:
-        """Get the value of the parameter.
-
-        Get the value of the parameter from the product of the two parameters values.
+        """Get the value of the parameter from the product of the two parameters values.
 
         Returns
         -------
@@ -522,36 +484,25 @@ class SubtractionParameters(Operations, Parameter):
 
     @value.setter
     def value(self, value):
-        """Set the value of the parameter.
-
-        Will update the value of the parameter.
-
-        Parameters
-        ----------
-        value : float
-            Value of the parameter.
-        """
         self._value = value
 
 
 class PowParameters(Operations, Parameter):
-    """Base class for the exponentiation of parameters.
+    """Class for the exponentiation of parameters.
 
+    Represents the mathematical operation: first^second.
+    
     Attributes
     ----------
-    first: Parameter
+    first : :obj:`Parameter`
         First parameter to exponentiate.
-    second: Parameter
+    second : :obj:`Parameter`
         Second parameter, is the exponent.
-    is_scalar: bool
+    is_scalar : :obj:`bool`
         True if the second parameter is a scalar, False otherwise.
-    fullname: str
+    fullname : :obj:`str`
         Full name of the resulting parameter.
 
-    Methods
-    -------
-    value
-        Returns the value of the resulting parameter.
     """
 
     def __init__(self, first: Parameter, second: Parameter, is_scalar=False):
@@ -559,11 +510,11 @@ class PowParameters(Operations, Parameter):
 
         Parameters
         ----------
-        first: Parameter
+        first : :obj:`Parameter`
             First parameter.
-        second: Parameter
+        second : :obj:`Parameter`
             Second parameter.
-        is_scalar: bool
+        is_scalar : :obj:`bool`
             True if the second parameter is a scalar, False otherwise.
         """
 
@@ -586,9 +537,7 @@ class PowParameters(Operations, Parameter):
 
     @property
     def value(self) -> TYPE_NUMBER:
-        """Get the value of the parameter.
-
-        Get the value of the parameter from the product of the two parameters values.
+        """Get the value of the parameter from the exponentiation of the two parameters values.
 
         Returns
         -------
@@ -601,36 +550,25 @@ class PowParameters(Operations, Parameter):
 
     @value.setter
     def value(self, value):
-        """Set the value of the parameter.
-
-        Will update the value of the parameter.
-
-        Parameters
-        ----------
-        value : float
-            Value of the parameter.
-        """
         self._value = value
 
 
 class DivisionParameters(Operations, Parameter):
-    """Base class for the division of parameters.
+    """Class for the division of parameters.
+    
+    Represents the mathematical operation: first/second.
 
     Attributes
     ----------
-    first: Parameter
-        First parameter to divide.
-    second: Parameter
-        Second parameter to divide.
-    is_scalar: bool
+    first : :obj:`Parameter`
+        First parameter.
+    second : :obj:`Parameter`
+        Second parameter.
+    is_scalar : :obj:`bool`
         True if the second parameter is a scalar, False otherwise.
-    fullname: str
+    fullname : :obj:`str`
         Full name of the resulting parameter.
 
-    Methods
-    -------
-    value
-        Returns the value of the resulting parameter.
     """
 
     def __init__(self, first: Parameter, second: Parameter, is_scalar=False):
@@ -638,11 +576,11 @@ class DivisionParameters(Operations, Parameter):
 
         Parameters
         ----------
-        first: Parameter
+        first : :obj:`Parameter`
             First parameter.
-        second: Parameter
+        second : :obj:`Parameter`
             Second parameter.
-        is_scalar: bool
+        is_scalar : :obj:`bool`
             True if the second parameter is a scalar, False otherwise.
         """
 
@@ -664,14 +602,12 @@ class DivisionParameters(Operations, Parameter):
 
     @property
     def value(self) -> TYPE_NUMBER:
-        """Get the value of the parameter.
-
-        Get the value of the parameter from the product of the two parameters values.
+        """Get the value of the parameter from the division of the two parameters values.
 
         Returns
         -------
-        float
-            Value of the parameter.
+        TYPE_NUMBER
+            Value of the division.
         """
 
         self._value = self.first.value / self.second.value
@@ -679,48 +615,37 @@ class DivisionParameters(Operations, Parameter):
 
     @value.setter
     def value(self, value):
-        """Set the value of the parameter.
-
-        Will update the value of the parameter.
-
-        Parameters
-        ----------
-        value : float
-            Value of the parameter.
-        """
         self._value = value
 
 
 class ProductParameters(Operations, Parameter):
-    """Base class for the product of parameters.
+    """Class for the product of parameters.
+    
+    Represents the mathematical operation: first*second.
 
     Attributes
     ----------
-    first: Parameter
-        First parameter to multiply.
-    second: Parameter
-        Second parameter to multiply.
-    is_scalar: bool
+    first : :obj:`Parameter`
+        First parameter.
+    second : :obj:`Parameter`
+        Second parameter.
+    is_scalar : :obj:`bool`
         True if the second parameter is a scalar, False otherwise.
-    fullname: str
+    fullname : :obj:`str`
         Full name of the resulting parameter.
 
-    Methods
-    -------
-    value
-        Returns the value of the resulting parameter.
     """
 
     def __init__(self, first: Parameter, second: Parameter, is_scalar=False):
         """Constructor of the class.
-
+        
         Parameters
         ----------
-        first: Parameter
+        first : :obj:`Parameter`
             First parameter.
-        second: Parameter
+        second : :obj:`Parameter`
             Second parameter.
-        is_scalar: bool
+        is_scalar : :obj:`bool`
             True if the second parameter is a scalar, False otherwise.
         """
 
@@ -743,14 +668,12 @@ class ProductParameters(Operations, Parameter):
 
     @property
     def value(self) -> TYPE_NUMBER:
-        """Get the value of the parameter.
-
-        Get the value of the parameter from the product of the two parameters values.
+        """Get the value of the parameter from the product of the two parameters values.
 
         Returns
         -------
-        float
-            Value of the parameter.
+        :obj:`float`
+            Value of the product.
         """
 
         self._value = self.first.value * self.second.value
@@ -758,13 +681,4 @@ class ProductParameters(Operations, Parameter):
 
     @value.setter
     def value(self, value):
-        """Set the value of the parameter.
-
-        Will update the value of the parameter.
-
-        Parameters
-        ----------
-        value : float
-            Value of the parameter.
-        """
         self._value = value

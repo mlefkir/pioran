@@ -1,5 +1,6 @@
 from .core import GaussianProcess
 from .acvf_base import CovarianceFunction
+from .psd_base import PowerSpectralDensity, PowerSpectralDensityComponent
 from .optim import Optimizer
 from .plots import plot_prediction
 from .acvf import SquareExponential, Exponential, Matern32, Matern52, RationalQuadratic

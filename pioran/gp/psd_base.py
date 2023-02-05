@@ -8,12 +8,39 @@ from .parameters import ParametersModel
 
 @dataclass
 class PowerSpectralDensityComponent:
+    """Class for the components of Power spectral density.
+    
+    This class is used to specify individual components of PSD model. 
+    See psd.py for examples of PSD components.
+    
+    Attributes
+    ----------
+    parameters: ParametersModel
+        Parameters of the component
+    componentname: str
+        Name of the component
+    ID: int
+        ID of the component
+    
+    Methods
+    -------
+    __init__
+    __add__
+    __mul__
+    __str__
+    
+    """
+    
     parameters: ParametersModel
     componentname: str
     ID: int
 
     def __init__(self, parameters_values, names, boundaries, free_parameters, **kwargs):
-        """Constructor
+        """Constructor of the PowerSpectralDensityComponent class 
+        
+        Parameters
+        ----------
+        parameters_values
         
         """
         if isinstance(parameters_values, ParametersModel):
@@ -76,16 +103,16 @@ class PowerSpectralDensityComponent:
     def __mul__(self, other):
         """Multiply two PSD components.
 
-        Overload of the + operator for the PowerSpectralDensityComponent class.
+        Overload of the * operator for the PowerSpectralDensityComponent class.
 
         Parameters
         ----------
         other: PowerSpectralDensityComponent or TYPE_NUMBER
-            Parameter or number to add.
+            Parameter or number to multiply.
 
         Returns
         -------
-        SumParameters
+        Parameters
             Sum of the two parameters.
 
         Raises
@@ -378,13 +405,15 @@ class SumPSD(PowerSpectralDensityComponent):
 
 @dataclass
 class ProductPSD(PowerSpectralDensityComponent):
-    """Base class for the sum of parameters.
+    """Class for the product of PowerSpectralDensityComponent.
+    
+    
 
     Attributes
     ----------
-    first: Parameter
-        First parameter to sum.
-    second: Parameter
+    first: PowerSpectralDensityComponent
+        First parameter.
+    second: PowerSpectralDensityComponent
         Second parameter to sum.
     is_scalar: bool
         True if the second parameter is a scalar, False otherwise.

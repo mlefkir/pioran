@@ -46,7 +46,7 @@ class GaussianProcess:
         Wrapper to compute the negative log marginal likelihood.
     """
 
-    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity], training_indexes, training_observables, training_errors=None, **kwargs):
+    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity,PowerSpectralDensityComponent], training_indexes, training_observables, training_errors=None, **kwargs):
         """Constructor method for the GaussianProcess class.
 
         Parameters
@@ -121,8 +121,7 @@ class GaussianProcess:
 
         # Prediction of data
         self.nb_predic_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
-        self.prediction_indexes = kwargs.get('prediction_indexes', 
-                                    self.reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_predic_points)))
+        self.prediction_indexes = kwargs.get('prediction_indexes', self.reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_predic_points)))
 
     def reshape_array(self, array):
         """ Reshape the array to a 2D array with jnp.shape(array,(len(array),1).
@@ -286,8 +285,7 @@ class GaussianProcess:
             L = cholesky(nearest_positive_definite(Cov_xx), lower=True)
 
         if self.estimate_mean:
-            z = solve_triangular(
-                L, self.training_observables-self.function.parameters["mu"].value, lower=True)
+            z = solve_triangular(L, self.training_observables-self.function.parameters["mu"].value, lower=True)
         else:
             z = solve_triangular(L, self.training_observables, lower=True)
 

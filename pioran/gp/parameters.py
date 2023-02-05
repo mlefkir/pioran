@@ -6,81 +6,60 @@ from .tools import check_instance, TYPE_NUMBER, TABLE_LENGTH, HEADER_PARAMETERS
 from .parameter_base import Parameter
 
 
-@dataclass  # (slots=True)
+@dataclass
 class ParametersModel:
-    """ Class for the parameters of a covariance function. 
+    """ Class to store the parameters of a model. 
 
+    This object stores one or several :obj:`Parameter` objects of a model. The model can be 
+    of type :obj:`CovarianceFunction` , :obj:`PowerSpectralDensity` or :obj:`PowerSpectralDensityComponent`.
     Initialised with a list of values for the parameters.
-
-
+    
+    
+    Parameters
+    ----------
+    param_values : list of float or list of Parameter objects
+        Values of the parameters.
+    names : list of str
+        Names of the parameters.
+    **kwargs : dict
+        boundaries : list of float or list of None
+            Boundaries of the parameters.
+        free_parameters : list of bool
+            True if the parameter is free, False otherwise.
+            
     Attributes
     ----------
-    all: dict of Parameter objects
+    all : dict of Parameter objects
         Dictionary with the name of the parameter as key and the Parameter object as value.
-    names: list of str
+    names : list of str
         Names of the parameters.
-    values: list of float
+    values : list of float
         Values of the parameters.
-    boundaries: list of (list of float or list of None)
+    boundaries : list of (list of float or list of None)
         Boundaries of the parameters.
-    free_parameters: list of bool
+    free_parameters : list of bool
         True if the parameter is free, False otherwise.
 
-    Methods
-    -------
-    update_names:
-        Update the parameters names.
-    update_boundaries:
-        Update the boundaries of the parameters.
-    add_parameter:
-        Add a parameter to the object.
-    check_boundaries:
-        Check if the parameters are within the boundaries.
-    print_parameters:
-        Print the parameters.
-    __getitem__:
-        Get the value of a parameter using the name of the parameter in square brackets.
-
     """
-    all: dict[str, Parameter]
-    names: list[str]
-    values: list[float]
-    boundaries: list
-    free_parameters: list[bool]
-
 
     def __init__(self, param_values, names, **kwargs):
         """Constructor method for the ParametersModel class.
 
-        Parameters
-        ----------
-        param_values: list of float or list of Parameter objects
-            Values of the parameters.
-        names: list of str
-            Names of the parameters.
-        **kwargs: dict
-            boundaries: list of float or list of None
-                Boundaries of the parameters.
-            free_parameters: list of bool
-                True if the parameter is free, False otherwise.
         """
         # sanity checks
-        assert len(param_values) == len(names), "The number of parameters is not the same as the number of names."
+        assert len(param_values) == len(names), f"The number of parameters ({len(param_values)}) is not the same as the number of names ({len(names)})."
         if "boundaries" in kwargs.keys():
-            assert len(kwargs["boundaries"]) == len(
-                names), "The number of boundaries is not the same as the number of names."
+            assert len(kwargs["boundaries"]) == len(names), f"The number of boundaries ({len(kwargs['boundaries'])}) is not the same as the number of names ({len(names)})."
             boundaries = kwargs["boundaries"]
         if "free_parameters" in kwargs.keys():
-            assert len(kwargs["free_parameters"]) == len(
-                names), "The number of free parameters is not the same as the number of names."
+            assert len(kwargs["free_parameters"]) == len(names), f"The number of free parameters ({len(kwargs['free_parameters'])}) is not the same as the number of names ({len(names)})."
             free_parameters = kwargs["free_parameters"]
 
         # check if the parameters are given as a list of Parameter objects
         if check_instance(param_values, Parameter):
             self.all = dict(zip([p.name for p in param_values], param_values))
         elif check_instance(param_values, TYPE_NUMBER):
-            self.all = {key: Parameter(name=key, value=value, bounds=[None, None],ID=counter+1) for counter,(
-                key, value) in enumerate(zip(names, param_values))}
+            self.all = {key: Parameter(name=key, value=value, bounds=[None, None],ID=counter+1) for counter,(key, value) in enumerate(zip(names, param_values))}
             if "boundaries" in kwargs.keys():
                 for i, key in enumerate(self.all.keys()):
                     self.all[key].bounds = boundaries[i]
@@ -95,22 +74,25 @@ class ParametersModel:
         
 
     def increment_IDs(self, increment: int):
-        """ Increment the ID of all parameters by a given value.
+        """ Increment the ID of all the parameters by a given value.
 
         Parameters
         ----------
-        increment: int
-            Value to increase the ID of the parameters.
+        increment : int
+            Value used to increase the ID of the parameters.
         """
         for p in self.all.values():
             p.ID += increment
 
     def append(self, parameter: Parameter):
         """ Add a parameter to the list of objects.
+        
+        The parameter should have a name that is different from ones that are already in the list. 
+        Otherwise it will replace the parameter with the same name. 
 
         Parameters
         ----------
-        parameter: Parameter
+        parameter : Parameter
             Parameter to add to the object.
 
         """
@@ -118,11 +100,20 @@ class ParametersModel:
 
     def __eq__(self, other) -> bool:
         """Compare two parameters.
+        
+        Returns True if the two objects have the same attribute all.
+        
+        Returns
+        -------
+        bool
+            True if the two objects have the same attribute all, False otherwise.
         """
         return self.all == other.all
 
     def __len__(self) -> int:
         """Length of the object.
+        
+        Returns the number of parameters in the object.
 
         Returns
         -------
@@ -137,7 +128,7 @@ class ParametersModel:
 
         Returns
         -------
-        boundaries: list of lists
+        boundaries : list of lists
             Boundaries of the parameters.
         """
         # update the list of boundaries if the boundaries of the parameters have changed
@@ -150,22 +141,20 @@ class ParametersModel:
 
         Parameters
         ----------
-        new_boundaries: list of (list of float or list of None)
+        new_boundaries : list of (list of float or list of None)
             Boundaries of the parameters.
         """
-        assert len(new_boundaries) == len(
-            self.all), "The number of boundaries is not the same as the number of parameters."
+        assert len(new_boundaries) == len(self.all), f"The number of boundaries ({len(new_boundaries)}) is not the same as the number of parameters ({len(self.all)})."
         # also update the boundaries of the parameters
         for i, b in enumerate(new_boundaries):
-            assert len(b) == 2, "The boundaries must be a list of 2 elements."
-
+            assert len(b) == 2, f"The boundaries must be a list of 2 elements, ({len(b)}) were given."
             # check the boundaries
             if (b[0] is not None and b[1] is not None):
                 assert b[0] < b[1], "The lower boundary must be smaller than the upper boundary."
             else:
                 assert b[0] is None or b[1] is None, "The boundaries must be None or a number."
             self.all[self.names[i]].bounds = b
-
+            
         self._boundaries = new_boundaries
 
     @property
@@ -186,7 +175,7 @@ class ParametersModel:
 
         Parameters
         ----------
-        new_names: list of str
+        new_names : list of str
             New names of the parameters.
 
         Raises
@@ -205,8 +194,7 @@ class ParametersModel:
             else:
                 raise TypeError("The names must be a list of strings.")
         else:
-            raise ValueError(
-                "The number of names is not the same as the number of parameters.")
+            raise ValueError("The number of names is not the same as the number of parameters.")
 
     @property
     def values(self):
@@ -214,7 +202,7 @@ class ParametersModel:
 
         Returns
         -------
-        values: list of float
+        values : list of float
             Values of the parameters.
         """
         # update the values in case they have changed since the last call
@@ -227,7 +215,7 @@ class ParametersModel:
 
         Parameters
         ----------
-        new_values: list of float or list of Parameter objects
+        new_values : list of float or list of Parameter objects
             Values of the parameters.
 
         Raises
@@ -246,11 +234,9 @@ class ParametersModel:
                 for i, p in enumerate(self.all.values()):
                     p.value = new_values[i]
             else:
-                raise TypeError(
-                    "The values must be a list of numbers or a list of Parameter objects.")
+                raise TypeError("The values must be a list of numbers or a list of Parameter objects.")
         else:
-            raise ValueError(
-                f"The number of values ({len(new_values)}) is not the same as the number of parameters ({len(self.all)}). ")
+            raise ValueError(f"The number of values ({len(new_values)}) is not the same as the number of parameters ({len(self.all)}). ")
 
     @property
     def free_values(self):
@@ -258,7 +244,7 @@ class ParametersModel:
 
         Returns
         -------
-        values: list of float
+        values : list of float
             Values of the free parameters.
         """
         return [p.value for p in self.all.values() if p.free]
@@ -269,7 +255,7 @@ class ParametersModel:
 
         Parameters
         ----------
-        new_free_values: list of float
+        new_free_values : list of float
             Values of the free parameters.
 
         Raises
@@ -288,11 +274,9 @@ class ParametersModel:
                         p.value = new_free_values[k]
                         k += 1
             else:
-                raise TypeError(
-                    "The values must be a list of numbers.")
+                raise TypeError("The values of the free parameters must be a list of numbers.")
         else:
-            raise ValueError(
-                f"The number of values ({len(new_free_values)}) is not the same as the number of free parameters ({len(self.free_parameters)}). ")
+            raise ValueError(f"The number of values given ({len(new_free_values)}) is not the same as the number of free parameters ({len(self.free_parameters)}). ")
     
     @property
     def free_parameters(self):
@@ -313,13 +297,11 @@ class ParametersModel:
 
         Parameters
         ----------
-        new_free_parameters: list of bool
+        new_free_parameters : list of bool
             True if the parameter is free, False otherwise.
         """
-        assert len(new_free_parameters) == len(
-            self.all), "The number of free parameters is not the same as the number of parameters."
-        assert check_instance(
-            new_free_parameters, bool), "The free parameters must be a list of booleans."
+        assert len(new_free_parameters) == len(self.all), f"The number of free parameters ({len(new_free_parameters)}) is not the same as the number of parameters ({len(self.all)})."
+        assert check_instance(new_free_parameters, bool), "The free parameters must be a list of booleans."
         self._free_parameters = new_free_parameters
         # also update the free parameters of the Parameter objects
         for i, p in enumerate(self.all.values()):
@@ -327,49 +309,57 @@ class ParametersModel:
 
     def __getitem__(self, key):
         """ Get a Parameter object using the name of the parameter in square brackets.
+        
+        Get the parameter object with the name in brackets : ['name'].
 
         Parameters
         ----------
-        key: str
+        key : str
             Name of the parameter.
 
         Returns
         -------
-        parameter: Parameter object
+        parameter : Parameter object
             Parameter with name "key".
 
         Raises
         ------
         KeyError
             When the parameter is not in the list of parameters.
+            
         """
+        
         if key in self.all.keys():
             return self.all[key]
         else:
             raise KeyError(f"Parameter {key} not found.")
 
-    def __setitem__(self, key, value: Parameter):
+    def __setitem__(self, key, value : Parameter):
         """ Set a Parameter object using the name of the parameter in square brackets.
 
         Parameters
         ----------
-        key: str
+        key : str
             Name of the parameter.
-        value: Parameter
+        value  : Parameter
             Value of the parameter with name "key".
 
         """
+        
         self.all[key] = value
         self.values = self.all.values()
         self.free_parameters = [p.free for p in self.all.values()]
 
     def __str__(self):
         """ String representation of the Parameters object.
+        
+        
 
         Returns
         -------
         str 
             Pretty table with the info on all parameters.
+            
         """
         s = ""+TABLE_LENGTH*"="+"\n"
         s += HEADER_PARAMETERS.format(ID='ID',Name="Name", Value="Value", Min="Min", Max="Max",

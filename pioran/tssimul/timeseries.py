@@ -97,11 +97,12 @@ class Simulations:
         ts = self.triang.T@r
         return t_test,ts
         
-    def save_time_series(self,name,errors,seed=0):
+    def save_time_series(self,name,errors=None,seed=0):
         t,ts = self.ACV_method(seed)
         if errors is not None:
-            ts_err = np.sqrt(np.abs(ts)*self.duration)/self.duration
-            np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts,ts_err]).T)
+            key = random.PRNGKey(seed)
+            ts_err = jnp.abs(random.normal(key,shape=(len(t),1)).flatten())
+            np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts-2*np.min(ts),ts_err/jnp.sqrt(len(t))]).T)
         else:
             np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts]).T)
         return t,ts

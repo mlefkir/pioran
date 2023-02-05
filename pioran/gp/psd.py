@@ -2,6 +2,8 @@ import jax.numpy as jnp
 from .psd_base import PowerSpectralDensityComponent
 
 class Lorentzian(PowerSpectralDensityComponent):
+    """Class f
+    """
     componentname = 'lorentzian'
     ID = 1
     n_parameters = 3 
