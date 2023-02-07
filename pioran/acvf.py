@@ -28,6 +28,7 @@ class Exponential(CovarianceFunction):
         Values of the parameters of the covariance function.
     **kwargs: dict
         Arguments for the ParametersModel class.
+        
         free_parameters: list of bool
             List of bool to indicate if the parameters are free or not.
             

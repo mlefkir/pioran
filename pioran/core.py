@@ -6,6 +6,7 @@ import jax.numpy as jnp
 from jax.scipy.linalg import cholesky, solve_triangular, solve
 
 from .utils import nearest_positive_definite
+from .tools import reshape_array,sanity_checks
 from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity, PowerSpectralDensityComponent
 from .psdtoacv import PSDToACV
@@ -16,6 +17,26 @@ from typing import Union
 class GaussianProcess:
     """ Class for the Gaussian Process Regression of 1D data. 
 
+    Parameters
+    ----------
+    covariance_function: CovarianceFunction
+        Covariance function associated to the Gaussian Process.
+    training_indexes: 1D array
+        Indexes of the training data, in this case it is the time.
+    training_observables: 1D array
+        Observables of the training data, in this it is flux, count-rate or intensity, etc.
+    training_errors: 1D array, optional
+        Errors on the observables, by default None
+    **kwargs: dict
+        nb_prediction_points: int, optional
+            Number of points to predict, by default 5 * length(training(indexes)).
+        prediction_indexes: 1D array, optional
+            Indexes of the prediction data, by default jnp.linspace(jnp.min(training_indexes),jnp.max(training_indexes),nb_prediction_points)
+        scale_errors: bool, optional
+            Scale the errors on the training data by adding a constant, by default True.
+        estimate_mean: bool, optional
+            Estimate the mean of the training data, by default True.
+            
 
     Attributes
     ----------
@@ -49,46 +70,25 @@ class GaussianProcess:
     def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity,PowerSpectralDensityComponent], training_indexes, training_observables, training_errors=None, **kwargs):
         """Constructor method for the GaussianProcess class.
 
-        Parameters
-        ----------
-        covariance_function: CovarianceFunction
-            Covariance function associated to the Gaussian Process.
-        training_indexes: 1D array
-            Indexes of the training data, in this case it is the time.
-        training_observables: 1D array
-            Observables of the training data, in this it is flux, count-rate or intensity, etc.
-        training_errors: 1D array, optional
-            Errors on the observables, by default None
-        **kwargs: dict
-            nb_prediction_points: int, optional
-                Number of points to predict, by default 5 * length(training(indexes)).
-            prediction_indexes: 1D array, optional
-                Indexes of the prediction data, by default jnp.linspace(jnp.min(training_indexes),jnp.max(training_indexes),nb_prediction_points)
-            scale_errors: bool, optional
-                Scale the errors on the training data by adding a constant, by default True.
-            estimate_mean: bool, optional
-                Estimate the mean of the training data, by default True.
         """
         # Check if the training arrays have the same shape
         if training_errors is None:
-            self.sanity_checks(training_indexes, training_observables)
+            sanity_checks(training_indexes, training_observables)
         else:
-            self.sanity_checks(training_indexes, training_observables)
-            self.sanity_checks(training_observables, training_errors)
+            sanity_checks(training_indexes, training_observables)
+            sanity_checks(training_observables, training_errors)
 
 
         if isinstance(function, CovarianceFunction):
-            self.acvf = function
             self.analytical_cov = True
-            self.function = self.acvf
+            self.function = function
 
         elif isinstance(function, PowerSpectralDensity) or isinstance(function, PowerSpectralDensityComponent):
-            self.psd = function
             self.analytical_cov = False
             S_low = kwargs.get("S_low", 5)
             S_high = kwargs.get("S_high", 10)
             
-            self.function = PSDToACV(self.psd, S_low=S_low, S_high=S_high,T = training_indexes[-1]-training_indexes[0],dt =jnp.min(jnp.diff(training_indexes)))
+            self.function = PSDToACV(function, S_low=S_low, S_high=S_high,T = training_indexes[-1]-training_indexes[0],dt =jnp.min(jnp.diff(training_indexes)))
         else:
             raise TypeError("The input model must be a CovarianceFunction or a PowerSpectralDensity or PowerSpectralDensityComponent.")
         
@@ -103,8 +103,8 @@ class GaussianProcess:
 
 
         # Reshape the arrays
-        self.training_indexes = self.reshape_array(training_indexes)
-        self.training_observables = self.reshape_array(training_observables)
+        self.training_indexes = reshape_array(training_indexes)
+        self.training_observables = reshape_array(training_observables)
         # add a small number to the errors to avoid singular matrices in the cholesky decomposition
         self.training_errors = training_errors.flatten() if training_errors is not None else jnp.ones_like(self.training_observables)*jnp.sqrt(jnp.finfo(float).eps)
 
@@ -121,35 +121,8 @@ class GaussianProcess:
 
         # Prediction of data
         self.nb_predic_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
-        self.prediction_indexes = kwargs.get('prediction_indexes', self.reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_predic_points)))
+        self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_predic_points)))
 
-    def reshape_array(self, array):
-        """ Reshape the array to a 2D array with jnp.shape(array,(len(array),1).
-
-        Parameters
-        ----------
-        array: 1D array
-        
-        Returns
-        -------
-        array: 2D array
-            Reshaped array.
-
-        """
-        return jnp.reshape(array, (len(array), 1))
-
-    def sanity_checks(self, array_A, array_B):
-        """ Check if the lists are of the same shape 
-
-        Parameters
-        ----------
-        array_A: array of shape (n,1)
-            First array.
-        array_B: array  of shape (m,1)
-            Second array.
-        """
-        assert jnp.shape(array_A) == jnp.shape(
-            array_B), "The training arrays must have the same shape."
 
     def get_cov(self, xt, xp, errors=None):
         """ Compute the covariance matrix between two arrays. 
@@ -236,7 +209,7 @@ class GaussianProcess:
         """
         # if we want to change the prediction indexes
         if "prediction_indexes" in kwargs:
-            self.prediction_indexes = self.reshape_array(kwargs["prediction_indexes"])
+            self.prediction_indexes = reshape_array(kwargs["prediction_indexes"])
 
         # Compute the covariance matrix between the training indexes
         _, Cov_inv, alpha = self.get_cov_training()

@@ -1,15 +1,17 @@
 """Generic class and functions for fake time series.
 """
-from dataclasses import dataclass
 import jax.numpy as jnp
-from .psd_base import PowerSpectralDensity
-from .acvf_base import CovarianceFunction
 from jax import random
-import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
-from .utils import EuclideanDistance
 from jax.scipy.linalg import cholesky
 import numpy as np
+from scipy.interpolate import interp1d
+import matplotlib.pyplot as plt
+
+from .psd_base import PowerSpectralDensity
+from .acvf_base import CovarianceFunction
+from .utils import EuclideanDistance
+
+
 
 class Simulations:
     
