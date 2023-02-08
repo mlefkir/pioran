@@ -104,7 +104,7 @@ class Simulations:
         if errors is not None:
             key = random.PRNGKey(seed)
             ts_err = jnp.abs(random.normal(key,shape=(len(t),1)).flatten())
-            np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts-2*np.min(ts),ts_err/jnp.sqrt(len(t))]).T)
+            np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts-2*jnp.min(ts),ts_err]).T)
         else:
             np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts]).T)
         return t,ts

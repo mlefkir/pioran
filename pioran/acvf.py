@@ -63,7 +63,9 @@ class Exponential(CovarianceFunction):
         covariance function evaluated on the array of lags.
         """
         
-        return  self.parameters['variance'].value * jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
+        # return  self.parameters['variance'].value * jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
+        return  0.5 * self.parameters['variance'].value / self.parameters['length'].value *  jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
+
 
 class SquareExponential(CovarianceFunction):
     r""" Class for the squared exponential covariance function.
