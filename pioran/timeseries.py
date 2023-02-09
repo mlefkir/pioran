@@ -15,12 +15,43 @@ from .utils import EuclideanDistance
 
 class Simulations:
     
+    """_summary_
+
+    Parameters
+    ----------
+    T : _type_
+        _description_
+    dt : _type_
+        _description_
+    S_low : _type_
+        _description_
+    S_high : _type_
+        _description_
+    PowerSpectrum : PowerSpectralDensity, optional
+        _description_, by default None
+    Autocovariance : CovarianceFunction, optional
+        _description_, by default None
+
+    Attributes
+    ----------
+    t : _type_
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
+    """
+    
     def __init__(self, T, dt, S_low,S_high,PowerSpectrum:PowerSpectralDensity=None,Autocovariance:CovarianceFunction=None):
 
+    
         # parameters of the time series
         self.duration = T
         self.sampling_period = dt
         self.n_time = int(T/dt)
+        self.t = jnp.arange(0,self.duration,self.sampling_period)      
+
          
         # parameters of the **observed** frequency grid 
         self.f_max_obs = 0.5/dt
@@ -52,6 +83,10 @@ class Simulations:
             raise ValueError("You must provide either a PowerSpectralDensity or a CovarianceFunction")
         
     def plot_acvf(self):
+        """Plot the autocovariance function
+        
+        """
+        
         if self.acvf is None:
             print("-------Calculating the ACVF from the PSD-------")
             acv = jnp.fft.irfft(self.psd)
@@ -67,6 +102,10 @@ class Simulations:
         return fig,ax
     
     def plot_psd(self):
+        """Plot the power spectral density
+        
+        """
+        
         fig,ax = plt.subplots(1,1,figsize=(15,3))
         ax.plot(self.frequencies,self.psd,'.-')
         ax.vlines(self.f_max_obs,ymin=jnp.min(self.psd),ymax=jnp.max(self.psd),label=r"$f_{\rm max}$",color='red')
@@ -81,10 +120,18 @@ class Simulations:
         
         
     def ACV_method(self,seed=0):
-
+        """Generate a time series using the ACV method
+        
+        If the ACVF is not already calculated, it is calculated from the PSD 
+        using the inverse Fourier transform.
+        
+        
+        """
+        
         if self.acvf is None:
             acv = jnp.fft.irfft(self.psd)
             self.acvf = acv[:len(acv)//2+1]
+        
         
         t_test = jnp.arange(0,self.duration,self.sampling_period)      
 
@@ -103,6 +150,7 @@ class Simulations:
         t,ts = self.ACV_method(seed)
         if errors is not None:
             key = random.PRNGKey(seed)
+            ts = ts + errors(t) 
             ts_err = jnp.abs(random.normal(key,shape=(len(t),1)).flatten())
             np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts-2*jnp.min(ts),ts_err]).T)
         else:
@@ -110,6 +158,8 @@ class Simulations:
         return t,ts
         
     def TimmerKonig(self,seed=0):
+        
+        
         key = random.PRNGKey(seed)
         key,subkey = random.split(key) 
                
