@@ -146,16 +146,46 @@ class Simulations:
         ts = self.triang.T@r
         return t_test,ts
         
-    def save_time_series(self,name,errors=None,seed=0):
-        t,ts = self.ACV_method(seed)
-        if errors is not None:
-            key = random.PRNGKey(seed)
-            ts = ts + errors(t) 
-            ts_err = jnp.abs(random.normal(key,shape=(len(t),1)).flatten())
-            np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts-2*jnp.min(ts),ts_err]).T)
+    def save_time_series(self,name,mean=None,seed=0):
+        """Generate a time series and save it to a file.
+        
+        if mean is not None, the time series is shifted by twice the minimum of the time to have a positive valued time series.
+        
+        
+
+        Parameters
+        ----------
+        name : _type_
+            _description_
+        mean : _type_, optional
+            _description_, by default None
+        seed : int, optional
+            _description_, by default 0
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
+        
+        t,true_timeseries = self.ACV_method(seed)
+        
+        if mean is not None:
+            true_timeseries += mean
         else:
-            np.savetxt(f"{name}_seed{seed}.txt",np.array([t,ts]).T)
-        return t,ts
+            true_timeseries -= 2*jnp.min(true_timeseries)
+            
+            
+        key = random.PRNGKey(seed+1)
+        key,subkey = random.split(key) 
+
+        # generate the variance of the errors
+        timeseries_error_size = jnp.abs(random.normal(key,shape=(len(t),1)).flatten())
+        # generate the measured time series with the associated fluxes
+        observed_timeseries = true_timeseries + timeseries_error_size*random.normal(subkey,shape=(len(t),1)).flatten()
+            
+        np.savetxt(f"{name}_seed{seed}.txt",np.array([t,observed_timeseries,timeseries_error_size]).T)
+        return t,observed_timeseries,timeseries_error_size
         
     def TimmerKonig(self,seed=0):
         
