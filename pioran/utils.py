@@ -1,12 +1,13 @@
 from jax.numpy import linalg as la
 from scipy.spatial.distance import cdist
 import jax.numpy as jnp
+from jax import jit
 import numpy as np
 
+@jit
 def EuclideanDistance(xq, xp):
     """Compute the Euclidean distance between two arrays.
 
-    using scipy.spatial.distance.cdist as it seems faster than a homemade version
 
     Parameters
     ----------
@@ -19,8 +20,8 @@ def EuclideanDistance(xq, xp):
     -------
     array of shape (n, m)
     """
-    return cdist(xq, xp, metric='euclidean')
-
+    #return cdist(xq, xp, metric='euclidean')
+    return jnp.sqrt((xq - xp.T)**2)
 
 # ---- Code from Ahmed Fasih ---- https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd
 def nearest_positive_definite(A):
