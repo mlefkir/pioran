@@ -9,8 +9,10 @@
 from jax import jit
 import jax.numpy as jnp
 from .acvf_base import CovarianceFunction
-from .utils import EuclideanDistance
 from .parameters import ParametersModel
+
+import equinox as eqx
+
 
 class Exponential(CovarianceFunction):
     r"""Class for the exponential covariance function.
@@ -38,6 +40,7 @@ class Exponential(CovarianceFunction):
         Parameters of the covariance function.
 
     """
+    parameters: ParametersModel
 
     def __init__(self, parameters_values, **kwargs):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
@@ -45,8 +48,9 @@ class Exponential(CovarianceFunction):
         assert len(parameters_values) == 2, 'The number of parameters for this  covariance function must be 2'
         free_parameters = kwargs.get('free_parameters', [True, True])
         # initialise the parameters and check
-        CovarianceFunction.__init__(self, parameters_values, names=['variance', 'length'], boundaries=[[0, jnp.inf], [0, jnp.inf]], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, parameters_values, names=['variance', 'length'], free_parameters=free_parameters)
     
+    @eqx.filter_jit
     def calculate(self,t):
         """Computes the exponential covariance function for an array of lags t.
         
@@ -64,7 +68,7 @@ class Exponential(CovarianceFunction):
         """
         
         # return  self.parameters['variance'].value * jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
-        return  0.5 * self.parameters['variance'].value / self.parameters['length'].value *  jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
+        return  0.5 * self.parameters['variance'] / self.parameters['length'] *  jnp.exp(- jnp.abs(t) * self.parameters['length'])
 
 
 class SquareExponential(CovarianceFunction):

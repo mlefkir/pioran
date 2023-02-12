@@ -6,9 +6,10 @@ import jax.numpy as jnp
 from .parameters import ParametersModel
 from .utils import EuclideanDistance
 
+import equinox as eqx
+from jax import jit
 
-@dataclass(slots=True)
-class CovarianceFunction:
+class CovarianceFunction(eqx.Module):
     """Master class for covariance functions.
 
     Bridge between the parameters and the covariance function. The covariance functions
@@ -46,8 +47,9 @@ class CovarianceFunction:
         Returns the covariance matrix.
 
     """    
+    parameters: ParametersModel
     
-    def __init__(self, parameters_values, names, boundaries, free_parameters):
+    def __init__(self, parameters_values, names, free_parameters):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
 
 
@@ -59,10 +61,27 @@ class CovarianceFunction:
             self.parameters = parameters_values
         elif isinstance(parameters_values, list) or isinstance(parameters_values, jnp.ndarray):
             self.parameters = ParametersModel(
-                parameters_values, names=names, boundaries=boundaries, free_parameters=free_parameters)
+                parameters_values, names=names, free_parameters=free_parameters)
         else:
             raise TypeError(
                 "The parameters of the covariance function must be a list of floats or jnp.ndarray or a ParametersModel object.")
+
+    # def __init__(self, parameters_values, names, boundaries, free_parameters):
+    #     """Constructor of the covariance function inherited from the CovarianceFunction class.
+
+
+
+    #     """
+    #     #self.isotropic = isotropic
+    #     # initialise the parameters
+    #     if isinstance(parameters_values, ParametersModel):
+    #         self.parameters = parameters_values
+    #     elif isinstance(parameters_values, list) or isinstance(parameters_values, jnp.ndarray):
+    #         self.parameters = ParametersModel(
+    #             parameters_values, names=names, boundaries=boundaries, free_parameters=free_parameters)
+    #     else:
+    #         raise TypeError(
+    #             "The parameters of the covariance function must be a list of floats or jnp.ndarray or a ParametersModel object.")
 
     @classmethod
     def __classname(cls):
@@ -89,7 +108,7 @@ class CovarianceFunction:
         s += self.parameters.__str__()
         return s
     
-    
+    @eqx.filter_jit
     def get_cov_matrix(self, xq, xp):
         """Compute the covariance matrix between two arrays xq, xp.
 

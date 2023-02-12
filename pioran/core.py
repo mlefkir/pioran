@@ -14,7 +14,14 @@ from .psdtoacv import PSDToACV
 from .parameter_base import Parameter
 from typing import Union
 
-class GaussianProcess:
+import os
+os.environ['PYTHONBREAKPOINT'] = '0'
+# Just In Time compilation tools
+import equinox as eqx
+from jax import jit
+
+
+class GaussianProcess(eqx.Module):
     """ Class for the Gaussian Process Regression of 1D data. 
 
     Parameters
@@ -66,7 +73,16 @@ class GaussianProcess:
     wrapper_neg_log_marginal_likelihood:
         Wrapper to compute the negative log marginal likelihood.
     """
-
+    function: Union[CovarianceFunction,PowerSpectralDensity,PowerSpectralDensityComponent]
+    training_indexes: jnp.ndarray
+    training_errors: jnp.ndarray
+    training_observables: jnp.ndarray
+    prediction_indexes: jnp.ndarray
+    nb_predic_points: int
+    scale_errors: bool
+    estimate_mean: bool
+    analytical_cov: bool    
+    
     def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity,PowerSpectralDensityComponent], training_indexes, training_observables, training_errors=None, **kwargs):
         """Constructor method for the GaussianProcess class.
 
@@ -95,11 +111,7 @@ class GaussianProcess:
         # add a factor to scale the errors
         self.scale_errors = kwargs.get("scale_errors", True)
         if self.scale_errors:
-            self.function.parameters.append(Parameter(name="nu", 
-                                                  value=1.0, 
-                                                  bounds=[0.0, 100.0], 
-                                                  free=True, 
-                                                  hyperpar=False))
+            self.function.parameters.append("nu",1.0,True)
 
 
         # Reshape the arrays
@@ -111,11 +123,7 @@ class GaussianProcess:
         # add the mean of the observed data as a parameter
         self.estimate_mean = kwargs.get("estimate_mean", True)
         if self.estimate_mean:
-            self.function.parameters.append(Parameter(name="mu", 
-                                                  value=jnp.mean(self.training_observables), 
-                                                  bounds=[jnp.min(self.training_observables), jnp.max(self.training_observables)],
-                                                  free=True, 
-                                                  hyperpar=False))
+            self.function.parameters.append("mu",jnp.mean(self.training_observables),True)
         else:
             print("The mean of the training data is not estimated. Be careful of the data included in the training set.")
 
@@ -123,7 +131,7 @@ class GaussianProcess:
         self.nb_predic_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
         self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_predic_points)))
 
-
+    #@jit
     def get_cov(self, xt, xp, errors=None):
         """ Compute the covariance matrix between two arrays. 
 
@@ -154,10 +162,11 @@ class GaussianProcess:
             return self.function.get_cov_matrix(xt, xp)
         # if errors and we want to scale them
         if self.scale_errors:
-            return self.function.get_cov_matrix(xt, xp) + self.function.parameters["nu"].value * jnp.diag(errors**2)
+            return self.function.get_cov_matrix(xt, xp) + self.function.parameters["nu"] * jnp.diag(errors**2)
         # if we do not want to scale the errors
         return self.function.get_cov_matrix(xt, xp) + jnp.diag(errors**2)
 
+    #@jit
     def get_cov_training(self):
         """ Compute the covariance matrix and other vectors for the training data.
 
@@ -176,7 +185,7 @@ class GaussianProcess:
         Cov_inv = solve(Cov_xx, jnp.eye(len(self.training_indexes)))
         if self.estimate_mean:
             alpha = Cov_inv@(self.training_observables -
-                             self.function.parameters["mu"].value)
+                             self.function.parameters["mu"])
         else:
             alpha = Cov_inv@(self.training_observables)
         return Cov_xx, Cov_inv, alpha
@@ -221,7 +230,7 @@ class GaussianProcess:
         # Compute the predictive mean
         if self.estimate_mean:
             predictive_mean = Cov_xxp.T@alpha + \
-                self.function.parameters["mu"].value
+                self.function.parameters["mu"]
         else:
             predictive_mean = Cov_xxp.T@alpha
         # Compute the predictive covariance and ensure that the covariance matrix is positive definite
@@ -229,7 +238,9 @@ class GaussianProcess:
             Cov_xpxp - Cov_xxp.T@Cov_inv@Cov_xxp)
 
         return predictive_mean, predictive_covariance
-
+    
+    
+    @eqx.filter_jit
     def compute_log_marginal_likelihood(self):
         """ Compute the log marginal likelihood of the GP.
 
@@ -258,7 +269,7 @@ class GaussianProcess:
             L = cholesky(nearest_positive_definite(Cov_xx), lower=True)
 
         if self.estimate_mean:
-            z = solve_triangular(L, self.training_observables-self.function.parameters["mu"].value, lower=True)
+            z = solve_triangular(L, self.training_observables-self.function.parameters["mu"], lower=True)
         else:
             z = solve_triangular(L, self.training_observables, lower=True)
 
@@ -277,7 +288,7 @@ class GaussianProcess:
         float 
             Log marginal likelihood of the GP.
         """
-        self.function.parameters.free_values = parameters
+        self.function.parameters.set_free_values(parameters)
         return self.compute_log_marginal_likelihood()
 
     def wrapper_neg_log_marginal_likelihood(self, parameters):
@@ -293,7 +304,7 @@ class GaussianProcess:
         float
             Negative log marginal likelihood of the GP.
         """
-        self.function.parameters.free_values = parameters
+        self.function.parameters.set_free_values(parameters)
         return -self.compute_log_marginal_likelihood()
 
     def __str__(self) -> str:

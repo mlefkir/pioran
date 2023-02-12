@@ -59,8 +59,18 @@ class Parameter():
         Full name of the parameter. The default is f"{name}[{ID}]"
 
     """
+    linked: bool
+    name: str
+    value: float
+    bounds: list
+    free: bool
+    hyperpar: bool
+    ID: int
+    relation: None
+    fullname: str
+    expression: str
 
-    def __init__(self, name: str, value: float, bounds: list = [None, None], ID: int = 1, free: bool = True, hyperpar=True, linked=False, relation=None):
+    def __init__(self, name: str, value: float, bounds = None, ID: int = 1, free: bool = True, hyperpar=True, linked=False, relation=None):
         """Constructor method for the Parameter class.
         """
         
