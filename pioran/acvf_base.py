@@ -7,7 +7,6 @@ from .parameters import ParametersModel
 from .utils import EuclideanDistance
 
 import equinox as eqx
-from jax import jit
 
 class CovarianceFunction(eqx.Module):
     """Master class for covariance functions.
@@ -104,7 +103,7 @@ class CovarianceFunction(eqx.Module):
             Include the representation of the parameters.
         """
         s = f"Covariance function: {self.__classname()}\n"
-        s += f"Number of parameters: {len(self.parameters)}\n"
+        s += f"Number of parameters: {len(self.parameters.values)}\n"
         s += self.parameters.__str__()
         return s
     

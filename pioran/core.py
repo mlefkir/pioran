@@ -18,7 +18,6 @@ import os
 os.environ['PYTHONBREAKPOINT'] = '0'
 # Just In Time compilation tools
 import equinox as eqx
-from jax import jit
 
 
 class GaussianProcess(eqx.Module):
@@ -131,7 +130,6 @@ class GaussianProcess(eqx.Module):
         self.nb_predic_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
         self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_predic_points)))
 
-    #@jit
     def get_cov(self, xt, xp, errors=None):
         """ Compute the covariance matrix between two arrays. 
 
@@ -166,7 +164,6 @@ class GaussianProcess(eqx.Module):
         # if we do not want to scale the errors
         return self.function.get_cov_matrix(xt, xp) + jnp.diag(errors**2)
 
-    #@jit
     def get_cov_training(self):
         """ Compute the covariance matrix and other vectors for the training data.
 
