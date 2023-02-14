@@ -1,23 +1,17 @@
 """Core class for Gaussian process regression.
 
 """
-
+import equinox as eqx
 import jax.numpy as jnp
 from jax.scipy.linalg import cholesky, solve_triangular, solve
 
 from .utils import nearest_positive_definite
 from .tools import reshape_array,sanity_checks
 from .acvf_base import CovarianceFunction
-from .psd_base import PowerSpectralDensity, PowerSpectralDensityComponent
+from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
 
-from .parameter_base import Parameter
 from typing import Union
-
-import os
-os.environ['PYTHONBREAKPOINT'] = '0'
-# Just In Time compilation tools
-import equinox as eqx
 
 
 class GaussianProcess(eqx.Module):
@@ -72,7 +66,7 @@ class GaussianProcess(eqx.Module):
     wrapper_neg_log_marginal_likelihood:
         Wrapper to compute the negative log marginal likelihood.
     """
-    function: Union[CovarianceFunction,PowerSpectralDensity,PowerSpectralDensityComponent]
+    model: Union[CovarianceFunction,PowerSpectralDensity]
     training_indexes: jnp.ndarray
     training_errors: jnp.ndarray
     training_observables: jnp.ndarray
@@ -82,7 +76,7 @@ class GaussianProcess(eqx.Module):
     estimate_mean: bool
     analytical_cov: bool    
     
-    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity,PowerSpectralDensityComponent], training_indexes, training_observables, training_errors=None, **kwargs):
+    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity], training_indexes, training_observables, training_errors=None, **kwargs):
         """Constructor method for the GaussianProcess class.
 
         """
@@ -96,21 +90,21 @@ class GaussianProcess(eqx.Module):
 
         if isinstance(function, CovarianceFunction):
             self.analytical_cov = True
-            self.function = function
+            self.model = function
 
         elif isinstance(function, PowerSpectralDensity) or isinstance(function, PowerSpectralDensityComponent):
             self.analytical_cov = False
             S_low = kwargs.get("S_low", 5)
             S_high = kwargs.get("S_high", 10)
             
-            self.function = PSDToACV(function, S_low=S_low, S_high=S_high,T = training_indexes[-1]-training_indexes[0],dt =jnp.min(jnp.diff(training_indexes)))
+            self.model = PSDToACV(function, S_low=S_low, S_high=S_high,T = training_indexes[-1]-training_indexes[0],dt =jnp.min(jnp.diff(training_indexes)))
         else:
             raise TypeError("The input model must be a CovarianceFunction or a PowerSpectralDensity or PowerSpectralDensityComponent.")
         
         # add a factor to scale the errors
         self.scale_errors = kwargs.get("scale_errors", True)
         if self.scale_errors:
-            self.function.parameters.append("nu",1.0,True)
+            self.model.parameters.append("nu",1.0,True,hyperparameter=False)
 
 
         # Reshape the arrays
@@ -122,7 +116,7 @@ class GaussianProcess(eqx.Module):
         # add the mean of the observed data as a parameter
         self.estimate_mean = kwargs.get("estimate_mean", True)
         if self.estimate_mean:
-            self.function.parameters.append("mu",jnp.mean(self.training_observables),True)
+            self.model.parameters.append("mu",jnp.mean(self.training_observables),True,hyperparameter=False)
         else:
             print("The mean of the training data is not estimated. Be careful of the data included in the training set.")
 
@@ -130,6 +124,7 @@ class GaussianProcess(eqx.Module):
         self.nb_predic_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
         self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_predic_points)))
 
+    # @eqx.filter_jit
     def get_cov(self, xt, xp, errors=None):
         """ Compute the covariance matrix between two arrays. 
 
@@ -157,12 +152,12 @@ class GaussianProcess(eqx.Module):
         """
         # if not errors return the covariance matrix
         if errors is None:
-            return self.function.get_cov_matrix(xt, xp)
+            return self.model.get_cov_matrix(xt, xp)
         # if errors and we want to scale them
         if self.scale_errors:
-            return self.function.get_cov_matrix(xt, xp) + self.function.parameters["nu"].value * jnp.diag(errors**2)
+            return self.model.get_cov_matrix(xt, xp) + self.model.parameters["nu"].value * jnp.diag(errors**2)
         # if we do not want to scale the errors
-        return self.function.get_cov_matrix(xt, xp) + jnp.diag(errors**2)
+        return self.model.get_cov_matrix(xt, xp) + jnp.diag(errors**2)
 
     def get_cov_training(self):
         """ Compute the covariance matrix and other vectors for the training data.
@@ -182,7 +177,7 @@ class GaussianProcess(eqx.Module):
         Cov_inv = solve(Cov_xx, jnp.eye(len(self.training_indexes)))
         if self.estimate_mean:
             alpha = Cov_inv@(self.training_observables -
-                             self.function.parameters["mu"].value)
+                             self.model.parameters["mu"].value)
         else:
             alpha = Cov_inv@(self.training_observables)
         return Cov_xx, Cov_inv, alpha
@@ -227,7 +222,7 @@ class GaussianProcess(eqx.Module):
         # Compute the predictive mean
         if self.estimate_mean:
             predictive_mean = Cov_xxp.T@alpha + \
-                self.function.parameters["mu"].value
+                self.model.parameters["mu"].value
         else:
             predictive_mean = Cov_xxp.T@alpha
         # Compute the predictive covariance and ensure that the covariance matrix is positive definite
@@ -266,7 +261,7 @@ class GaussianProcess(eqx.Module):
             L = cholesky(nearest_positive_definite(Cov_xx), lower=True)
 
         if self.estimate_mean:
-            z = solve_triangular(L, self.training_observables-self.function.parameters["mu"].value, lower=True)
+            z = solve_triangular(L, self.training_observables-self.model.parameters["mu"].value, lower=True)
         else:
             z = solve_triangular(L, self.training_observables, lower=True)
 
@@ -285,7 +280,7 @@ class GaussianProcess(eqx.Module):
         float 
             Log marginal likelihood of the GP.
         """
-        self.function.parameters.set_free_values(parameters)
+        self.model.parameters.set_free_values(parameters)
         return self.compute_log_marginal_likelihood()
 
     def wrapper_neg_log_marginal_likelihood(self, parameters):
@@ -301,7 +296,7 @@ class GaussianProcess(eqx.Module):
         float
             Negative log marginal likelihood of the GP.
         """
-        self.function.parameters.set_free_values(parameters)
+        self.model.parameters.set_free_values(parameters)
         return -self.compute_log_marginal_likelihood()
 
     def __str__(self) -> str:
@@ -314,5 +309,5 @@ class GaussianProcess(eqx.Module):
         """
         s = 31*"=" +" Gaussian Process "+31*"="+"\n\n"
         s += f"Marginal log likelihood: {self.compute_log_marginal_likelihood():.5f}\n"
-        s += self.function.__str__()
+        s += self.model.__str__()
         return s

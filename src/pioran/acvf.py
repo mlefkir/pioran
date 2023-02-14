@@ -6,12 +6,12 @@
 - Matern 5/2
 - Rational Quadratic
 """
-from jax import jit
+import equinox as eqx
 import jax.numpy as jnp
+
 from .acvf_base import CovarianceFunction
 from .parameters import ParametersModel
 
-import equinox as eqx
 
 
 class Exponential(CovarianceFunction):
@@ -41,6 +41,7 @@ class Exponential(CovarianceFunction):
 
     """
     parameters: ParametersModel
+    expression = 'exponential'
 
     def __init__(self, param_values, **kwargs):
         """Constructor of the covariance function inherited from the CovarianceFunction class.

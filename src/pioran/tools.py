@@ -7,8 +7,8 @@ from typing import Union
 TYPE_NUMBER = Union[float,int,jnp.number]
 
 
-TABLE_LENGTH = 80+30+4
-HEADER_PARAMETERS = "{ID:<4} {Name:<15} {Value:<14} {Min:<10} {Max:<10} {Status:<9} {Linked:<9} {Expression:<15} {Type:<15} "
+TABLE_LENGTH = 76
+HEADER_PARAMETERS = "{Component:<4} {ID:<4} {Name:<15} {Value:<14} {Status:<9} {Linked:<9} {Type:<15} "
 
 def sanity_checks(array_A, array_B):
     """ Check if the lists are of the same shape 
