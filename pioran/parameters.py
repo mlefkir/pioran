@@ -8,49 +8,145 @@ from .parameter_base import Parameter
 import jax.numpy as jnp
 import equinox as eqx
 
+from jax.tree_util import register_pytree_node_class
+
+@register_pytree_node_class
+class Parameter:
+    value: float
+    name: str
+    free: bool
+    ID: int
+    hyperparameter: bool
+    component: int
+    relation: None
+    _value: float = None
+
+    def __init__(self, name, value, free=True,ID=1,hyperparameter=True,component=1,relation=None):
+        self._value = value
+        self.name = name
+        self.free = free
+        self.ID = ID
+        self.hyperparameter = hyperparameter
+        self.component = component
+        self.relation = relation
+        
+    def __str__(self):
+        return f"Parameter {self.name} = {self.value}"
+
+    @property
+    def value(self):
+        return self._value
+    
+    @value.setter
+    def value(self,new_value):
+        self._value = new_value
+
+    def tree_flatten(self):
+        children = (self.name,self._value, self.free, self.ID, self.hyperparameter, self.component, self.relation)
+        aux_data = None
+        return (children, aux_data)
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children):
+        return cls(*children)
+
 class ParametersModel(eqx.Module):
     names: list
-    values: jnp.ndarray
     free_parameters: jnp.ndarray
-#     free_values: jnp.ndarray
-#     free_names: jnp.ndarray
+    components: jnp.ndarray
+    IDs: list
+    relations: list
+    values: jnp.ndarray
+    hyperparameters: list
+    _pars:list =  None
     
-    def __init__(self, param_values, names,free_parameters):
-        self.names = names
-        self.values = param_values
-        self.free_parameters = free_parameters
+    def __init__(self,param_names,param_values,free_parameters,IDs=None,hyperparameters=None,components=None,relations=None):
 
+        if IDs is None:
+            IDs = [i for i in range(1,1+len(param_names))]
+        self.IDs = IDs
+        if hyperparameters is None:
+            hyperparameters = [True for i in range(len(param_names))]
+        if components is None:
+            components = [1 for i in range(len(param_names))]
+        self.components = components
+        if relations is None:
+            relations = [None for i in range(len(param_names))]
+        self.relations = relations
+        
+        self._pars = [Parameter(param_names[i],param_values[i],free_parameters[i],self.IDs[i],hyperparameters[i],self.components[i]) for i in range(len(param_names))]
+        
+    def __str__(self) -> str:
+        s = ""
+        for i in range(len(self.names)):
+            s += f"{self.names[i]} = {self.values[i]} (free = {self.free_parameters[i]}) (ID = {self.IDs[i]}) (hyperparameter = {self.hyperparameters[i]}) (component = {self.components[i]}) (relation = {self.relations[i]})\n"
+        return s
+   
+   
+    @property
+    def names(self):
+        return [P.name for P in self._pars]
+    
+    @names.setter
+    def names(self,new_names):
+        for i in range(len(self._pars)):
+            self._pars[i].name = new_names[i]
+    
+    @property
+    def values(self):
+        return [P.value for P in self._pars]
+    
+    @values.setter
+    def values(self,new_values):
+        for i in range(len(self._pars)):
+            self._pars[i].value = new_values[i]
+            
+    @property
+    def free_parameters(self):
+        return [P.free for P in self._pars]
+    
+    @free_parameters.setter
+    def free_parameters(self,new_free_parameters):
+        for i in range(len(self._pars)):
+            self._pars[i].free = new_free_parameters[i]        
+    
+    @property
+    def free_values(self):
+        return [P.value for P in self._pars if P.free]
+    
+    # @free_values.setter
+    # def free_values(self,new_free_values):
+    #     w = 0 
+    #     for i in range(len(self._pars)):
+    #         if self._pars[i].free:
+    #             self._pars[i].value = new_free_values[w]
+    #             w += 1
+    def set_free_values(self,new_free_values):
+        w = 0 
+        for i in range(len(self._pars)):
+            if self._pars[i].free:
+                self._pars[i].value = new_free_values[w]
+                w += 1
 #     def new_free_values(self,new_free_values):
 #         return eqx.tree_at(lambda tree: (tree.free_values),self,replace=(new_free_values),)
+    @property
+    def hyperparameters(self):
+        return [P.hyperparameter for P in self._pars]
     
-    def get_free_names(self):
-        return [self.names[i] for i in range(len(self.names)) if self.free_parameters[i]]
+    @hyperparameters.setter
+    def hyperparameters(self,new_hyperparameters):
+        for i in range(len(self._pars)):
+            self._pars[i].hyperparameter = new_hyperparameters[i]
 
-    def set_values(self, new_values):
-        """ Set the values of the parameters.
 
-        Parameters
-        ----------
-        new_values : list of float or list of Parameter objects
-            Values of the parameters.
 
-        Raises
-        ------
-        TypeError
-            When the new values are not a list of floats or Parameter objects.
-        ValueError
-            When the number of new values is not the same as the number of parameters.
-        """
-        return eqx.tree_at(lambda tree: (tree.values), self, replace=(new_values),)
-            
-    def set_free_values(self,new_values):
-        w = 0 
-        for i in range(len(self.values)):
-            if self.free_parameters[i]:
-                self.values[i] = new_values[w]
-                w += 1
-        
+    def increment_component(self,increment):
+        for i in range(len(self.components)):
+            self.components[i] += increment
     
+    def increment_IDs(self,increment):
+        for i in range(len(self.IDs)):
+            self.IDs[i] += increment
     def __getitem__(self, key):
         """ Get a Parameter object using the name of the parameter in square brackets.
 
@@ -74,7 +170,9 @@ class ParametersModel(eqx.Module):
         """
         
         if key in self.names:
-            return self.values[self.names.index(key)]
+            return self._pars[self.names.index(key)]
+        elif isinstance(key,int):
+            return self._pars[key]
         else:
             raise KeyError(f"Parameter {key} not found.")
             
@@ -90,11 +188,11 @@ class ParametersModel(eqx.Module):
 
         """
         if key in self.names:
-            self.values[self.names.index(key)] = value
+            self._pars[self.names.index(key)].value = value
         else:
             raise KeyError(f"Parameter {key} not found.")
     
-    def append(self, name,value,free):
+    def append(self, name,value,free,ID=None,hyperparameter=True,component=None,relation=None):
         """ Add a parameter to the list of objects.
         
         The parameter should have a name that is different from ones that are already in the list. 
@@ -106,9 +204,114 @@ class ParametersModel(eqx.Module):
             Parameter to add to the object.
 
         """
-        self.values.append(value)
-        self.names.append(name)
-        self.free_parameters.append(free)
+
+        if ID is None:
+            ID = len(self.IDs)+1
+        self._pars.append(Parameter(name,value,free,ID,hyperparameter,component,relation))
+
+
+
+# class ParametersModel(eqx.Module):
+#     names: list
+#     values: jnp.ndarray
+#     free_parameters: jnp.ndarray
+# #     free_values: jnp.ndarray
+# #     free_names: jnp.ndarray
+    
+#     def __init__(self, param_values, names,free_parameters):
+#         self.names = names
+#         self.values = param_values
+#         self.free_parameters = free_parameters
+
+# #     def new_free_values(self,new_free_values):
+# #         return eqx.tree_at(lambda tree: (tree.free_values),self,replace=(new_free_values),)
+    
+#     def get_free_names(self):
+#         return [self.names[i] for i in range(len(self.names)) if self.free_parameters[i]]
+
+#     def set_values(self, new_values):
+#         """ Set the values of the parameters.
+
+#         Parameters
+#         ----------
+#         new_values : list of float or list of Parameter objects
+#             Values of the parameters.
+
+#         Raises
+#         ------
+#         TypeError
+#             When the new values are not a list of floats or Parameter objects.
+#         ValueError
+#             When the number of new values is not the same as the number of parameters.
+#         """
+#         return eqx.tree_at(lambda tree: (tree.values), self, replace=(new_values),)
+            
+#     def set_free_values(self,new_values):
+#         w = 0 
+#         for i in range(len(self.values)):
+#             if self.free_parameters[i]:
+#                 self.values[i] = new_values[w]
+#                 w += 1
+        
+    
+#     def __getitem__(self, key):
+#         """ Get a Parameter object using the name of the parameter in square brackets.
+
+#         Get the parameter object with the name in brackets : ['name'].
+
+#         Parameters
+#         ----------
+#         key : str
+#             Name of the parameter.
+
+#         Returns
+#         -------
+#         parameter : Parameter object
+#             Parameter with name "key".
+
+#         Raises
+#         ------
+#         KeyError
+#             When the parameter is not in the list of parameters.
+
+#         """
+        
+#         if key in self.names:
+#             return self.values[self.names.index(key)]
+#         else:
+#             raise KeyError(f"Parameter {key} not found.")
+            
+#     def __setitem__(self, key, value):
+#         """ Set a Parameter object using the name of the parameter in square brackets.
+
+#         Parameters
+#         ----------
+#         key : str
+#             Name of the parameter.
+#         value  : Parameter
+#             Value of the parameter with name "key".
+
+#         """
+#         if key in self.names:
+#             self.values[self.names.index(key)] = value
+#         else:
+#             raise KeyError(f"Parameter {key} not found.")
+    
+#     def append(self, name,value,free):
+#         """ Add a parameter to the list of objects.
+        
+#         The parameter should have a name that is different from ones that are already in the list. 
+#         Otherwise it will replace the parameter with the same name. 
+
+#         Parameters
+#         ----------
+#         parameter : Parameter
+#             Parameter to add to the object.
+
+#         """
+#         self.values.append(value)
+#         self.names.append(name)
+#         self.free_parameters.append(free)
 
 # class ParametersModel:
 #     """ Class to store the parameters of a model. 

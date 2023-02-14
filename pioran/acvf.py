@@ -42,13 +42,13 @@ class Exponential(CovarianceFunction):
     """
     parameters: ParametersModel
 
-    def __init__(self, parameters_values, **kwargs):
+    def __init__(self, param_values, **kwargs):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
         """
-        assert len(parameters_values) == 2, 'The number of parameters for this  covariance function must be 2'
+        assert len(param_values) == 2, 'The number of parameters for this  covariance function must be 2'
         free_parameters = kwargs.get('free_parameters', [True, True])
         # initialise the parameters and check
-        CovarianceFunction.__init__(self, parameters_values, names=['variance', 'length'], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, param_values=param_values,param_names=['variance', 'length'], free_parameters=free_parameters)
     
     @eqx.filter_jit
     def calculate(self,t):
@@ -68,8 +68,7 @@ class Exponential(CovarianceFunction):
         """
         
         # return  self.parameters['variance'].value * jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
-        return  0.5 * self.parameters['variance'] / self.parameters['length'] *  jnp.exp(- jnp.abs(t) * self.parameters['length'])
-
+        return  0.5 * self.parameters['variance'].value / self.parameters['length'].value *  jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
 
 class SquareExponential(CovarianceFunction):
     r""" Class for the squared exponential covariance function.

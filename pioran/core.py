@@ -160,7 +160,7 @@ class GaussianProcess(eqx.Module):
             return self.function.get_cov_matrix(xt, xp)
         # if errors and we want to scale them
         if self.scale_errors:
-            return self.function.get_cov_matrix(xt, xp) + self.function.parameters["nu"] * jnp.diag(errors**2)
+            return self.function.get_cov_matrix(xt, xp) + self.function.parameters["nu"].value * jnp.diag(errors**2)
         # if we do not want to scale the errors
         return self.function.get_cov_matrix(xt, xp) + jnp.diag(errors**2)
 
@@ -182,7 +182,7 @@ class GaussianProcess(eqx.Module):
         Cov_inv = solve(Cov_xx, jnp.eye(len(self.training_indexes)))
         if self.estimate_mean:
             alpha = Cov_inv@(self.training_observables -
-                             self.function.parameters["mu"])
+                             self.function.parameters["mu"].value)
         else:
             alpha = Cov_inv@(self.training_observables)
         return Cov_xx, Cov_inv, alpha
@@ -227,7 +227,7 @@ class GaussianProcess(eqx.Module):
         # Compute the predictive mean
         if self.estimate_mean:
             predictive_mean = Cov_xxp.T@alpha + \
-                self.function.parameters["mu"]
+                self.function.parameters["mu"].value
         else:
             predictive_mean = Cov_xxp.T@alpha
         # Compute the predictive covariance and ensure that the covariance matrix is positive definite
@@ -266,7 +266,7 @@ class GaussianProcess(eqx.Module):
             L = cholesky(nearest_positive_definite(Cov_xx), lower=True)
 
         if self.estimate_mean:
-            z = solve_triangular(L, self.training_observables-self.function.parameters["mu"], lower=True)
+            z = solve_triangular(L, self.training_observables-self.function.parameters["mu"].value, lower=True)
         else:
             z = solve_triangular(L, self.training_observables, lower=True)
 

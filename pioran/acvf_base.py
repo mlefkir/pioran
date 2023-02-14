@@ -48,19 +48,16 @@ class CovarianceFunction(eqx.Module):
     """    
     parameters: ParametersModel
     
-    def __init__(self, parameters_values, names, free_parameters):
+    def __init__(self, param_values,param_names, free_parameters):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
 
 
 
         """
-        #self.isotropic = isotropic
-        # initialise the parameters
-        if isinstance(parameters_values, ParametersModel):
-            self.parameters = parameters_values
-        elif isinstance(parameters_values, list) or isinstance(parameters_values, jnp.ndarray):
-            self.parameters = ParametersModel(
-                parameters_values, names=names, free_parameters=free_parameters)
+        if isinstance(param_values, ParametersModel):
+            self.parameters = param_values
+        elif isinstance(param_values, list) or isinstance(param_values, jnp.ndarray):
+            self.parameters = ParametersModel( param_names=param_names, param_values=param_values, free_parameters=free_parameters)
         else:
             raise TypeError(
                 "The parameters of the covariance function must be a list of floats or jnp.ndarray or a ParametersModel object.")
