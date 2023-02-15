@@ -79,7 +79,7 @@ class PSDToACV(eqx.Module):
         f0 = f_min_obs/S_low
         fN = f_max_obs*S_high
         n_freq_grid = int(jnp.ceil(fN/f0)) + 1 
-        
+        print('n_freq_grid',n_freq_grid)
         self.frequencies = jnp.arange(0,fN+f0,f0)
         tau_max = .5/f0#0.5/self.f0
         self.dtau = tau_max/(n_freq_grid-1) 
@@ -118,7 +118,7 @@ class PSDToACV(eqx.Module):
         #     I = interpo(x)
         return  I
 
-    @eqx.filter_jit
+    # @eqx.filter_jit
     def get_cov_matrix(self, xq, xp):
         """Compute the covariance matrix between two arrays for the exponential covariance function.
 

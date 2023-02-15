@@ -54,9 +54,9 @@ class Optimizer:
             - "ML: using scipy.optimize.minimize
             - "NS": using nested sampling via ultranest
         x0: list of floats, optional
-            Initial guess for the (hyper)parameters, by default None (it will select the free parameters in GP.function.parameters.values)
+            Initial guess for the (hyper)parameters, by default None (it will select the free parameters in GP.model.parameters.values)
         bounds: list of tuple, optional
-            Bounds for the (hyper)parameters, by default None (it will select the free parameters in GP.function.parameters.boundaries)
+            Bounds for the (hyper)parameters, by default None (it will select the free parameters in GP.model.parameters.boundaries)
             
         Raises
         ------
@@ -72,29 +72,29 @@ class Optimizer:
         #     if isinstance(x0, list) or isinstance(x0, jnp.ndarray):
         #         self.initial_guess = x0 
         #         # add the initial guess of nu and mu if they are not in x0
-        #         if  len(self.initial_guess) != len(self.GP.function.parameters.free_parameters):
-        #             if self.GP.estimate_mean: self.initial_guess.append(self.GP.function.parameters["nu"].value)
-        #             if self.GP.estimate_mean:  self.initial_guess.append(self.GP.function.parameters["mu"].value)   
-        #             assert len(self.initial_guess) == len(self.GP.function.parameters.free_parameters), f"The number of initial guesses ({len(self.initial_guess)}) is not the same as the number of free parameters ({len(self.GP.function.parameters.free_parameters)}) to optimize."
+        #         if  len(self.initial_guess) != len(self.GP.model.parameters.free_parameters):
+        #             if self.GP.estimate_mean: self.initial_guess.append(self.GP.model.parameters["nu"].value)
+        #             if self.GP.estimate_mean:  self.initial_guess.append(self.GP.model.parameters["mu"].value)   
+        #             assert len(self.initial_guess) == len(self.GP.model.parameters.free_parameters), f"The number of initial guesses ({len(self.initial_guess)}) is not the same as the number of free parameters ({len(self.GP.model.parameters.free_parameters)}) to optimize."
         #     else:
         #         raise TypeError("x0 must be a list or a numpy array.")
-        # # if x0 is None, use the values of the (hyper)parameters in GP.function.parameters.values
+        # # if x0 is None, use the values of the (hyper)parameters in GP.model.parameters.values
         # else:
-        #     self.initial_guess = [val for (val, free) in zip(self.GP.function.parameters.values, self.GP.function.parameters.free_parameters) if free]
+        #     self.initial_guess = [val for (val, free) in zip(self.GP.model.parameters.values, self.GP.model.parameters.free_parameters) if free]
         
         # # set the boundaries
         # if bounds is not None:
         #     if isinstance(bounds, list) or isinstance(bounds, jnp.ndarray):
         #         self.bounds = bounds
-        #         if not len(self.bounds) == len(self.GP.function.parameters.free_parameters):
+        #         if not len(self.bounds) == len(self.GP.model.parameters.free_parameters):
         #             # add the boundaries of nu and mu
-        #             if self.GP.scale_errors: self.bounds.append(self.GP.function.parameters["nu"].bounds)
-        #             if self.GP.estimate_mean: self.bounds.append(self.GP.function.parameters["mu"].bounds)
-        #             assert len(self.bounds) == len(self.GP.function.parameters.free_parameters), f"The number of boundaries ({len(self.bounds)}) is not the same as the number of free parameters  ({len(self.GP.function.parameters.free_parameters)}) to optimize."
+        #             if self.GP.scale_errors: self.bounds.append(self.GP.model.parameters["nu"].bounds)
+        #             if self.GP.estimate_mean: self.bounds.append(self.GP.model.parameters["mu"].bounds)
+        #             assert len(self.bounds) == len(self.GP.model.parameters.free_parameters), f"The number of boundaries ({len(self.bounds)}) is not the same as the number of free parameters  ({len(self.GP.model.parameters.free_parameters)}) to optimize."
         #     else:
         #         raise TypeError("bounds must be a list or a numpy array.")
         # else:
-        #     self.bounds = self.GP.function.parameters.boundaries
+        #     self.bounds = self.GP.model.parameters.boundaries
         
         # set the method
         if isinstance(method, str):
@@ -102,7 +102,7 @@ class Optimizer:
         else:
             raise TypeError("method must be a string.")   
         
-        self.free_names = [name for (name, free) in zip(self.GP.function.parameters.names, self.GP.function.parameters.free_parameters) if free]
+        self.free_names = [name for (name, free) in zip(self.GP.model.parameters.names, self.GP.model.parameters.free_parameters) if free]
          
     def run(self, priors=None, verbose=True, **kwargs):
         """ Optimize the (hyper)parameters of the Gaussian Process.
@@ -166,7 +166,7 @@ class Optimizer:
         method = kwargs.get('method', 'L-BFGS-B')
         
         res = minimize(self.GP.wrapper_neg_log_marginal_likelihood, self.initial_guess, method=method, bounds=self.bounds,options=options)
-        self.GP.function.parameters.values =  res.x
+        self.GP.model.parameters.values =  res.x
         print("Optimization terminated successfully." if res.success else "/!\/!\/!\  Optimization failed! /!\/!\/!\ ")
         return res
         
@@ -196,11 +196,11 @@ class Optimizer:
         log_dir = kwargs.get('log_dir','GP_ultranest')
         run_kwargs = kwargs.get('run_kwargs',{})
         viz = {} if verbose else  {'show_status': False , 'viz_callback': void}
-        free_names = self.GP.function.parameters.get_free_names()
+        free_names = self.GP.model.parameters.free_names
         sampler = ultranest.ReactiveNestedSampler(free_names, self.GP.wrapper_log_marginal_likelihood,priors,resume=resume,log_dir=log_dir)
         results = sampler.run()#sampler.run(frac_remain=1e-5,dKL=0.2,min_num_live_points = 500)#sampler.run(**run_kwargs, **viz)
         sampler.plot()
-        self.GP.function.parameters.set_free_values(results['posterior']['median'])
+        self.GP.model.parameters.set_free_values(results['posterior']['median'])
         return results 
     
 def void(*args, **kwargs):

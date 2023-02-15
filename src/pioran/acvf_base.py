@@ -85,7 +85,7 @@ class CovarianceFunction(eqx.Module):
         """    
         return self.__str__()
     
-    @eqx.filter_jit
+    # @eqx.filter_jit
     def get_cov_matrix(self, xq, xp):
         """Compute the covariance matrix between two arrays xq, xp.
 

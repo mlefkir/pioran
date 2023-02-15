@@ -13,7 +13,6 @@ from .acvf_base import CovarianceFunction
 from .parameters import ParametersModel
 
 
-
 class Exponential(CovarianceFunction):
     r"""Class for the exponential covariance function.
 
@@ -51,7 +50,6 @@ class Exponential(CovarianceFunction):
         # initialise the parameters and check
         CovarianceFunction.__init__(self, param_values=param_values,param_names=['variance', 'length'], free_parameters=free_parameters)
     
-    @eqx.filter_jit
     def calculate(self,t):
         """Computes the exponential covariance function for an array of lags t.
         
@@ -68,7 +66,7 @@ class Exponential(CovarianceFunction):
         covariance function evaluated on the array of lags.
         """
         
-        # return  self.parameters['variance'].value * jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
+        # return  self.parameters['variance'].value * jnp.exp(- jnp.abs(t) / self.parameters['length'].value)
         return  0.5 * self.parameters['variance'].value / self.parameters['length'].value *  jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
 
 class SquareExponential(CovarianceFunction):

@@ -92,14 +92,14 @@ class GaussianProcess(eqx.Module):
             self.analytical_cov = True
             self.model = function
 
-        elif isinstance(function, PowerSpectralDensity) or isinstance(function, PowerSpectralDensityComponent):
+        elif isinstance(function, PowerSpectralDensity):
             self.analytical_cov = False
-            S_low = kwargs.get("S_low", 5)
-            S_high = kwargs.get("S_high", 10)
+            S_low = kwargs.get("S_low", 2)
+            S_high = kwargs.get("S_high", 2)
             
             self.model = PSDToACV(function, S_low=S_low, S_high=S_high,T = training_indexes[-1]-training_indexes[0],dt =jnp.min(jnp.diff(training_indexes)))
         else:
-            raise TypeError("The input model must be a CovarianceFunction or a PowerSpectralDensity or PowerSpectralDensityComponent.")
+            raise TypeError("The input model must be a CovarianceFunction or a PowerSpectralDensity.")
         
         # add a factor to scale the errors
         self.scale_errors = kwargs.get("scale_errors", True)
@@ -232,7 +232,6 @@ class GaussianProcess(eqx.Module):
         return predictive_mean, predictive_covariance
     
     
-    @eqx.filter_jit
     def compute_log_marginal_likelihood(self):
         """ Compute the log marginal likelihood of the GP.
 
@@ -266,7 +265,8 @@ class GaussianProcess(eqx.Module):
             z = solve_triangular(L, self.training_observables, lower=True)
 
         return -((jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.training_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z)).flatten()[0])
-
+    
+    @eqx.filter_jit
     def wrapper_log_marginal_likelihood(self, parameters):
         """ Wrapper to compute the log marginal likelihood in function of the (hyper)parameters. 
 

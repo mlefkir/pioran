@@ -196,7 +196,11 @@ class ParametersModel:
 
     @property
     def free_values(self):
-        return [p.value for p in self.all.values() if p.free]
+        return [p.value for p in self._pars if p.free]
+    
+    @property
+    def free_names(self):
+        return [p.name for p in self._pars if p.free]
     
     def set_free_values(self,new_free_values):
         """ Set the values of the free parameters.
