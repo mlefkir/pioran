@@ -85,18 +85,22 @@ class PSDToACV(eqx.Module):
         self.dtau = tau_max/(n_freq_grid-1) 
         self.tau = jnp.arange(0,tau_max+self.dtau,self.dtau)
       
-    @eqx.filter_jit
     def calculate(self,x):
         """
         Calculate the autocovariance function from the power spectral density.
         """
         psd = self.PSD.calculate(self.frequencies)
-        acvf = jnp.fft.irfft(psd) 
-        acvf = acvf[:len(self.tau)]/self.dtau # normalize by the frequency step 
+        acvf = self.get_acvf_byFFT(psd)
+# normalize by the frequency step 
         # acvf = acvf[:len(acvf)//2+1]/self.dtau was not working properly for odd number of points
 
         return  self.interpolation(x,acvf)
-
+    
+    def get_acvf_byFFT(self,psd):
+        acvf = jnp.fft.irfft(psd) 
+        acvf = acvf[:len(self.tau)]/self.dtau 
+        return  acvf
+    
     @eqx.filter_jit
     def interpolation(self, x, acvf):
         """Interpolate the autocovariance function at the points x.

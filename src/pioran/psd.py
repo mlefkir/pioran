@@ -20,7 +20,6 @@ class Lorentzian(PowerSpectralDensity):
         # initialise the parameters and check
         PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=["position",'amplitude', 'halfwidth'], free_parameters=free_parameters)
     
-    # @eqx.filter_jit
     def calculate(self,x) -> jnp.ndarray:
         # return self.parameters['amplitude'].value / ( ( 1 + ( ( x - self.parameters['position'].value ) / self.parameters['halfwidth'].value )**2 ) )/jnp.pi/self.parameters['halfwidth'].value
         # return 2 * self.parameters['amplitude'].value * self.parameters['halfwidth'].value  /  ( self.parameters['halfwidth'].value**2 + 4 * jnp.pi**2 * ( x - self.parameters['position'].value )**2 )

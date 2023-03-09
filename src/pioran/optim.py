@@ -139,6 +139,8 @@ class Optimizer:
             raise ValueError("The method must be either 'ML' or 'NS'.")
         print("\n>>>>>> Optimization done.")
         print(self.GP)
+        
+        # print(self.GP)
         return results
 
 
