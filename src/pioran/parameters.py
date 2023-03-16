@@ -1,49 +1,81 @@
-"""Classes for the parameters of covariance functions
+"""Classes to store for the parameters of models.
 
 """
-from dataclasses import dataclass
-from .tools import check_instance, TYPE_NUMBER, TABLE_LENGTH, HEADER_PARAMETERS
+from .tools import TABLE_LENGTH, HEADER_PARAMETERS
 from .parameter_base import Parameter
 
 import jax.numpy as jnp
-import equinox as eqx
-
 
 
 
 class ParametersModel:
     """ Class to store the parameters of a model. 
 
-    This object stores one or several :obj:`Parameter` objects of a model. The model can be 
+    This object stores one or several :obj:`Parameter` objects for a model. The model can be 
     of type :obj:`CovarianceFunction` , :obj:`PowerSpectralDensity` or :obj:`PowerSpectralDensityComponent`.
     Initialised with a list of values for the parameters.
     
     
     Parameters
     ----------
-    param_values : list of float or list of Parameter objects
-        Values of the parameters.
-    names : list of str
+    param_names : :obj:`list of str`
         Names of the parameters.
-    **kwargs : dict
-        boundaries : list of float or list of None
-            Boundaries of the parameters.
-        free_parameters : list of bool
-            True if the parameter is free, False otherwise.
+    param_values : :obj:`list of float`
+        Values of the parameters.
+    free_parameters : :obj:`list of bool`
+        List of bool to indicate if the parameters are free or not.
+    IDs : :obj:`list of int`
+        IDs of the parameters.
+    hyperparameters : :obj:`list of bool`
+        List of bool to indicate if the parameters are hyperparameters or not.
+    components : :obj:`list of int`
+        List of int to indicate the component number of the parameters.
+    relations : :obj:`list of str`
+        List of str to indicate the relation between the parameters.
+    kwargs : dict
+        _pars : :obj:`list of Parameter`
+            List of Parameter objects.
             
     Attributes
     ----------
-    all : dict of Parameter objects
-        Dictionary with the name of the parameter as key and the Parameter object as value.
-    names : list of str
+    names : :obj:`list of str`
         Names of the parameters.
-    values : list of float
+    values : :obj:`list of float`
         Values of the parameters.
-    boundaries : list of (list of float or list of None)
-        Boundaries of the parameters.
-    free_parameters : list of bool
+    free_parameters : :obj:`list of bool`
         True if the parameter is free, False otherwise.
-
+    IDs : :obj:`list of int`
+        IDs of the parameters.
+    hyperparameters : :obj:`list of bool`
+        True if the parameter is a hyperparameter, False otherwise.
+    components : :obj:`list of int`
+        Component number of the parameters.
+    relations : :obj:`list of str`
+        Relation between the parameters.
+    _pars : :obj:`list of Parameter`
+        List of Parameter objects.
+        
+    Methods
+    -------
+    increment_component(increment)
+        Increment the component number of the parameters.
+    increment_ID(increment)
+        Increment the ID of the parameters.
+    append(param)
+        Append a parameter to the list of parameters.
+    set_free_values(values)
+        Set the values of the free parameters.
+    set_names(names)
+        Set the names of the parameters.
+    __getitem__(key)
+        Get the parameter at the index key.
+    __setitem__(key,value)
+        Set the parameter at the index key to value.
+    __str__()
+        String representation of the parameters.
+    __repr__()
+        Representation of the parameters.
+    
     """
     names: list
     free_parameters: jnp.ndarray
@@ -57,7 +89,6 @@ class ParametersModel:
 
     def __init__(self,param_names,param_values,free_parameters,IDs=None,hyperparameters=None,components=None,relations=None,**kwargs):
         """Constructor method for the ParametersModel class.
-
         """
         if '_pars' in kwargs.keys():
             self._pars = (kwargs['_pars'])
@@ -74,12 +105,12 @@ class ParametersModel:
             self._pars = [Parameter(param_names[i],param_values[i],free_parameters[i],IDs[i],hyperparameters[i],components[i]) for i in range(len(param_names))]
 
 
-    def increment_component(self,increment):
+    def increment_component(self,increment:int):
         """ Increment the component number of all the parameters by a given value.
 
         Parameters
         ----------
-        increment : int
+        increment : :obj:`int`
             Value used to increase the component number of the parameters.
         """
         for i in range(len(self.components)):
@@ -90,7 +121,7 @@ class ParametersModel:
 
         Parameters
         ----------
-        increment : int
+        increment : :obj:`int`
             Value used to increase the ID of the parameters.
         """
         for i in range(len(self.IDs)):
@@ -102,19 +133,20 @@ class ParametersModel:
 
         Parameters
         ----------
-        name : str
+        name : :obj:`str`
             Name of the parameter.
-        value : float
+        value : `float`
             Value of the parameter.
-        free : bool
+        free : :obj:`bool`
             True if the parameter is free, False otherwise.
-        ID : int, optional
+        ID : :obj:`int`, optional
             ID of the parameter.
-        hyperparameter : bool, optional
-            True if the parameter is a hyperparameter, False otherwise.
-        component : int, optional
+        hyperparameter : :obj:`bool`, optional
+            True if the parameter is a hyperparameter, False otherwise. 
+            The default is True.
+        component : :obj:`int`, optional
             Component number of the parameter.
-        relation : str, optional
+        relation : :obj:`str`, optional
             Relation between the parameter and the hyperparameters.
         """
         if ID is None:
@@ -123,22 +155,22 @@ class ParametersModel:
 
     @property
     def names(self):
-        """ Names of the parameters. 
+        """ Get the names of the parameters. 
 
         Returns
         -------
-        list of str
+        :obj:`list of str`
             Names of the parameters.
         """
         return [P.name for P in self._pars]
 
     @property
     def free_parameters(self):
-        """ Get the values of the free parameters.
+        """Get the values of the free parameters.
 
         Returns
         -------
-        values : list of float
+        :obj:`list of float`
             Values of the free parameters.
         """
         return [P.free for P in self._pars]
@@ -149,21 +181,45 @@ class ParametersModel:
 
         Returns
         -------
-        IDs : list of float
+        :obj:`list of float`
             IDs of the parameters.
         """
         return [P.ID for P in self._pars]
     
     @property
     def hyperparameters(self):
+        """ Get the hyperparameters of the parameters.
+        
+        Returns
+        -------
+        :obj:`list of bool`
+            List of bool to indicate if the parameters are hyperparameters or not.
+        """
+        
         return [P.hyperparameter for P in self._pars]
     
     @property
     def relations(self):
+        """Get the relation between the parameters.
+
+        Returns
+        -------
+        :obj:`list of str`
+            Relation between the parameters.
+        """
+        
         return [P.relation for P in self._pars]
     
     @property
     def components(self):
+        """Get the component numbers of the parameters.
+
+        Returns
+        -------
+        :obj:`list of int`
+            Component numbers of the parameters.
+        """
+        
         return [P.component for P in self._pars]
 
     def set_names(self,new_names):
@@ -189,17 +245,32 @@ class ParametersModel:
 
         Returns
         -------
-        values : list of float
+        :obj:`list of float`
             Values of the parameters.
         """
         return [P.value for P in self._pars]
 
     @property
     def free_values(self):
+        """ Get the values of the free parameters.
+
+        Returns
+        -------
+        :obj:`list of float`
+            Values of the free parameters.
+        """
         return [p.value for p in self._pars if p.free]
     
     @property
     def free_names(self):
+        """ Get the names of the free parameters.
+
+        Returns
+        -------
+        :obj:`list of str`
+            Names of the free parameters.
+        """
+        
         return [p.name for p in self._pars if p.free]
     
     def set_free_values(self,new_free_values):
@@ -207,7 +278,7 @@ class ParametersModel:
 
         Parameters
         ----------
-        new_free_values : list of float
+        new_free_values : :obj:`list of float`
             Values of the free parameters.
 
         Raises
@@ -232,12 +303,12 @@ class ParametersModel:
 
         Parameters
         ----------
-        key : str
+        key : :obj:`str`
             Name of the parameter.
 
         Returns
         -------
-        parameter : Parameter object
+        parameter : `Parameter` object
             Parameter with name "key".
 
         Raises
@@ -275,11 +346,9 @@ class ParametersModel:
     def __str__(self) -> str:
         """ String representation of the Parameters object.
         
-        
-
         Returns
         -------
-        str 
+        :obj:`str`
             Pretty table with the info on all parameters.
             
         """

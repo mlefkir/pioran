@@ -1,4 +1,4 @@
-"""General classes for operations on one parameter
+"""General class to represent one parameter of a model.
 
 """
 from jax.tree_util import register_pytree_node_class
@@ -8,7 +8,7 @@ from .tools import HEADER_PARAMETERS
 
 @register_pytree_node_class
 class Parameter():
-    """Class for one parameters, it can be a hyperparameter or a mean
+    """Class for one parameters, it can be a hyperparameter or model
     parameter.
 
     The object of this class is then used to create a list of
@@ -48,8 +48,11 @@ class Parameter():
     ID : :obj:`int`, optional
         ID of the parameter, default is 1.
     relation : :obj:`Parameter`, optional
-        Relation between the parameter and the linked one. The default is None.
-
+        Relation between the parameter and the linked one. The default is :obj:`None`.
+   
+   
+    Methods
+    -------
     """    
     value: float
     name: str
@@ -73,6 +76,13 @@ class Parameter():
 
     @property
     def name(self):
+        """Get the name of the parameter.
+        
+        Returns
+        -------
+        :obj:`str`
+            Name of the parameter.
+        """
         return self._name
     
     @name.setter
@@ -85,7 +95,7 @@ class Parameter():
 
         Returns
         -------
-        float
+        :obj:`float`
             Value of the parameter.
         """
         return self._value
@@ -98,7 +108,7 @@ class Parameter():
 
         Parameters
         ----------
-        value : float
+        value : :obj:`float`
             Value of the parameter.
         """
         self._value = new_value
@@ -114,7 +124,7 @@ class Parameter():
 
         Returns
         -------
-        str
+        :obj:`str`
             String representation of the parameter.
         """
         
@@ -135,12 +145,12 @@ class Parameter():
         """Flatten the object for the JAX tree.
 
         The object is flatten in a tuple containing the dynamic children and the static auxiliary data.
-        The dynamic children are the name and the value of the parameter while the static auxiliary data are the attributes
-        free, ID, hyperparameter, component and relation.
+        The dynamic children are the :py:attr:`name` and :py:attr:`value` of the parameter while the static auxiliary data are the attributes
+        :py:attr:`free`, :py:attr:`ID`, :py:attr:`hyperparameter`, :py:attr:`component` and :py:attr:`relation`.
         
         Returns
         -------
-        tuple
+        :obj:`tuple`
             Tuple containing the children and the auxiliary data.
         """
         
@@ -156,14 +166,14 @@ class Parameter():
 
         Parameters
         ----------
-        aux_data : dict
+        aux_data : :obj:`dict`
             Dictionary containing the static auxiliary data.
-        children : tuple
+        children : :obj:`tuple`
             Tuple containing the dynamic children.
 
         Returns
         -------
-        Parameter
+        :obj:`Parameter`
             Parameter object.
         """
 

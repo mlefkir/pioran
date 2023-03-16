@@ -9,40 +9,43 @@ from .utils import EuclideanDistance
 
 
 class CovarianceFunction(eqx.Module):
-    """Master class for covariance functions.
+    """Master class for covariance functions, inherited from the ``equinox.Module`` class.
 
     Bridge between the parameters and the covariance function. The covariance functions
     inherit from this class.
     
     Parameters
     ----------
-    parameters_values : :obj:`ParametersModel` or list of float
+    param_values : :obj:`ParametersModel` or `list of float`
         Values of the parameters of the covariance function.
-    param_names : list of str
+    param_names : `list of str`
         param_names of the parameters of the covariance function.
-    free_parameters : list of bool
+    free_parameters : `list of bool`
         List of bool to indicate if the parameters are free or not.
 
     Raises
     ------
-    TypeError
-        If parameters_values is not a list of float or a :obj:`ParametersModel`.
+    `TypeError`
+        If param_values is not a `list of float` or a :obj:`ParametersModel`.
 
     Attributes
     ----------
     parameters : :obj:`ParametersModel`
         Parameters of the covariance function.
-    expression : str
+    expression : `str`
         Expression of the covariance function.
 
     Methods
     -------
-    __init__
+    __init__(param_values, param_names, free_parameters)
         Constructor of the covariance function class.
-    __str__
+    __str__()
         String representation of the covariance function.
-        Include the representation of the parameters.
-    get_cov_matrix
+    __add__(other)
+        Overload the + operator to add two covariance functions.
+    __mul__(other)
+        Overload the * operator to multiply two covariance functions.
+    get_cov_matrix(xp,xq)
         Returns the covariance matrix.
 
     """    
@@ -60,7 +63,7 @@ class CovarianceFunction(eqx.Module):
             raise TypeError(
                 "The parameters of the covariance function must be a list of floats or jnp.ndarray or a ParametersModel object.")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String representation of the covariance function.
 
         Returns
@@ -74,7 +77,7 @@ class CovarianceFunction(eqx.Module):
         s += self.parameters.__str__()
         return s
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Representation of the covariance function.
 
         Returns
@@ -85,11 +88,10 @@ class CovarianceFunction(eqx.Module):
         """    
         return self.__str__()
     
-    # @eqx.filter_jit
-    def get_cov_matrix(self, xq, xp):
+    def get_cov_matrix(self, xq, xp) -> jnp.ndarray:
         """Compute the covariance matrix between two arrays xq, xp.
 
-        The term (xq-xp) is computed using the Euclidean distance.
+        The term (xq-xp) is computed using the Euclidean distance from the utils module.
 
         Parameters
         ----------
@@ -108,8 +110,8 @@ class CovarianceFunction(eqx.Module):
         # Compute the covariance matrix        
         return self.calculate(dist)
     
-    def __add__(self, other):
-        """Overload of the + operator for the covariance functions.
+    def __add__(self, other) -> "SumCovarianceFunction":
+        """Overload of the + operator to add two covariance functions.
 
         Parameters
         ----------
@@ -125,8 +127,8 @@ class CovarianceFunction(eqx.Module):
         other.parameters.increment_component(max(self.parameters.components))
         return SumCovarianceFunction(self, other)
     
-    def __mul__(self, other):
-        """Overload of the * operator for the covariance functions.
+    def __mul__(self, other) -> "ProductCovarianceFunction":
+        """Overload of the * operator to multiply two covariance functions.
         
         Parameters
         ----------
@@ -162,9 +164,13 @@ class ProductCovarianceFunction(CovarianceFunction):
         Second covariance function.
     parameters : :obj:`ParametersModel`
         Parameters of the covariance function.
-    expression : str
+    expression : `str`
         Expression of the total covariance function.
 
+    Methods
+    -------
+    calculate(x)
+        Compute the product of the two covariance functions.
     """
     cov1: CovarianceFunction
     cov2: CovarianceFunction
@@ -189,15 +195,16 @@ class ProductCovarianceFunction(CovarianceFunction):
                                           param_values=cov1.parameters.values + cov2.parameters.values,
                                           free_parameters=cov1.parameters.free_parameters + cov2.parameters.free_parameters,
                                           _pars=cov1.parameters._pars + cov2.parameters._pars)
+    
     @eqx.filter_jit
-    def calculate(self, x):
+    def calculate(self, x) -> jnp.ndarray:
         """Compute the covariance function at the points x.
         
         It is the product of the two covariance functions.
         
         Parameters
         ----------
-        x : array 
+        x : jnp.array 
             Points where the covariance function is computed.
         
         Returns
@@ -225,9 +232,13 @@ class SumCovarianceFunction(CovarianceFunction):
         Second covariance function.
     parameters : :obj:`ParametersModel`
         Parameters of the covariance function.
-    expression : str
+    expression : `str`
         Expression of the total covariance function.
 
+    Methods
+    -------
+    calculate(x)
+        Compute the sum of the two covariance functions.
     """
     cov1: CovarianceFunction
     cov2: CovarianceFunction
@@ -244,15 +255,16 @@ class SumCovarianceFunction(CovarianceFunction):
                                           param_values=cov1.parameters.values + cov2.parameters.values,
                                           free_parameters=cov1.parameters.free_parameters + cov2.parameters.free_parameters,
                                           _pars=cov1.parameters._pars + cov2.parameters._pars)
+    
     @eqx.filter_jit
-    def calculate(self, x):
+    def calculate(self, x) -> jnp.ndarray:
         """Compute the covariance function at the points x.
         
         It is the sum of the two covariance functions.
         
         Parameters
         ----------
-        x : array 
+        x : jnp.array 
             Points where the covariance function is computed.
         
         Returns

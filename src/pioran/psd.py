@@ -8,6 +8,14 @@ from .parameters import ParametersModel
 class Lorentzian(PowerSpectralDensity):
     """Class for the Lorentzian power spectral density.
     
+    
+    Parameters
+    ----------
+    parameters_values : list
+        list of the parameters values.
+        in the order: [position, amplitude, halfwidth]
+    kwargs : dict
+        free_parameters: list of booleans
     """
     parameters: ParametersModel
     expression = 'lorentzian'
@@ -26,6 +34,21 @@ class Lorentzian(PowerSpectralDensity):
         return self.parameters['amplitude'].value  /  ( self.parameters['halfwidth'].value**2 + 4 * jnp.pi**2 * ( x - self.parameters['position'].value )**2 )
 
 class Gaussian(PowerSpectralDensity):
+    r"""
+    
+            K(\tau) = A \times \exp{\left( -\dfrac{\tau^2}{2\sigma}\right) } 
+
+
+    Parameters
+    ----------
+    PowerSpectralDensity : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     componentname = 'gaussian'
     ID = 1
     n_parameters = 3 
