@@ -1,12 +1,54 @@
 
+"""Module to represent the power spectral density functions.
+"""
+
 import equinox as eqx
 import jax.numpy as jnp
+
 from .parameters import ParametersModel
 
+
 class PowerSpectralDensity(eqx.Module):
-    """ Master class for the power density function functions.
+    """Master class for the power density function functions, inherited from the ``equinox.Module`` class.
+
+    Bridge between the parameters and the power spectral density function. The power spectral density functions
+    inherit from this class.
     
-    """
+    Parameters
+    ----------
+    param_values : :obj:`ParametersModel` or  :obj:`list of float`
+        Values of the parameters of the power spectral density function.
+    param_names : :obj:`list of str`
+        param_names of the parameters of the power spectral density function.
+    free_parameters :  :obj:`list of bool`
+        List of bool to indicate if the parameters are free or not.
+
+    Raises
+    ------
+    `TypeError`
+        If param_values is not a :obj:`list of float` or a :obj:`ParametersModel`.
+
+    Attributes
+    ----------
+    parameters : :obj:`ParametersModel`
+        Parameters of the covariance function.
+    expression : :obj:`str`
+        Expression of the covariance function.
+
+    Methods
+    -------
+    __init__(param_values, param_names, free_parameters)
+        Constructor of the power spectral density function class.
+    __str__()
+        String representation of the covariance function.
+    __add__(other)
+        Overload the + operator to add two covariance functions.
+    __mul__(other)
+        Overload the * operator to multiply two covariance functions.
+    get_cov_matrix(xp,xq)
+        Returns the covariance matrix.
+
+    """    
     parameters: ParametersModel
     expression: str
     
@@ -25,7 +67,7 @@ class PowerSpectralDensity(eqx.Module):
         
         Returns
         -------
-        str
+        :obj:`str`
             String representation of the power spectral density.
         """
     
@@ -42,7 +84,7 @@ class PowerSpectralDensity(eqx.Module):
         Parameters
         ----------
         other : :obj:`PowerSpectralDensity`
-            power spectral density to add.
+            Power spectral density to add.
 
         Returns
         -------
@@ -59,7 +101,7 @@ class PowerSpectralDensity(eqx.Module):
         Parameters
         ----------
         other : :obj:`PowerSpectralDensity`
-            power spectral density to multiply.
+            Power spectral density to multiply.
         
         Returns
         -------
@@ -92,6 +134,10 @@ class ProductPowerSpectralDensity(PowerSpectralDensity):
     expression : str
         Expression of the total power spectral density.
 
+    Methods
+    -------
+    calculate(x)
+        Compute the total power spectral density at the points x.
     """
     psd1: PowerSpectralDensity
     psd2: PowerSpectralDensity
@@ -117,14 +163,14 @@ class ProductPowerSpectralDensity(PowerSpectralDensity):
                                           free_parameters=psd1.parameters.free_parameters + psd2.parameters.free_parameters,
                                           _pars=psd1.parameters._pars + psd2.parameters._pars)
     @eqx.filter_jit
-    def calculate(self, x):
+    def calculate(self, x) -> jnp.ndarray:
         """Compute the power spectral density at the points x.
         
         It is the product of the two power spectral densities.
         
         Parameters
         ----------
-        x : array 
+        x : :obj:`jnp.ndarray` 
             Points where the power spectral density is computed.
         
         Returns
@@ -135,7 +181,7 @@ class ProductPowerSpectralDensity(PowerSpectralDensity):
         return self.psd1.calculate(x) * self.psd2.calculate(x)
     
 class SumPowerSpectralDensity(PowerSpectralDensity):
-    """Class for the sum of two power spectral densitys.
+    """Class for the sum of two power spectral densities.
 
     Parameters
     ----------
@@ -152,9 +198,13 @@ class SumPowerSpectralDensity(PowerSpectralDensity):
         Second power spectral density.
     parameters : :obj:`ParametersModel`
         Parameters of the power spectral density.
-    expression : str
+    expression : :obj:`str`
         Expression of the total power spectral density.
 
+    Methods
+    -------
+    calculate(x)
+        Compute the total power spectral density at the points x.
     """
     psd1: PowerSpectralDensity
     psd2: PowerSpectralDensity
@@ -172,14 +222,14 @@ class SumPowerSpectralDensity(PowerSpectralDensity):
                                           free_parameters=psd1.parameters.free_parameters + psd2.parameters.free_parameters,
                                           _pars=psd1.parameters._pars + psd2.parameters._pars)
     @eqx.filter_jit
-    def calculate(self, x):
+    def calculate(self, x) -> jnp.ndarray:
         """Compute the power spectrum at the points x.
         
         It is the sum of the two power spectra.
         
         Parameters
         ----------
-        x : array 
+        x : :obj:`jnp.ndarray` 
             Points where the power spectrum is computed.
         
         Returns

@@ -12,7 +12,7 @@ class ParametersModel:
     """ Class to store the parameters of a model. 
 
     This object stores one or several :obj:`Parameter` objects for a model. The model can be 
-    of type :obj:`CovarianceFunction` , :obj:`PowerSpectralDensity` or :obj:`PowerSpectralDensityComponent`.
+    of type :obj:`CovarianceFunction` or :obj:`PowerSpectralDensity`.
     Initialised with a list of values for the parameters.
     
     

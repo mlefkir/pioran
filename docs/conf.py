@@ -35,7 +35,7 @@ release = '0.1.0'
 extensions = [ 'sphinx.ext.autodoc','numpydoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.autosummary',
-    'sphinx.ext.viewcode']
+    'sphinx.ext.viewcode',    'sphinx.ext.napoleon']
 
 autosummary_generate = True
 

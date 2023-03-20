@@ -1,4 +1,4 @@
-"""Generic class for the covariance function.
+"""Module for classes representing the covariance function.
 """
 
 import jax.numpy as jnp
@@ -16,11 +16,11 @@ class CovarianceFunction(eqx.Module):
     
     Parameters
     ----------
-    param_values : :obj:`ParametersModel` or `list of float`
+    param_values : :obj:`ParametersModel` or  :obj:`list of float`
         Values of the parameters of the covariance function.
-    param_names : `list of str`
+    param_names :  :obj:`list of str`
         param_names of the parameters of the covariance function.
-    free_parameters : `list of bool`
+    free_parameters :  :obj:`list of bool`
         List of bool to indicate if the parameters are free or not.
 
     Raises
@@ -32,7 +32,7 @@ class CovarianceFunction(eqx.Module):
     ----------
     parameters : :obj:`ParametersModel`
         Parameters of the covariance function.
-    expression : `str`
+    expression : :obj:`str`
         Expression of the covariance function.
 
     Methods
@@ -68,7 +68,7 @@ class CovarianceFunction(eqx.Module):
 
         Returns
         -------
-        str
+        :obj:`str`
             String representation of the covariance function.
             Include the representation of the parameters.
         """    
@@ -82,7 +82,7 @@ class CovarianceFunction(eqx.Module):
 
         Returns
         -------
-        str
+        :obj:`str`
             Representation of the covariance function.
             Include the representation of the parameters.
         """    

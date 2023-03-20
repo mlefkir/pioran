@@ -15,63 +15,73 @@ from typing import Union
 
 
 class GaussianProcess(eqx.Module):
-    """ Class for the Gaussian Process Regression of 1D data. 
+    r""" Class for the Gaussian Process Regression of 1D data. 
+
+    The Gaussian Process Regression is a non-parametric method to estimate the mean and the covariance of a function.
 
     Parameters
     ----------
-    covariance_function: CovarianceFunction
-        Covariance function associated to the Gaussian Process.
-    training_indexes: 1D array
+    fun : :obj:`CovarianceFunction` or :obj:`PowerSpectralDensity`
+        Model function associated to the Gaussian Process. Can be a covariance function or a power spectral density.
+    training_indexes : :obj:`jnp.array`
         Indexes of the training data, in this case it is the time.
-    training_observables: 1D array
+    training_observables : :`obj:jnp.array`
         Observables of the training data, in this it is flux, count-rate or intensity, etc.
-    training_errors: 1D array, optional
-        Errors on the observables, by default None
-    **kwargs: dict
-        nb_prediction_points: int, optional
+    training_errors : :obj:`jnp.array`, optional
+        Errors on the observables, by default :obj:`None`
+    **kwargs : dict
+        nb_prediction_points : :obj:`int`, optional
             Number of points to predict, by default 5 * length(training(indexes)).
-        prediction_indexes: 1D array, optional
+        prediction_indexes : :obj:`jnp.array`, optional
             Indexes of the prediction data, by default jnp.linspace(jnp.min(training_indexes),jnp.max(training_indexes),nb_prediction_points)
-        scale_errors: bool, optional
+        scale_errors : :obj:`bool`, optional
             Scale the errors on the training data by adding a constant, by default True.
-        estimate_mean: bool, optional
+        estimate_mean : :obj:`bool`, optional
             Estimate the mean of the training data, by default True.
-            
+        S_low : :obj:`float`, optional
+            Scaling factor for the lower bound of the PSD, by default 2. See :obj:`PSDToACV` for more details.
+        S_high : :obj:`float`, optional
+            Scaling factor for the upper bound of the PSD, by default 2. See :obj:`PSDToACV` for more details.
 
     Attributes
     ----------
-    acvf: CovarianceFunction
-        Autocovariance function associated to the Gaussian Process.
-    training_indexes: array of shape (n,1)
+    model : :obj:`CovarianceFunction` or :obj:`PowerSpectralDensity`
+        Modelassociated to the Gaussian Process, can be a covariance function or a power spectral density.
+    training_indexes : :obj:`jnp.array` (n,1)
         Indexes of the training data.
-    training_observables: array of shape (n,1)
+    training_observables : :obj:`jnp.array` of shape (n,1)
         Observabled training data.
-    training_errors: array of shape (n,1)
+    training_errors : :obj:`jnp.array` of shape (n,1)
         Errors on the training observed data.
-    scale_errors: bool
+    scale_errors : :obj:`bool`
         Scale the errors on the training data by adding a constant, by default True.
-    estimate_mean: bool
+    estimate_mean : :obj:`bool`
         Estimate the mean of the training data, by default True.
+    analytical_cov : :obj:`bool`
+        True if the covariance function is analytical, False if it is estimated from a power spectral density.
+    nb_prediction_points : :obj:`int`
+        Number of points to predict, by default 5 * length(training(indexes)).
 
     Methods
     -------
-    get_cov:
+    get_cov(xt, xp, errors=None)
         Compute the covariance matrix between two arrays.
-    compute_predictive_distribution:
+    compute_predictive_distribution(**kwargs)
         Compute the predictive mean and predictive covariance given prediction indexes.
-    compute_log_marginal_likelihood:
+    compute_log_marginal_likelihood()
         Compute the log marginal likelihood.
-    wrapper_log_marginal_likelihood:
+    wrapper_log_marginal_likelihood(parameters)
         Wrapper to compute the log marginal likelihood.
-    wrapper_neg_log_marginal_likelihood:
+    wrapper_neg_log_marginal_likelihood(parameters)
         Wrapper to compute the negative log marginal likelihood.
+        
     """
     model: Union[CovarianceFunction,PowerSpectralDensity]
     training_indexes: jnp.ndarray
     training_errors: jnp.ndarray
     training_observables: jnp.ndarray
     prediction_indexes: jnp.ndarray
-    nb_predic_points: int
+    nb_prediction_points: int
     scale_errors: bool
     estimate_mean: bool
     analytical_cov: bool    
@@ -94,8 +104,8 @@ class GaussianProcess(eqx.Module):
 
         elif isinstance(function, PowerSpectralDensity):
             self.analytical_cov = False
-            S_low = kwargs.get("S_low", 2)
-            S_high = kwargs.get("S_high", 2)
+            S_low = kwargs.get("S_low", 10)
+            S_high = kwargs.get("S_high", 10)
             
             self.model = PSDToACV(function, S_low=S_low, S_high=S_high,T = training_indexes[-1]-training_indexes[0],dt =jnp.min(jnp.diff(training_indexes)))
         else:
@@ -121,12 +131,19 @@ class GaussianProcess(eqx.Module):
             print("The mean of the training data is not estimated. Be careful of the data included in the training set.")
 
         # Prediction of data
-        self.nb_predic_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
-        self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_predic_points)))
+        self.nb_prediction_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
+        self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_prediction_points)))
 
     # @eqx.filter_jit
     def get_cov(self, xt, xp, errors=None):
         """ Compute the covariance matrix between two arrays. 
+        
+        To compute the covariance matrix, this function calls the get_cov_matrix method of the model. 
+        If the errors are not None, then the covariance matrix is computed for the training dataset, 
+        i.e. with observed data as input (xt=xp=training data) and the errors is the "standard deviation".
+        The total covariance matrix is computed as:
+        
+        
 
         Parameters
         ----------
@@ -233,16 +250,18 @@ class GaussianProcess(eqx.Module):
     
     
     def compute_log_marginal_likelihood(self):
-        """ Compute the log marginal likelihood of the GP.
+        r""" Compute the log marginal likelihood of the Gaussian Process.
 
         The log marginal likelihood is computed using algorithm (2.1) in Rasmussen and Williams (2006)
-        Following the notation of the book, x is the training indexes, x* is the predictive indexes, y the training observable, 
+        Following the notation of the book, :math:`x` are the training indexes, x* is the predictive indexes, y the training observable, 
         k the covariance function, sig the noise in the observation.
 
         Following Simon's notes simply solve of triangular system instead of inverting the matrix:
         
-        L = cholesky( k(x,x) + sig^2 * I )
-        z = L^-1 * y
+        :math:`L = {\rm cholesky}( k(x,x) + \nu \sigma^2 \times [I] )`
+        
+        :math:`z = L^{-1} \times \boldsymbol{y}`
+        
         log_marginal_likelihood = - 0.5 * z^T * z - sum(log(diag(L))) - n/2 * log(2*pi)
 
         Returns

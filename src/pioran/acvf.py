@@ -11,7 +11,7 @@ class Exponential(CovarianceFunction):
 
     .. math:: :label: expocov  
     
-       K(\tau) = A \times \exp( {- |\tau| / \gamma}).
+       K(\tau) = \dfrac{A}{\gamma} \times \exp( {- |\tau| \gamma}).
 
     with the variance :math:`A\ge 0` and length :math:`\gamma>0`.
     
@@ -23,20 +23,20 @@ class Exponential(CovarianceFunction):
     
     Parameters
     ----------
-    param_values : `list of float`
+    param_values : :obj:`list of float`
         Values of the parameters of the covariance function.
-    **kwargs : `dict`        
-        free_parameters: `list of bool`
+    **kwargs : :obj:`dict`        
+        free_parameters: :obj:`list of bool`
             List of bool to indicate if the parameters are free or not.
             
     Attributes
     ----------
-    parameters : :class:`ParametersModel`
+    parameters : :obj:`ParametersModel`
         Parameters of the covariance function.
         
     Methods
     -------
-    calculate:
+    calculate(t)
         Computes the exponential covariance function for an array of lags :math:`\tau`.
     """
     
@@ -58,12 +58,12 @@ class Exponential(CovarianceFunction):
 
         Parameters
         ----------
-        t : `jnp.array`
+        t : :obj:`jnp.array`
             Array of lags.
 
         Returns
         -------
-        covariance function evaluated on the array of lags.
+        Covariance function evaluated on the array of lags.
         """
         
         # return  self.parameters['variance'].value * jnp.exp(- jnp.abs(t) / self.parameters['length'].value)
@@ -86,10 +86,10 @@ class ExponentialSquared(CovarianceFunction):
     
     Parameters
     ----------
-    param_values : `list of float`
+    param_values : :obj:`list of float`
         Values of the parameters of the covariance function.
-    **kwargs : `dict`        
-        free_parameters: `list of bool`
+    **kwargs : :obj:`dict`        
+        free_parameters: :obj:`list of bool`
             List of bool to indicate if the parameters are free or not.
             
     Attributes
@@ -99,7 +99,7 @@ class ExponentialSquared(CovarianceFunction):
     
     Methods
     -------
-    calculate:
+    calculate(x)
         Computes the exponential squared covariance function for an array of lags :math:`\tau`.
     """
 
@@ -124,7 +124,7 @@ class ExponentialSquared(CovarianceFunction):
 
         Returns
         -------
-        covariance function evaluated on the array of lags.
+        Covariance function evaluated on the array of lags.
         """
         
         return  self.parameters['variance'].value * jnp.exp(-2 * jnp.pi**2 * t**2 * self.parameters['length'].value**2)
@@ -146,10 +146,10 @@ class Matern32(CovarianceFunction):
     
     Parameters
     ----------
-    param_values : `list of float`
+    param_values : :obj:`list of float`
         Values of the parameters of the covariance function.
-    **kwargs : `dict`        
-        free_parameters: `list of bool`
+    **kwargs : :obj:`dict`        
+        free_parameters: :obj:`list of bool`
             List of bool to indicate if the parameters are free or not.
             
     Attributes
@@ -159,7 +159,7 @@ class Matern32(CovarianceFunction):
     
     Methods
     -------
-    calculate:
+    calculate(t)
         Computes the Matern 3/2 covariance function for an array of lags :math:`\tau`.
     """
     
@@ -184,7 +184,7 @@ class Matern32(CovarianceFunction):
 
         Returns
         -------
-        covariance function evaluated on the array of lags.
+        Covariance function evaluated on the array of lags.
         """
         return self.parameters['variance'].value * (1 + jnp.sqrt(3) * t / self.parameters['length'].value ) * jnp.exp(-jnp.sqrt(3) * t / self.parameters['length'].value )
 
@@ -207,10 +207,10 @@ class Matern52(CovarianceFunction):
     
     Parameters
     ----------
-    param_values : `list of float`
+    param_values : :obj:`list of float`
         Values of the parameters of the covariance function.
-    **kwargs : `dict`        
-        free_parameters: `list of bool`
+    **kwargs : :obj:`dict`        
+        free_parameters: :obj:`list of bool`
             List of bool to indicate if the parameters are free or not.
             
     Attributes
@@ -220,7 +220,7 @@ class Matern52(CovarianceFunction):
         
     Methods
     -------
-    calculate:
+    calculate(t)
         Computes the Matern 5/2 covariance function for an array of lags :math:`\tau`.
     """
     
@@ -247,7 +247,7 @@ class Matern52(CovarianceFunction):
 
         Returns
         -------
-        covariance function evaluated on the array of lags.
+        Covariance function evaluated on the array of lags.
         """
         return self.parameters['variance'].value * (1 + jnp.sqrt(5) * t / self.parameters['length'].value + 5 * t**2 / ( 3 * self.parameters['length'].value**2) ) * jnp.exp( - jnp.sqrt(5) * t / self.parameters['length'].value )
 
@@ -270,10 +270,10 @@ class RationalQuadratic(CovarianceFunction):
     
     Parameters
     ----------
-    param_values : `list of float`
+    param_values : :obj:`list of float`
         Values of the parameters of the covariance function.
-    **kwargs : `dict`        
-        free_parameters: `list of bool`
+    **kwargs : :obj:`dict`        
+        free_parameters: :obj:`list of bool`
             List of bool to indicate if the parameters are free or not.
             
     Attributes
@@ -283,7 +283,7 @@ class RationalQuadratic(CovarianceFunction):
         
     Methods
     -------
-    calculate:
+    calculate(t)
         Computes the rational quadratic covariance function for an array of lags :math:`\tau`.
     """
     
@@ -309,6 +309,6 @@ class RationalQuadratic(CovarianceFunction):
 
         Returns
         -------
-        covariance function evaluated on the array of lags.
+        Covariance function evaluated on the array of lags.
         """        
         return self.parameters['variance'].value * (1 + x**2 / ( 2 * self.parameters['alpha'].value * self.parameters['length'].value**2) ) ** ( - self.parameters['alpha'].value)

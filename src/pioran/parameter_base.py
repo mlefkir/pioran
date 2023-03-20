@@ -8,7 +8,7 @@ from .tools import HEADER_PARAMETERS
 
 @register_pytree_node_class
 class Parameter():
-    """Class for one parameters, it can be a hyperparameter or model
+    """ Class for one parameters, it can be a hyperparameter or model
     parameter.
 
     The object of this class is then used to create a list of
@@ -53,6 +53,11 @@ class Parameter():
    
     Methods
     -------
+    tree_flatten()
+        Flattens the tree representation of the parameter.
+    tree_unflatten(aux_data, children)
+        Unflattens the tree representation of the parameter.
+
     """    
     value: float
     name: str
