@@ -200,7 +200,7 @@ class Optimizer:
         viz = {} if verbose else  {'show_status': False , 'viz_callback': void}
         free_names = self.GP.model.parameters.free_names
         sampler = ultranest.ReactiveNestedSampler(free_names, self.GP.wrapper_log_marginal_likelihood,priors,resume=resume,log_dir=log_dir)
-        results = sampler.run()#sampler.run(frac_remain=1e-5,dKL=0.2,min_num_live_points = 500)#sampler.run(**run_kwargs, **viz)
+        results = sampler.run(**viz)#sampler.run(frac_remain=1e-5,dKL=0.2,min_num_live_points = 500)#sampler.run(**run_kwargs, **viz)
         sampler.plot()
         self.GP.model.parameters.set_free_values(results['posterior']['median'])
         return results 
