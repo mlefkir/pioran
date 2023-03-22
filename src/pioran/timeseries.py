@@ -359,7 +359,7 @@ class Simulations:
         # rescale the time series to have the desired variance
         if variance is not None and method != 'ACV':
             true_timeseries = (true_timeseries - old_mean) / old_std * jnp.sqrt(variance)
-        else:
+        elif method != 'ACV':
             true_timeseries = (true_timeseries - old_mean) / old_std * jnp.sqrt(self.variance) 
         
             
