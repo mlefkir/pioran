@@ -1,5 +1,8 @@
 """Generic class and functions for fake time series.
 """
+from jax.config import config
+config.update("jax_enable_x64", True)
+
 from numpy import savetxt
 import jax.numpy as jnp
 from jax import random
@@ -43,7 +46,7 @@ class Simulations:
         sampling period of the time series.
     n_time : :obj:`int`
         number of time indexes.
-    t : jnp.ndarray
+    t : :obj:`jnp.ndarray`
         time :obj:`jnp.array` of the time series.
     f_max_obs : :obj:`float` 
         maximum frequency of the observed frequency grid.
@@ -55,19 +58,19 @@ class Simulations:
         maximum frequency of the total frequency grid.
     n_freq_grid : :obj:`int`
         number of frequency indexes.
-    frequencies : jnp.ndarray
-        frequency :obj:`jnp.array` of the total frequency grid.
+    frequencies : :obj:`jnp.ndarray`
+        frequency array of the total frequency grid.
     tau_max : :obj:`float`
         maximum lag of the autocovariance function.
     dtau : :obj:`float`
         sampling period of the autocovariance function.
-    tau : jnp.ndarray
-        lag :obj:`jnp.array` of the autocovariance function.
-    psd : jnp.ndarray
+    tau : :obj:`jnp.ndarray`
+        lag array of the autocovariance function.
+    psd : :obj:`jnp.ndarray`
         power spectral density of the time series.
-    acvf : jnp.ndarray
+    acvf : :obj:`jnp.ndarray`
         autocovariance function of the time series.
-    triang : jnp.ndarray
+    triang : :obj:`jnp.ndarray`
         triangular matrix used to generate the time series with the Cholesky decomposition.
     keys : dict
         dictionary of the keys used to generate the random numbers.
@@ -118,11 +121,11 @@ class Simulations:
         # parameters of the **total** frequency grid
         self.f0 = self.f_min_obs/S_low
         self.fN = self.f_max_obs*S_high
-        self.n_freq_grid = jnp.rint(jnp.ceil(self.fN/self.f0)).astype(int) + 1 
+        self.n_freq_grid = jnp.rint(self.fN/self.f0).astype(int) + 1 
         # print(f"Number of frequency indexes desired : {self.n_freq_grid}")
         self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0)
-        self.tau_max = .5/self.f0#0.5/self.f0
-        self.dtau = self.tau_max/(self.n_freq_grid-1) 
+        self.tau_max = 0.5/self.f0 #0.5/self.f0
+        self.dtau = 0.5/self.fN #self.tau_max/(self.n_freq_grid-1) 
         self.tau = jnp.arange(0,self.tau_max+self.dtau,self.dtau)
         
         self.psd = None
@@ -136,7 +139,7 @@ class Simulations:
             self.acvf = model.calculate(self.tau)
         else:
             raise ValueError(f"You must provide a model which is either a PowerSpectralDensity or a CovarianceFunction, not {type(model)}")
-                
+        self.model = model
         
     def generate_keys(self,seed=0):
         """Generate the keys to generate the random numbers.
@@ -158,8 +161,7 @@ class Simulations:
         
         key = random.PRNGKey(seed)
         self.keys['ts'],self.keys['errors'],self.keys['fluxes'],self.keys['subset'],self.keys['sampling'] = random.split(key,5)
-
-        
+    
     def plot_acvf(self,figsize=(15,3),filename=None):
         """Plot the autocovariance function.
         
@@ -238,9 +240,7 @@ class Simulations:
         if filename is not None:
             fig.savefig(f'{filename}',format='pdf')
         return fig,ax
-        
-        
-        
+             
     def autocovariance_method(self,interpolation='cubic'):
         """Generate a time series using the autocovariance method
         
@@ -266,20 +266,27 @@ class Simulations:
 
         # if the cholesky decomposition of the autocovariance function is not already calculated, we calculate it
         if self.triang is None:
-            if interpolation == 'linear':
-                interpo = interp1d(self.tau,self.acvf,'linear')
-            elif interpolation == 'cubic':
-                interpo = interp1d(self.tau,self.acvf,'cubic')
+            
             dist = EuclideanDistance(t_test.reshape(-1,1),t_test.reshape(-1,1))
-            K = interpo(dist)
-            self.triang = cholesky(K)
+            
+            if isinstance(self.model,CovarianceFunction):
+                print("Calculating the autocovariance function")
+                K = self.model.calculate(dist)
+            else:
+                print("Interpolating the autocovariance function")
+                if interpolation == 'linear':
+                    interpo = interp1d(self.tau,self.acvf,'linear')
+                elif interpolation == 'cubic':
+                    interpo = interp1d(self.tau,self.acvf,'cubic')
+                K = interpo(dist)
+                
+            self.triang = cholesky(K).T
         
         r = random.normal(key=self.keys['ts'],shape=(len(t_test),))
-        ts = self.triang.T@r
+        ts = self.triang@r
         return t_test,ts
-    
-    
-    def simulate(self, mean=None,variance=None,method='ACV',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs):
+       
+    def simulate(self, mean=None,method='ACV',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs):
         """Method to simulate time series using either the ACV method or the TK method.
         
         When using the ACV method, the time series is generated using an analytical autocovariance function or a power spectral density.
@@ -289,7 +296,7 @@ class Simulations:
         When using the TK method, the time series is generated using the Timmer and Koenig method for a larger duration and then the final time series
         is obtained by taking a subset of the generate time series.
         
-        If the irregular_sampling flag is set to True, the time series will be sampled at irregular time intervals randomly.
+        If the irregular_sampling flag is set to `True`, the time series will be sampled at irregular time intervals randomly.
         
 
         Parameters
@@ -299,11 +306,11 @@ class Simulations:
         method : :obj:`str`, optional
             method to simulate the time series, by default 'ACV' 
             can be 'TK' which uses Timmer and Koening method
-        randomise_fluxes : bool, optional
+        randomise_fluxes : :obj:`bool`, optional
             If True the fluxes will be randomised.
         errors : :obj:`str`, optional
             If 'gauss' the errors will be drawn from a gaussian distribution
-        irregular_sampling : bool, optional
+        irregular_sampling : :obj:`bool`, optional
             If True the time series will be sampled at irregular time intervals
         seed : :obj:`int`, optional
             Set the seed for the RNG
@@ -324,11 +331,11 @@ class Simulations:
         
         Returns
         -------
-        t : jnp.ndarray
+        t : :obj:`jnp.ndarray`
             Time :obj:`jnp.array`
-        ts : jnp.ndarray
+        ts : :obj:`jnp.ndarray`
             Simulated time series
-        ts_err : jnp.ndarray
+        ts_err : :obj:`jnp.ndarray`
             Errors on the simulated time series
         
         """
@@ -353,16 +360,7 @@ class Simulations:
             
         else:
             raise ValueError(f"method {method} is not accepted, use either 'ACV' or 'TK'")
-        #(rate-avg)/std * mean * rms + mean
-        old_std = jnp.std(true_timeseries)
-        old_mean = jnp.mean(true_timeseries)
-        # rescale the time series to have the desired variance
-        if variance is not None and method != 'ACV':
-            true_timeseries = (true_timeseries - old_mean) / old_std * jnp.sqrt(variance)
-        elif method != 'ACV':
-            true_timeseries = (true_timeseries - old_mean) / old_std * jnp.sqrt(self.variance) 
-        
-            
+
         if randomise_fluxes:
             if errors == 'gauss':
                 # generate the variance of the errors
@@ -371,8 +369,7 @@ class Simulations:
                 observed_timeseries = true_timeseries + timeseries_error_size*random.normal(key=self.keys['fluxes'],shape=(len(t),))
             elif errors == 'poisson':
                 raise NotImplementedError("Poisson errors are not implemented yet")
-                # observed_timeseries = random.poisson(key=self.keys['errors'],lam=true_timeseries,shape=(len(true_timeseries),))
-                # timeseries_error_size = jnp.sqrt(observed_timeseries)
+                #### IMPLEMENT POISSON ERRORS
             else:
                 raise ValueError(f"Error type {errors} is not accepted, use either 'gauss' or 'poisson'")
           
@@ -380,6 +377,7 @@ class Simulations:
             timeseries_error_size = jnp.zeros_like(t)
             observed_timeseries = true_timeseries
 
+        # set the mean of the time series
         if mean is not None:
             observed_timeseries = observed_timeseries - jnp.mean(observed_timeseries) + mean
         else:
@@ -397,24 +395,23 @@ class Simulations:
             
         Parameters
         ----------
-        t : :obj:`jnp.array`
+        t : :obj:`jnp.ndarray`
             Input time series of size N.
-        y : :obj:`jnp.array`
+        y : :obj:`jnp.ndarray`
             The fluxes of the simulated light curve.
         M : :obj:`int`
             The number of points in the desired time series.
 
         Returns
         -------
-        :obj:`jnp.array`
+        :obj:`jnp.ndarray`
             The time series of size M.
-        :obj:`jnp.array`
+        :obj:`jnp.ndarray`
             The values of the time series of size M.
         """
         N = len(t)
         start_index = random.randint(key=self.keys['subset'],shape=(1,),minval=M,maxval=N-M-1)[0]
         return t[start_index:start_index+M],y[start_index:start_index+M]
-
 
     def sample_timeseries(self,t,y,M,irregular_sampling=False):
         """Extract a random subset of points from the time series.
@@ -425,20 +422,20 @@ class Simulations:
         
         Parameters
         ----------
-        t : :obj:`jnp.array`
+        t : :obj:`jnp.ndarray`
             The time indexes of the time series.
-        y : :obj:`jnp.array`
+        y : :obj:`jnp.ndarray`
             The values of the time series.
         M : :obj:`int`
             The number of points in the desired time series.
-        irregular_sampling : bool
+        irregular_sampling : :obj:`bool`
             If True, the time series is irregularly sampled. If False, the time series is regularly sampled.
         
         Returns
         -------
-        :obj:`jnp.array`
+        :obj:`jnp.ndarray`
             The time indexes of the sampled time series.
-        :obj:`jnp.array`
+        :obj:`jnp.ndarray`
             The values of the sampled time series.
         """
         input_sampling_period = t[1]-t[0]
@@ -453,8 +450,7 @@ class Simulations:
             sorted_indices = jnp.argsort(t_sampled)
             
             return t_sampled[sorted_indices],y_sampled[sorted_indices]
-
-            
+       
     def Timmer_Koenig_method(self):
         r"""Generate a time series using the Timmer-Konig method.
         
@@ -475,9 +471,9 @@ class Simulations:
 
         Returns
         -------
-        :obj:`jnp.array`
+        :obj:`jnp.ndarray`
             The time indexes of the time series.
-        :obj:`jnp.array`
+        :obj:`jnp.ndarray`
             The values of the time series.
         
         """
@@ -491,7 +487,7 @@ class Simulations:
         
         # t = jnp.linspace(0,1/self.f0,2*(len(self.psd)-1))
         ts = jnp.fft.irfft(randpsd)
-        dt = 0.5/self.fN
-        t = jnp.arange(0,dt*len(ts),dt)
+        t = jnp.arange(0,self.dtau*len(ts),self.dtau)
         self.variance = jnp.sum(self.psd*self.f0)
+        ts = 2*ts*jnp.sqrt((len(self.psd))**2 *self.f0)
         return t,ts

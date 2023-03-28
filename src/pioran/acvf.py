@@ -102,6 +102,8 @@ class ExponentialSquared(CovarianceFunction):
     calculate(x)
         Computes the exponential squared covariance function for an array of lags :math:`\tau`.
     """
+    parameters: ParametersModel
+    expression = 'exponential_squared'
 
     def __init__(self, param_values, **kwargs):
         """Constructor of the covariance function inherited from the CovarianceFunction class. """
@@ -109,7 +111,7 @@ class ExponentialSquared(CovarianceFunction):
 
         free_parameters = kwargs.get('free_parameters', [True, True])
         # initialise the parameters and check
-        CovarianceFunction.__init__(self, param_values, names=['variance', 'length'], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, param_values, param_names=['variance', 'length'], free_parameters=free_parameters)
 
     def calculate(self,t) -> jnp.array:
         r"""Compute the exponential squared covariance function for an array of lags :math:`\tau`.
@@ -162,6 +164,8 @@ class Matern32(CovarianceFunction):
     calculate(t)
         Computes the Matern 3/2 covariance function for an array of lags :math:`\tau`.
     """
+    parameters: ParametersModel
+    expression = 'matern32'
     
     def __init__(self, param_values, **kwargs):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
@@ -169,7 +173,7 @@ class Matern32(CovarianceFunction):
         assert len(param_values) == 2, 'The number of parameters for this covariance function must be 2'
         free_parameters = kwargs.get('free_parameters', [True, True])
         # initialise the parameters and check
-        CovarianceFunction.__init__(self, param_values, names=['variance', 'length'], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, param_values, param_names=['variance', 'length'], free_parameters=free_parameters)
 
     def calculate(self,t) -> jnp.array:
         r"""Computes the Matérn 3/2 covariance function for an array of lags :math:`\tau`.
@@ -223,6 +227,8 @@ class Matern52(CovarianceFunction):
     calculate(t)
         Computes the Matern 5/2 covariance function for an array of lags :math:`\tau`.
     """
+    parameters: ParametersModel
+    expression = 'matern52'
     
     
 
@@ -232,7 +238,7 @@ class Matern52(CovarianceFunction):
         assert len(param_values) == 2, 'The number of parameters for this covariance function must be 2'
         free_parameters = kwargs.get('free_parameters', [True, True])
         # initialise the parameters and check
-        CovarianceFunction.__init__(self, param_values, names=['variance', 'length'], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, param_values, param_names=['variance', 'length'], free_parameters=free_parameters)
 
     def calculate(self,t) -> jnp.array:
         r"""Computes the Matérn 5/2 covariance function for an array of lags :math:`\tau`.
@@ -286,6 +292,8 @@ class RationalQuadratic(CovarianceFunction):
     calculate(t)
         Computes the rational quadratic covariance function for an array of lags :math:`\tau`.
     """
+    parameters: ParametersModel
+    expression = 'rationalquadratic'
     
     
     def __init__(self, param_values, **kwargs):
@@ -294,7 +302,7 @@ class RationalQuadratic(CovarianceFunction):
         free_parameters = kwargs.get('free_parameters', [True, True, True])
         # initialise the parameters
         assert len(param_values) == 3, 'The number of parameters for the rational quadratic covariance function is 3.'
-        CovarianceFunction.__init__(self, param_values, names=[ 'variance', 'alpha', 'length'], free_parameters=free_parameters)
+        CovarianceFunction.__init__(self, param_values, param_names=[ 'variance', 'alpha', 'length'], free_parameters=free_parameters)
 
     def calculate(self,x) -> jnp.array:
         r"""Computes the rational quadratic covariance function for an array of lags :math:`\tau`.

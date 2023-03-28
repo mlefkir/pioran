@@ -25,7 +25,7 @@ class GaussianProcess(eqx.Module):
         Model function associated to the Gaussian Process. Can be a covariance function or a power spectral density.
     training_indexes : :obj:`jnp.array`
         Indexes of the training data, in this case it is the time.
-    training_observables : :`obj:jnp.array`
+    training_observables : :obj:`jnp.array`
         Observables of the training data, in this it is flux, count-rate or intensity, etc.
     training_errors : :obj:`jnp.array`, optional
         Errors on the observables, by default :obj:`None`

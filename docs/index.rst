@@ -10,7 +10,13 @@ Welcome to pioran's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   introduction
+   installation
+   quickstart
+   modelling
+   simulations
    modules
+
 
 
 Indices and tables
