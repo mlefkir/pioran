@@ -10,12 +10,12 @@ class Lorentzian(PowerSpectralDensity):
     
     .. math:: :label: lorentzianpsd 
     
-       P(f) = \dfrac{A}{\gamma^2 +4\pi^2 (f-f_0)^2}.
+       \mathcal{P}(f) = \dfrac{A}{\gamma^2 +4\pi^2 (f-f_0)^2}.
 
     with the amplitude :math:`A\ge 0`, the position :math:`f_0\ge 0` and the halfwidth :math:`\gamma>0`.
     
     The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
-    The values of the parameters can be accessed using the `parameters` attribute via three keys: '`position`', '`amplitude`' and '`haltwidth`'
+    The values of the parameters can be accessed using the `parameters` attribute via three keys: '`position`', '`amplitude`' and '`halfwidth`'.
     
     The power spectral density function is evaluated on an array of frequencies :math:`f` using the `calculate` method.
     
@@ -71,7 +71,7 @@ class Gaussian(PowerSpectralDensity):
 
     .. math:: :label: gaussianpsd 
     
-       P(f) = \dfrac{A}{\sqrt{2\pi}\sigma} \exp\left(-\dfrac{\left(f-f_0\right)^2}{2\sigma^2} \right).
+       \mathcal{P}(f) = \dfrac{A}{\sqrt{2\pi}\sigma} \exp\left(-\dfrac{\left(f-f_0\right)^2}{2\sigma^2} \right).
 
     with the amplitude :math:`A\ge 0`, the position :math:`f_0\ge 0` and the standard-deviation '`sigma`' :math:`\sigma>0`.
     
@@ -125,6 +125,65 @@ class Gaussian(PowerSpectralDensity):
         """
         return self.parameters['amplitude'].value / (jnp.sqrt( 2*jnp.pi ) * self.parameters['sigma'].value ) * jnp.exp( -0.5 * (f - self.parameters['position'].value )**2 / self.parameters['sigma'].value**2 )
 
+class Matern32PSD(PowerSpectralDensity):
+    """Class for the power spectral density of the Matern 3/2 covariance function.
+    
+    .. math:: :label: matern32psd 
+    
+       \mathcal{P}(f) = \dfrac{A}{\gamma^3}\dfrac{12\sqrt{3}}{{(3/\gamma^2 +4\pi^2 f^2)}^2}.
+
+    with the amplitude :math:`A\ge 0` and the scale :math:`\gamma>0`.
+    
+    The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
+    The values of the parameters can be accessed using the `parameters` attribute via three keys: '`position`' and '`scale`'
+    
+    The power spectral density function is evaluated on an array of frequencies :math:`f` using the `calculate` method.
+    
+    
+    Parameters
+    ----------
+    param_values : :obj:`list of float`
+        Values of the parameters of the power spectral density function.
+    **kwargs : :obj:`dict`        
+        free_parameters: :obj:`list of bool`
+            List of bool to indicate if the parameters are free or not.
+            
+    Attributes
+    ----------
+    parameters : :obj:`ParametersModel`
+        Parameters of the power spectral density function.
+        
+    Methods
+    -------
+    calculate(t)
+        Computes the power spectral density function on an array of frequencies :math:`f`.
+    """
+    parameters: ParametersModel
+    expression = 'matern32psd'
+    
+    def __init__(self, parameters_values, **kwargs):
+        assert len(parameters_values) == 2, 'The number of parameters for the Matern3/2 PSD must be 2'
+        free_parameters = kwargs.get('free_parameters', [True, True,True])
+        # initialise the parameters and check
+        PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=["amplitude",'scale'], free_parameters=free_parameters)
+    
+    def calculate(self,f) -> jnp.ndarray:
+        r"""Computes the power spectral density of the Matern 3/2 covariance function on an array of frequencies :math:`f`.
+        
+        The expression is given by Equation :math:numref:`mate32psd`
+        with the variance :math:`A\ge 0` and the scale :math:`\gamma>0`.
+
+        Parameters
+        ----------
+        f : :obj:`jnp.array`
+            Array of frequencies.
+
+        Returns
+        -------
+        Power spectral density function evaluated on the array of frequencies.
+        """
+        return self.parameters['amplitude'].value  * 12 * jnp.sqrt(3) / self.parameters['scale'].value**3 /  ( 3 / self.parameters['scale'].value**2 + 4 * jnp.pi**2 * f**2 )**2
+
 
 class PowerLawLim(PowerSpectralDensity):
     componentname = 'powerlaw'
@@ -161,7 +220,7 @@ class MultipleBendingPowerLaw(PowerSpectralDensity):
 
     .. math:: :label: multiplebendplpsd     
     
-       P(f) =  \dfrac{A \left({f/}{f_0}\right)^{-\alpha_0}}{\displaystyle\prod_{i=1}^{N} \left(1+\left(\dfrac{f}{f_{b_i}}\right)^{\alpha_{i+1}-\alpha_{i}}\right)}
+       \mathcal{P}(f) =  \dfrac{A \left({f/}{f_0}\right)^{-\alpha_0}}{\displaystyle\prod_{i=1}^{N} \left(1+\left(\dfrac{f}{f_{b_i}}\right)^{\alpha_{i+1}-\alpha_{i}}\right)}
     
     with the amplitude :math:`A\ge 0`, the position :math:`f_0\ge 0` and the standard-deviation '`sigma`' :math:`\sigma>0`.
     
