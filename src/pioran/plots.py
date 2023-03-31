@@ -5,6 +5,10 @@
 import numpy as np
 import matplotlib.pyplot as plt    
 from matplotlib.ticker import AutoMinorLocator
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
+import scipy 
+
 import plotly.graph_objects as go
 
 from .core import GaussianProcess
@@ -12,7 +16,7 @@ from .core import GaussianProcess
 
 
 
-# plt.style.use("https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs.mplstyle")
+plt.style.use("https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs.mplstyle")
 
 def plot_prediction_plotly(gp, name, figsize=(18, 5), xlabel="Time", ylabel="Flux",title="Light Curve",show=False):
     predict_mean, predict_var = gp.compute_predictive_distribution()
@@ -95,7 +99,8 @@ def plot_prediction_plotly(gp, name, figsize=(18, 5), xlabel="Time", ylabel="Flu
     if show:
         fig.show()
 
-def plot_prediction(GP: GaussianProcess,filename,figsize,confidence_bands=True,title=None,xlabel=None,ylabel=None,xlim=None,ylim=None):
+
+def plot_prediction(GP: GaussianProcess,filename,figsize=(16,6),confidence_bands=True,title=None,xlabel=None,ylabel=None,xlim=None,ylim=None):
     """Plot the prediction of the Gaussian Process.
 
     Parameters
@@ -147,4 +152,94 @@ def plot_prediction(GP: GaussianProcess,filename,figsize,confidence_bands=True,t
     ax.legend()
     
     fig.tight_layout()
-    fig.savefig(f"{filename}.pdf")
+    fig.savefig(f"{filename}_regression.pdf")
+    fig.show()
+    
+
+def plot_residuals(GP: GaussianProcess,filename,figsize=(10,10),maxlag=None,title=None):
+    """Plot the residuals of the Gaussian Process inference
+
+
+    Parameters
+    ----------
+    GP: GaussianProcess
+        Gaussian Process object.
+    filename: str
+        Name of the file to save the figure.
+    figsize: tuple
+        Size of the figure.
+    maxlag: int, optional
+        Maximum lag to plot, by default None
+    title: str, optional
+        Title of the plot, by default None
+    """
+    
+    if maxlag is None:
+        maxlag = len(GP.training_indexes)-2
+    else:
+        maxlag = np.rint(maxlag)
+
+    predict_mean_train, _ = GP.compute_predictive_distribution(prediction_indexes=GP.training_indexes)
+  
+    residuals = GP.training_observables.flatten() - predict_mean_train.flatten()
+    scaled_residuals = (residuals/GP.training_errors).flatten()
+    max_scale_res = np.rint(np.max(scaled_residuals))
+
+    fig = plt.figure(tight_layout=True,figsize=figsize)
+
+    gs0 = fig.add_gridspec(2, 1)
+    gs00 = gs0[0].subgridspec(2, 2, width_ratios=[3,1],wspace=0)
+    gs01 = gs0[1].subgridspec(1,1)
+
+    ax = []
+    ax.append([fig.add_subplot(gs00[0, 0]),fig.add_subplot(gs00[0, 1])])
+    ax.append([fig.add_subplot(gs00[1, 0]),fig.add_subplot(gs00[1, 1])])
+    ax.append(fig.add_subplot(gs01[0, :]))
+
+
+    ax[0][0].sharey(ax[0][1])
+    ax[1][0].sharey(ax[1][1])
+    
+    ax[0][0].scatter(GP.training_indexes.flatten(),residuals,marker='.')
+    ax[0][0].axhline(0,c='k',ls='--')
+    ax[0][0].set_ylabel('Residuals')
+    ax[0][0].set_xticklabels([])
+        
+    ax[1][0].scatter(GP.training_indexes.flatten(),scaled_residuals,c='C1',marker='.')
+    ax[1][0].set_ylabel('Residuals / Error')
+    ax[1][0].set_xlabel('Time')
+    ax[1][0].axhline(0,c='k',ls='--')
+
+    p = scipy.stats.norm.fit(scaled_residuals)
+
+    ax[1][1].plot(scipy.stats.norm.pdf(np.linspace(-max_scale_res,max_scale_res,100),p[0],p[1]),np.linspace(-max_scale_res,max_scale_res,100))
+    ax[1][1].hist(scaled_residuals,bins='auto',orientation='horizontal',density=True)
+    ax[1][1].set_xticks([])
+    ax[1][1].tick_params(axis='y',labelleft=False)
+
+    ax[0][1].set_xticks([])
+    ax[0][1].hist(residuals,bins='auto',orientation='horizontal',density=True)
+    ax[0][1].tick_params(axis='both',labelleft=False,right='off', left='off',top='off', bottom='off')
+
+
+    lag,acvf,l,b = ax[2].acorr(scaled_residuals,maxlags=maxlag,color='C2',linewidth=2,usevlines=True)
+    axins = inset_axes(ax[2], width="60%", height="40%", loc='upper right')
+    lag,acvf,l,b = axins.acorr(scaled_residuals,maxlags=10,color='C2',linewidth=2)
+    axins.set_xlim(-.15,10)
+
+    ax[2].set_xlim(-10,maxlag)
+    ax[2].set_xlabel('Time lag')
+    ax[2].set_ylabel('Autocorrelation\nResiduals / Error')
+    axins.set_xlabel('Time lag')
+
+    if title is not None:
+        fig.suptitle(title)
+    else:
+        fig.suptitle('Residuals of the fit')
+        
+    fig.align_ylabels()
+    fig.tight_layout()
+    
+    fig.savefig(f'{filename}_residuals.pdf')
+    fig.show()
+    

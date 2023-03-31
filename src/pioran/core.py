@@ -227,14 +227,15 @@ class GaussianProcess(eqx.Module):
         """
         # if we want to change the prediction indexes
         if "prediction_indexes" in kwargs:
-            self.prediction_indexes = reshape_array(kwargs["prediction_indexes"])
-
+            prediction_indexes = reshape_array(kwargs["prediction_indexes"])
+        else:
+            prediction_indexes = self.prediction_indexes
         # Compute the covariance matrix between the training indexes
         _, Cov_inv, alpha = self.get_cov_training()
         # Compute the covariance matrix between the training indexes and the prediction indexes
-        Cov_xxp = self.get_cov(self.training_indexes, self.prediction_indexes)
-        Cov_xpxp = self.get_cov(self.prediction_indexes,
-                                self.prediction_indexes)
+        Cov_xxp = self.get_cov(self.training_indexes, prediction_indexes)
+        Cov_xpxp = self.get_cov(prediction_indexes,
+                                prediction_indexes)
 
         # Compute the predictive mean
         if self.estimate_mean:

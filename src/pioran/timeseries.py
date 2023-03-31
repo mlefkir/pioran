@@ -1,5 +1,7 @@
 """Generic class and functions for fake time series.
 """
+import sys
+
 from jax.config import config
 config.update("jax_enable_x64", True)
 
@@ -7,6 +9,9 @@ from numpy import savetxt
 import jax.numpy as jnp
 from jax import random
 from jax.scipy.linalg import cholesky
+
+from astropy.io import fits
+from astropy.table import Table
 
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
@@ -82,6 +87,8 @@ class Simulations:
         
     Methods
     -------
+    batch_simulations(self,seed:int,sample_size:int,filename:str,**simulations_kwargs)
+        Simulate a batch of time series.
     generate_keys(seed)
         Generate the keys for the random numbers.
     plot_psd(figsize,filename)
@@ -90,7 +97,7 @@ class Simulations:
         Plot the ACVF of the time series.
     autocovariance_method()
         Generate the time series with the autocovariance method.
-    Timmer_Koenig_method()
+    timmer_Koenig_method()
         Generate the time series with the Timmer-Koenig method.
     sample_time_series(t,y,M,irregular_sampling=False)
         Sample the timeseries.
@@ -107,6 +114,8 @@ class Simulations:
     
     def __init__(self, T, dt, S_low,S_high,model):
 
+        self.S_low = S_low
+        self.S_high = S_high
         # parameters of the time series
         self.duration = T
         self.sampling_period = dt
@@ -286,6 +295,74 @@ class Simulations:
         ts = self.triang@r
         return t_test,ts
        
+    def batch_simulations(self,seed:int,sample_size:int,filename:str,**simulations_kwargs):
+        """Generate a batch of time series.
+        
+        Function to generate a batch of time series using the same model. The time series are saved in a FITS file.
+        The seed is used to generate the seeds of simulated the time series.  
+    
+        
+        Parameters
+        ----------
+        seed  : :obj:`int`
+            Seed for the random number generator to draw the seeds of the time series.
+        sample_size  : :obj:`int`
+            Number of time series to generate.
+        filename  : :obj:`str`
+            Name of the file to save the time series.
+        simulations_kwargs  : :obj:`dict`
+            Keyword arguments for the function :func:`simulate`.
+        
+        """
+    
+        seeds = random.choice(random.PRNGKey(seed),jnp.arange(0,15*sample_size),shape=(sample_size,),replace=False)
+        
+        hdu_list = []
+        seeds_list = []
+        
+        print(f" Generating {sample_size} time series")
+        
+        for it,cur_seed in enumerate(seeds):
+            
+            t,x,xerr = self.simulate(seed=cur_seed,**simulations_kwargs)
+            
+            seeds_list.append(int(cur_seed))
+
+            table = Table([t,x,xerr],names=['TIME','FLUX','ERROR'])
+            
+            hdu = fits.BinTableHDU(table, name=f'TS_{cur_seed}')
+            
+            hdu.header['SEED'] = int(cur_seed)
+            hdu.header['DURATION'] = self.duration
+            hdu.header['SCALELO'] = self.S_low
+            hdu.header['SCALEHI'] = self.S_high
+            hdu.header['SAMPLING'] = 'REGULAR' if simulations_kwargs.get('irregular_sampling',False) else 'IRREGULAR'
+            hdu.header['ERRORS'] = simulations_kwargs.get('errors','gauss')
+            hdu.header['RANDOMI'] = str(simulations_kwargs.get('randomise_fluxes',True))
+            hdu.header['MODELTYP'] = 'PSD' if isinstance(self.model,PowerSpectralDensity) else 'ACVF'
+            hdu.header['METHOD'] = simulations_kwargs.get('method','ACV')
+            hdu.header['MEAN'] = simulations_kwargs.get('mean','None')
+            hdu.header['MODEL'] = self.model.expression # or 'Exponential' 'Lorentzian' 'ExponentialSquared'
+            for par in self.model.parameters:
+                if par.ID < 10:
+                    hdu.header[f'{par.name[:7]}{par.ID}'] = par.value
+                else:       
+                    hdu.header[f'{par.name[:6]}{par.ID}'] = par.value
+            hdu_list.append(hdu)
+
+            print(f'{it+1}/{sample_size}', end='\r')
+            sys.stdout.flush()
+        
+        print('Saving the time series')
+        seed_tab = Table([seeds],names=['SEED'])
+        hdu_seed = fits.BinTableHDU(seed_tab, name=f'SEEDS')
+        hdu  = fits.PrimaryHDU()
+        hdu.header['MAINSEED'] = seed  
+        hdu_list = [hdu,hdu_seed] + hdu_list
+        hdu = fits.HDUList(hdu_list)
+        hdu.writeto(f'{filename}.fits',overwrite=True)
+            
+    
     def simulate(self, mean=None,method='ACV',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs):
         """Method to simulate time series using either the ACV method or the TK method.
         
@@ -351,7 +428,7 @@ class Simulations:
             if self.psd is None:
                 raise ValueError("You must provide a PowerSpectralDensity model to use the TK method")
             # generate a long time series using the TK method
-            long_t,long_true_timeseries = self.Timmer_Koenig_method()
+            long_t,long_true_timeseries = self.timmer_Koenig_method()
             # minimal index of the start of the subset of the time series
             start_subset = jnp.rint(self.duration/(0.5/self.fN)).astype(int)
             subset_t, subset_true_timeseries = self.extract_subset_timeseries(long_t,long_true_timeseries,start_subset)
@@ -451,7 +528,7 @@ class Simulations:
             
             return t_sampled[sorted_indices],y_sampled[sorted_indices]
        
-    def Timmer_Koenig_method(self):
+    def timmer_Koenig_method(self):
         r"""Generate a time series using the Timmer-Konig method.
         
         Use the Timmer-Konig method to generate a time series with a given power spectral density
