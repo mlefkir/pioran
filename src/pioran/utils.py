@@ -1,12 +1,13 @@
-from numpy import linalg as la
+from jax.numpy import linalg as la
 from scipy.spatial.distance import cdist
+import jax.numpy as jnp
+from jax import jit
 import numpy as np
 
-
+@jit
 def EuclideanDistance(xq, xp):
     """Compute the Euclidean distance between two arrays.
 
-    using scipy.spatial.distance.cdist as it seems faster than a homemade version
 
     Parameters
     ----------
@@ -19,8 +20,8 @@ def EuclideanDistance(xq, xp):
     -------
     array of shape (n, m)
     """
-    return cdist(xq, xp, metric='euclidean')
-
+    #return cdist(xq, xp, metric='euclidean')
+    return jnp.sqrt((xq - xp.T)**2)
 
 # ---- Code from Ahmed Fasih ---- https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd
 def nearest_positive_definite(A):
@@ -48,7 +49,7 @@ def nearest_positive_definite(A):
     B = (A + A.T) / 2
     _, s, V = la.svd(B)
 
-    H = np.dot(V.T, np.dot(np.diag(s), V))
+    H = jnp.dot(V.T, jnp.dot(jnp.diag(s), V))
 
     A2 = (B + H) / 2
 
@@ -67,10 +68,10 @@ def nearest_positive_definite(A):
     # `spacing` will, for Gaussian random :es of small dimension, be on
     # othe order of 1e-16. In practice, both ways converge, as the unit test
     # below suggests.
-    I = np.eye(A.shape[0])
+    I = jnp.eye(A.shape[0])
     k = 1
     while not isPD(A3):
-        mineig = np.min(np.real(la.eigvals(A3)))
+        mineig = jnp.min(jnp.real(la.eigvals(A3)))
         A3 += I * (-mineig * k**2 + spacing)
         k += 1
 

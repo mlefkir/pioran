@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pioran"
+authors = [
+    {name = "Mehdy Lefkir", email = "mehdylefkir.work@gmail.com"},
+]
+description = "Timing package"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy","h5py",
+    "scipy","matplotlib","astropy","jax","equinox","jaxlib","ultranest","plotly"
+    ]
+version = "0.1.0"
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
