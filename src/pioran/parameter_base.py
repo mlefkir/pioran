@@ -119,7 +119,7 @@ class Parameter():
         self._value = new_value
 
 
-    def __str__(self) -> str:
+    def __str__(self) -> str: # pragma: no cover
         """String representation of the parameter.
         
         In the following format:
@@ -139,10 +139,10 @@ class Parameter():
                                         Status='Free' if self.free else 'Fixed',
                                         Linked='Yes' if self.relation is not None else 'No',
                                         Type='Hyper-parameter' if self.hyperparameter else 'Model parameter')
-    def __repr__(self) -> str:
+    def __repr__(self) -> str: # pragma: no cover
         return self.__str__()
     
-    def __repr_html__(self) -> str:
+    def __repr_html__(self) -> str: # pragma: no cover
         return self.__str__()
     
     

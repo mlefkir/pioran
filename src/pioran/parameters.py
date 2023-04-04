@@ -151,6 +151,8 @@ class ParametersModel:
         """
         if ID is None:
             ID = len(self.IDs)+1
+        if component is None:
+            component = 1
         self._pars.append(Parameter(name,value,free,ID,hyperparameter,component,relation))
 
     @property
@@ -343,7 +345,7 @@ class ParametersModel:
             raise KeyError(f"Parameter {key} not found.")
     
 
-    def __str__(self) -> str:
+    def __str__(self) -> str: # pragma: no cover
         """ String representation of the Parameters object.
         
         Returns
@@ -359,8 +361,8 @@ class ParametersModel:
             s += str(p) + '\n'
         return s+"\n"
     
-    def __repr__(self) -> str:
+    def __repr__(self) -> str: # pragma: no cover
         return self.__str__()
     
-    def __repr_html__(self) -> str:
+    def __repr_html__(self) -> str: # pragma: no cover
         return self.__str__()

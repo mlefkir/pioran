@@ -63,7 +63,7 @@ class CovarianceFunction(eqx.Module):
             raise TypeError(
                 "The parameters of the covariance function must be a list of floats or jnp.ndarray or a ParametersModel object.")
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         """String representation of the covariance function.
 
         Returns
@@ -77,7 +77,7 @@ class CovarianceFunction(eqx.Module):
         s += self.parameters.__str__()
         return s
     
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         """Representation of the covariance function.
 
         Returns
