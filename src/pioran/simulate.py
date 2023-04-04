@@ -195,9 +195,7 @@ class Simulations:
         
         if self.acvf is None:
             raise NotImplementedError("Plotting the PSD when the model is the ACV is not implemented yet")
-            # acv = jnp.fft.irfft(self.psd)
-            # self.acvf = acv[:len(acv)//2+1]/self.dtau
-            
+
         fig,ax = plt.subplots(1,1,figsize=figsize)
         ax.plot(self.tau,self.acvf,'.-')
         ax.legend()
@@ -397,8 +395,6 @@ class Simulations:
             Additional arguments to pass to the method
                 interp_method : :obj:`str`, optional
                     Interpolation method to use when calculating the autocovariance function from the power spectral density, by default 'linear'
-        
-
         Raises
         ------
         ValueError

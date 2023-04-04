@@ -11,7 +11,7 @@ class Exponential(CovarianceFunction):
 
     .. math:: :label: expocov  
     
-       K(\tau) = \dfrac{A}{\gamma} \times \exp( {- |\tau| \gamma}).
+       K(\tau) = \dfrac{A}{2\gamma} \times \exp( {- |\tau| \gamma}).
 
     with the variance :math:`A\ge 0` and length :math:`\gamma>0`.
     
@@ -69,8 +69,8 @@ class Exponential(CovarianceFunction):
         # return  self.parameters['variance'].value * jnp.exp(- jnp.abs(t) / self.parameters['length'].value)
         return  0.5 * self.parameters['variance'].value / self.parameters['length'].value *  jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
 
-class ExponentialSquared(CovarianceFunction):
-    r""" Class for the exponential squared covariance function.
+class SquaredExponential(CovarianceFunction):
+    r""" Class for the squared exponential covariance function.
 
     .. math:: :label: exposquare  
 
@@ -100,7 +100,7 @@ class ExponentialSquared(CovarianceFunction):
     Methods
     -------
     calculate(x)
-        Computes the exponential squared covariance function for an array of lags :math:`\tau`.
+        Computes the squared exponential covariance function for an array of lags :math:`\tau`.
     """
     parameters: ParametersModel
     expression = 'exponential_squared'
@@ -114,14 +114,14 @@ class ExponentialSquared(CovarianceFunction):
         CovarianceFunction.__init__(self, param_values, param_names=['variance', 'length'], free_parameters=free_parameters)
 
     def calculate(self,t) -> jnp.array:
-        r"""Compute the exponential squared covariance function for an array of lags :math:`\tau`.
+        r"""Compute the squared exponential covariance function for an array of lags :math:`\tau`.
       
         The expression is given by Equation :math:numref:`exposquare`.
         with the variance :math:`A\ge 0` and length :math:`\sigma>0`.
 
         Parameters
         ----------
-        t : `jnp.array`
+        t : :obj:`jnp.array`
             Array of lags.
 
         Returns

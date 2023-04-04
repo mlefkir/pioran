@@ -84,10 +84,10 @@ pioran.psdtoacv module
    :undoc-members:
    :show-inheritance:
 
-pioran.timeseries module
-------------------------
+pioran.simulate module
+----------------------
 
-.. automodule:: pioran.timeseries
+.. automodule:: pioran.simulate
    :members:
    :undoc-members:
    :show-inheritance:

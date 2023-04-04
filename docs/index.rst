@@ -13,10 +13,11 @@ Welcome to pioran's documentation!
    introduction
    installation
    quickstart
+   notebook
+   timeseries
    modelling
    simulations
    modules
-
 
 
 Indices and tables

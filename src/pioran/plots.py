@@ -16,7 +16,7 @@ from .core import GaussianProcess
 
 
 
-plt.style.use("https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs.mplstyle")
+# plt.style.use("https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs.mplstyle")
 
 def plot_prediction_plotly(gp, name, figsize=(18, 5), xlabel="Time", ylabel="Flux",title="Light Curve",show=False):
     predict_mean, predict_var = gp.compute_predictive_distribution()

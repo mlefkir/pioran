@@ -34,11 +34,10 @@ release = '0.1.0'
 
 extensions = [ 'sphinx.ext.autodoc','sphinx.ext.intersphinx','numpydoc',
                 'sphinx.ext.mathjax',
-                'sphinx.ext.autosummary',
+                'sphinx.ext.autosummary','sphinx_togglebutton',
                 'sphinx.ext.viewcode',    
                 'sphinx.ext.napoleon',
-                'myst_parser',
-                'nbsphinx',
+                'myst_nb', "sphinx_design",
                 'sphinx_codeautolink',  
                 'sphinx_copybutton']
 
@@ -50,9 +49,29 @@ intersphinx_mapping = {
     'jax': ('https://jax.readthedocs.io/en/latest/', None), 
 }
 
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.ipynb': 'myst-nb',
+    '.myst': 'myst-nb',
+}
 
-# bibtex_default_style = 'plain'
+# myst_enable_extensions = ["amsmath","dollarmath"]  
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
 
+myst_dmath_allow_labels=True
 autosummary_generate = True
 
 #'sphinx_autodoc_typehints'
@@ -62,7 +81,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','**.ipynb_checkpoints']
 
 # latex_additional_files = ["aa_macros.sty"]
 #autoclass_content = 'both'
