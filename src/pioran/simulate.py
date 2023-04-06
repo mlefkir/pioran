@@ -254,6 +254,12 @@ class Simulations:
         If the ACVF is not already calculated, it is calculated from the PSD 
         using the inverse Fourier transform.
         
+        Parameters
+        ----------
+        interpolation  : :obj:`str`, optional
+            Interpolation method to use for the autocovariance function, by default 'cubic'
+        
+        
         Returns
         -------
         :obj:`jnp.ndarray`
@@ -293,7 +299,7 @@ class Simulations:
         ts = self.triang@r
         return t_test,ts
        
-    def batch_simulations(self,seed:int,sample_size:int,filename:str,**simulations_kwargs):
+    def batch_simulations(self,seed,sample_size,filename,**simulations_kwargs):
         """Generate a batch of time series.
         
         Function to generate a batch of time series using the same model. The time series are saved in a FITS file.

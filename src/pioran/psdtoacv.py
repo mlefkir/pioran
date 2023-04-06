@@ -8,6 +8,9 @@ Class to convert a power spectral density to an autocovariance function via the 
 import jax.numpy as jnp
 import equinox as eqx
 
+from jax_finufft import nufft2
+from .utils import decompose_triangular_matrix, reconstruct_triangular_matrix
+
 from .psd_base import PowerSpectralDensity
 from .parameters import ParametersModel
 from .utils import EuclideanDistance
@@ -68,8 +71,12 @@ class PSDToACV(eqx.Module):
     frequencies: jnp.ndarray
     tau: jnp.ndarray
     dtau: float
+    method: str
+    f0: float
+    fN: float
+    n_freq_grid: int    
     
-    def __init__(self, PSD:PowerSpectralDensity, S_low:float, S_high:float,T, dt):
+    def __init__(self, PSD:PowerSpectralDensity, S_low:float, S_high:float,T, dt, **kwargs):
         """Constructor of the PSDToACV class."""
         
         if not isinstance(PSD,PowerSpectralDensity):
@@ -89,15 +96,17 @@ class PSDToACV(eqx.Module):
         f_min_obs = 1/T
         
         # parameters of the **total** frequency grid
-        f0 = f_min_obs/S_low
-        fN = f_max_obs*S_high
-        n_freq_grid = int(jnp.ceil(fN/f0)) + 1 
-        self.frequencies = jnp.arange(0,fN+f0,f0)
-        tau_max = .5/f0#0.5/self.f0
-        self.dtau = tau_max/(n_freq_grid-1) 
+        self.f0 = f_min_obs/S_low
+        self.fN = f_max_obs*S_high
+        self.n_freq_grid = int(jnp.ceil(self.fN/self.f0)) + 1 
+        self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0)
+        tau_max = .5/self.f0#0.5/self.f0
+        self.dtau = tau_max/(self.n_freq_grid-1) 
         self.tau = jnp.arange(0,tau_max+self.dtau,self.dtau)
+        
+        self.method = kwargs.get('method','FFT')
       
-    def calculate(self,t):
+    def calculate(self,t,**kwargs):
         """
         Calculate the autocovariance function from the power spectral density.
         
@@ -111,12 +120,31 @@ class PSDToACV(eqx.Module):
             Time lags where the autocovariance function is computed.
         
         """
-        psd = self.PSD.calculate(self.frequencies)
-        acvf = self.get_acvf_byFFT(psd)
-# normalize by the frequency step 
-        # acvf = acvf[:len(acvf)//2+1]/self.dtau was not working properly for odd number of points
+        if self.method == 'FFT':
+            psd = self.PSD.calculate(self.frequencies)
+            acvf = self.get_acvf_byFFT(psd)
+            # normalize by the frequency step 
+            # acvf = acvf[:len(acvf)//2+1]/self.dtau was not working properly for odd number of points
+            return  self.interpolation(t,acvf)
+        
+        elif self.method == 'NuFFT':
+            N = 2*(self.n_freq_grid-1)
+            k = jnp.arange(-N/2,N/2)*self.f0
+            psd = self.PSD.calculate(k)+0j
+            return  self.get_acvf_byNuFFT(psd,t*4*jnp.pi**2)
+    
+    def get_acvf_byNuFFT(self,psd,t):
+        """Compute the autocovariance function from the power spectral density using the non uniform Fourier transform.
 
-        return  self.interpolation(t,acvf)
+        Parameters
+        ----------
+        psd : array
+            Power spectral dens
+            
+            
+        """
+        P = 2 * jnp.pi / self.f0
+        return nufft2(psd, t/P).real * self.f0
     
     def get_acvf_byFFT(self,psd):
         """Compute the autocovariance function from the power spectral density using the inverse Fourier transform.
@@ -170,7 +198,7 @@ class PSDToACV(eqx.Module):
         ----------
         xq: array of shape (n,1)
             First array.
-        xp: array  of shape (m,1)
+        xp: array of shape (m,1)
             Second array.
 
         Returns
@@ -180,8 +208,18 @@ class PSDToACV(eqx.Module):
         """
         # Compute the Euclidean distance between the query and the points
         dist = EuclideanDistance(xq, xp)
-        # Compute the covariance matrix
-        return self.calculate(dist)
+
+        if self.method == 'NuFFT': 
+            if xq.shape == xp.shape:
+                unique, reverse_indexes, triu_indexes, n = decompose_triangular_matrix(dist)
+                avcf_unique = self.calculate(unique)    
+                return reconstruct_triangular_matrix(avcf_unique, reverse_indexes, triu_indexes, n) 
+            else:
+                d = dist.flatten()
+                return self.calculate(d).reshape(dist.shape)
+        else:
+            # Compute the covariance matrix
+            return self.calculate(dist)
 
     def __str__(self) -> str:
         return f"PSDToACV\n{self.PSD.__str__()}"

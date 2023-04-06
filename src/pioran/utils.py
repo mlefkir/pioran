@@ -77,6 +77,66 @@ def nearest_positive_definite(A):
 
     return A3
 
+def decompose_triangular_matrix(M):
+    """Decompose a triangular matrix into a vector of unique values.
+    
+    Decompose a triangular matrix into a vector of unique values and returns the
+    indexes to reconstruct the original matrix.
+
+    Parameters
+    ----------
+    M : :obj:`jnp.ndarray`
+        Triangular matrix of shape (n,n).
+
+    Returns
+    -------
+    unique : :obj:`jnp.ndarray`
+        Vector of unique values.
+    reverse_indexes : :obj:`jnp.ndarray`
+        Indexes to reconstruct the original matrix.
+    tril_indexes : :obj:`jnp.ndarray`
+        Indexes of the lower triangular matrix.
+    n : :obj:`int`
+        Size of the original matrix.        
+    """
+    
+    n = M.shape[0]
+    tril_indexes = jnp.tril_indices(n, k=0)
+    trunc = M[tril_indexes]
+    unique, reverse_indexes = jnp.unique(trunc,return_inverse=True,size=len(trunc))
+    return unique, reverse_indexes, tril_indexes, n
+
+
+def reconstruct_triangular_matrix(unique, reverse_indexes, tril_indexes, n):
+    """Recompose a triangular matrix from a vector of unique values.
+    
+    Recompose a triangular matrix from a vector of unique values and the indexes    
+
+    Parameters
+    ----------
+    unique : :obj:`jnp.ndarray`
+        Vector of unique values.
+    reverse_indexes : :obj:`jnp.ndarray`
+        Indexes to reconstruct the original matrix.
+    tril_indexes : :obj:`jnp.ndarray`
+        Indexes of the lower triangular matrix.
+    n : :obj:`int`
+        Size of the original matrix.
+        
+    Returns
+    -------
+    M : :obj:`jnp.ndarray`
+        Triangular matrix of shape (n,n).
+    
+    Raises
+    ------
+    ValueError
+        If the matrix is not triangular.
+    """
+
+    M = jnp.zeros((n,n))
+    M = M.at[tril_indexes].set(unique[reverse_indexes])
+    return M+M.T-jnp.diag(jnp.diag(M))
 
 def isPD(B):
     """Returns true when input is positive-definite, via Cholesky

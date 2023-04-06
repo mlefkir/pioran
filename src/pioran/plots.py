@@ -100,7 +100,7 @@ def plot_prediction_plotly(gp, name, figsize=(18, 5), xlabel="Time", ylabel="Flu
         fig.show()
 
 
-def plot_prediction(GP: GaussianProcess,filename,figsize=(16,6),confidence_bands=True,title=None,xlabel=None,ylabel=None,xlim=None,ylim=None):
+def plot_prediction(GP: GaussianProcess,filename,figsize=(16,6),confidence_bands=True,title=None,xlabel=None,ylabel=None,xlim=None,ylim=None,**kwargs):
     """Plot the prediction of the Gaussian Process.
 
     Parameters
@@ -124,6 +124,8 @@ def plot_prediction(GP: GaussianProcess,filename,figsize=(16,6),confidence_bands
     ylim: tuple of floats, optional
         Limits of the y-axis, by default None
     """  
+    show = kwargs.get('show',False)
+
     fig,ax = plt.subplots(1,1,figsize=figsize)
      
     # get predictions from GP
@@ -153,10 +155,11 @@ def plot_prediction(GP: GaussianProcess,filename,figsize=(16,6),confidence_bands
     
     fig.tight_layout()
     fig.savefig(f"{filename}_regression.pdf")
-    fig.show()
+    if show:
+        fig.show()
     
 
-def plot_residuals(GP: GaussianProcess,filename,figsize=(10,10),maxlag=None,title=None):
+def plot_residuals(GP: GaussianProcess,filename,figsize=(10,10),maxlag=None,title=None,**kwargs):
     """Plot the residuals of the Gaussian Process inference
 
 
@@ -173,6 +176,7 @@ def plot_residuals(GP: GaussianProcess,filename,figsize=(10,10),maxlag=None,titl
     title: str, optional
         Title of the plot, by default None
     """
+    show = kwargs.get('show',False)
     
     if maxlag is None:
         maxlag = len(GP.training_indexes)-2
@@ -241,5 +245,6 @@ def plot_residuals(GP: GaussianProcess,filename,figsize=(10,10),maxlag=None,titl
     fig.tight_layout()
     
     fig.savefig(f'{filename}_residuals.pdf')
-    fig.show()
+    if show:
+        fig.show()
     
