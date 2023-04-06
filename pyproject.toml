@@ -12,7 +12,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "numpy","h5py",
-    "scipy","matplotlib","astropy","jax","equinox","jaxlib","ultranest","plotly"
+    "scipy","matplotlib","astropy","jax","equinox","jaxlib","ultranest","plotly","jax_finufft"
     ]
 version = "0.1.0"
 
