@@ -1,4 +1,4 @@
-# Time series analysis
+# Stochastic processes and time series
 
 In this package, we model the underlying random process producing the observed time series. This process is assumed to be a continuous random, but the time series we given in input of this code is a discrete time series. The resulting discrete time series can suffer from distorsions due to the sampling or the observation method used to collect the time series. Nevertheless, we can model the underlying random process using two mathematical objects: the autocovariance function and the power spectral density function. In the end, we are interested in inferring the shape and parameters of these two objects.
 
@@ -62,7 +62,16 @@ From the previous equations, we can see that the variance of the process is give
 - $\mathcal{P}(0)=\int_{-\infty}^{+\infty} {R}(\tau)  {\rm d }\tau=\mu^2$, the square mean of the process.
 - $\mathcal{P}(f)$ is always positive, this implies that the covariance matrix is always positive semi-definite.
 
-In the case of white noise, the power spectral density is a constant function.
+In the case of white noise, the power spectral density is a constant function, the variance of this process is infinite.
+
+## AR(1) process or damped random walk
+
+Let us consider a first order autoregressive process, the exponential autocovariance function and the power spectrum are given by Equation {eq}`exponentialacov`.
+
+```{math}
+:label: exponentialacov
+R(\tau)= \dfrac{A}{2\gamma} \exp{(-\|\tau\|\gamma)}\quad  \quad \mathcal{P}(f)= \dfrac{A}{\gamma^2 +4\pi^2 f^2}
+```
 
 ## References
 

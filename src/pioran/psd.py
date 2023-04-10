@@ -14,7 +14,7 @@ class Lorentzian(PowerSpectralDensity):
 
     with the amplitude :math:`A\ge 0`, the position :math:`f_0\ge 0` and the halfwidth :math:`\gamma>0`.
     
-    The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
+    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object. 
     The values of the parameters can be accessed using the `parameters` attribute via three keys: '`position`', '`amplitude`' and '`halfwidth`'.
     
     The power spectral density function is evaluated on an array of frequencies :math:`f` using the `calculate` method.
@@ -30,7 +30,7 @@ class Lorentzian(PowerSpectralDensity):
             
     Attributes
     ----------
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the power spectral density function.
         
     Methods
@@ -55,12 +55,13 @@ class Lorentzian(PowerSpectralDensity):
 
         Parameters
         ----------
-        f : :obj:`jnp.array`
+        f : :obj:`jax.Array`
             Array of frequencies.
 
         Returns
         -------
-        Power spectral density function evaluated on the array of frequencies.
+        :obj:`jax.Array`
+            Power spectral density function evaluated on the array of frequencies.
         """
         # return self.parameters['amplitude'].value / ( ( 1 + ( ( x - self.parameters['position'].value ) / self.parameters['halfwidth'].value )**2 ) )/jnp.pi/self.parameters['halfwidth'].value
         # return 2 * self.parameters['amplitude'].value * self.parameters['halfwidth'].value  /  ( self.parameters['halfwidth'].value**2 + 4 * jnp.pi**2 * ( x - self.parameters['position'].value )**2 )
@@ -75,7 +76,7 @@ class Gaussian(PowerSpectralDensity):
 
     with the amplitude :math:`A\ge 0`, the position :math:`f_0\ge 0` and the standard-deviation '`sigma`' :math:`\sigma>0`.
     
-    The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
+    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object. 
     The values of the parameters can be accessed using the `parameters` attribute via three keys: '`position`', '`amplitude`' and '`sigma`'
     
     The power spectral density function is evaluated on an array of frequencies :math:`f` using the `calculate` method.
@@ -91,7 +92,7 @@ class Gaussian(PowerSpectralDensity):
             
     Attributes
     ----------
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the power spectral density function.
         
     Methods
@@ -116,12 +117,13 @@ class Gaussian(PowerSpectralDensity):
 
         Parameters
         ----------
-        f : :obj:`jnp.array`
+        f : :obj:`jax.Array`
             Array of frequencies.
 
         Returns
         -------
-        Power spectral density function evaluated on the array of frequencies.
+        :obj:`jax.Array`
+            Power spectral density function evaluated on the array of frequencies.
         """
         return self.parameters['amplitude'].value / (jnp.sqrt( 2*jnp.pi ) * self.parameters['sigma'].value ) * jnp.exp( -0.5 * (f - self.parameters['position'].value )**2 / self.parameters['sigma'].value**2 )
 
@@ -134,7 +136,7 @@ class Matern32PSD(PowerSpectralDensity):
 
     with the amplitude :math:`A\ge 0` and the scale :math:`\gamma>0`.
     
-    The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
+    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object. 
     The values of the parameters can be accessed using the `parameters` attribute via three keys: '`position`' and '`scale`'
     
     The power spectral density function is evaluated on an array of frequencies :math:`f` using the `calculate` method.
@@ -150,7 +152,7 @@ class Matern32PSD(PowerSpectralDensity):
             
     Attributes
     ----------
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the power spectral density function.
         
     Methods
@@ -170,49 +172,50 @@ class Matern32PSD(PowerSpectralDensity):
     def calculate(self,f) -> jnp.ndarray:
         r"""Computes the power spectral density of the Matern 3/2 covariance function on an array of frequencies :math:`f`.
         
-        The expression is given by Equation :math:numref:`mate32psd`
+        The expression is given by Equation :math:numref:`matern32psd`
         with the variance :math:`A\ge 0` and the scale :math:`\gamma>0`.
 
         Parameters
         ----------
-        f : :obj:`jnp.array`
+        f : :obj:`jax.Array`
             Array of frequencies.
 
         Returns
         -------
-        Power spectral density function evaluated on the array of frequencies.
+        :obj:`jax.Array`
+            Power spectral density function evaluated on the array of frequencies.
         """
         return self.parameters['amplitude'].value  * 12 * jnp.sqrt(3) / self.parameters['scale'].value**3 /  ( 3 / self.parameters['scale'].value**2 + 4 * jnp.pi**2 * f**2 )**2
 
 
-class PowerLawLim(PowerSpectralDensity):
-    componentname = 'powerlaw'
-    ID = 1
-    n_parameters = 5
+# class PowerLawLim(PowerSpectralDensity):
+#     componentname = 'powerlaw'
+#     ID = 1
+#     n_parameters = 5
     
-    def __init__(self, parameters_values, **kwargs):
-        """
-        """
-        assert len(parameters_values) == self.n_parameters, f'The number of parameters for {self.__classname__()} must be {self.n_parameters}, not {len(parameters_values)}'
-        free_parameters = kwargs.get('free_parameters', [True,True,True, True,True])
-        # initialise the parameters and check
-        PowerSpectralDensity.__init__(self, parameters_values, names=['min','max','freq','amplitude', 'index'], boundaries=[[0, jnp.inf], [0, jnp.inf],[0, jnp.inf], [0, jnp.inf],[0,jnp.inf]], free_parameters=free_parameters)
+#     def __init__(self, parameters_values, **kwargs):
+#         """
+#         """
+#         assert len(parameters_values) == self.n_parameters, f'The number of parameters for {self.__classname__()} must be {self.n_parameters}, not {len(parameters_values)}'
+#         free_parameters = kwargs.get('free_parameters', [True,True,True, True,True])
+#         # initialise the parameters and check
+#         PowerSpectralDensity.__init__(self, parameters_values, names=['min','max','freq','amplitude', 'index'], boundaries=[[0, jnp.inf], [0, jnp.inf],[0, jnp.inf], [0, jnp.inf],[0,jnp.inf]], free_parameters=free_parameters)
     
-    def calculate(self,x):
-        return jnp.where((x>=self.parameters['min'].value)&(x<self.parameters['max'].value),self.parameters['amplitude'].value * jnp.power( x / self.parameters['freq'].value , -self.parameters['index'].value ), 0)
+#     def calculate(self,x):
+#         return jnp.where((x>=self.parameters['min'].value)&(x<self.parameters['max'].value),self.parameters['amplitude'].value * jnp.power( x / self.parameters['freq'].value , -self.parameters['index'].value ), 0)
     
-class Scalar(PowerSpectralDensity):
-    componentname = 'scalar'
-    ID = 1
-    n_parameters = 1
-    def __init__(self, parameters_values, **kwargs):
-        assert len(parameters_values) == self.n_parameters, f'The number of parameters for {self.__classname__()} must be {self.n_parameters}, not {len(parameters_values)}'
-        free_parameters = kwargs.get('free_parameters', [True])
-        # initialise the parameters and check
-        PowerSpectralDensity.__init__(self, parameters_values, names=['scalar'], boundaries=[[-jnp.inf, jnp.inf]], free_parameters=free_parameters)
+# class Scalar(PowerSpectralDensity):
+#     componentname = 'scalar'
+#     ID = 1
+#     n_parameters = 1
+#     def __init__(self, parameters_values, **kwargs):
+#         assert len(parameters_values) == self.n_parameters, f'The number of parameters for {self.__classname__()} must be {self.n_parameters}, not {len(parameters_values)}'
+#         free_parameters = kwargs.get('free_parameters', [True])
+#         # initialise the parameters and check
+#         PowerSpectralDensity.__init__(self, parameters_values, names=['scalar'], boundaries=[[-jnp.inf, jnp.inf]], free_parameters=free_parameters)
     
-    def calculate(self,x):
-        return self.parameters['scalar'].value
+#     def calculate(self,x):
+#         return self.parameters['scalar'].value
 
 
 class MultipleBendingPowerLaw(PowerSpectralDensity):
@@ -224,7 +227,7 @@ class MultipleBendingPowerLaw(PowerSpectralDensity):
     
     with the amplitude :math:`A\ge 0`, the position :math:`f_0\ge 0` and the standard-deviation '`sigma`' :math:`\sigma>0`.
     
-    The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
+    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object. 
     The values of the parameters can be accessed using the `parameters` attribute via three keys: '`position`', '`amplitude`' and '`sigma`'
     
     The power spectral density function is evaluated on an array of frequencies :math:`f` using the `calculate` method.
@@ -240,15 +243,16 @@ class MultipleBendingPowerLaw(PowerSpectralDensity):
             
     Attributes
     ----------
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the power spectral density function.
         
     Methods
     -------
     calculate(t)
         Computes the power spectral density function on an array of frequencies :math:`f`.
+    
     """
-    componentname = 'multiplebendingpowerlaw'
+    expression = 'multiplebendingpowerlaw'
     parameters: ParametersModel    
     
     def __init__(self, parameters_values, **kwargs):     
@@ -264,6 +268,21 @@ class MultipleBendingPowerLaw(PowerSpectralDensity):
         PowerSpectralDensity.__init__(self, parameters_values, names=names, boundaries=[[0,jnp.inf]]*self.n_parameters, free_parameters=free_parameters)
                                     
     def calculate(self,x):
+        r"""Computes the Multiple bending power-law model on an array of frequencies :math:`f`.
+        
+        The expression is given by Equation :math:numref:`multiplebendplpsd`
+        with the variance :math:`A\ge 0` and the scale :math:`\gamma>0`.
+
+        Parameters
+        ----------
+        f : :obj:`jax.Array`
+            Array of frequencies.
+
+        Returns
+        -------
+        :obj:`jax.Array`
+            Power spectral density function evaluated on the array of frequencies.
+        """
         P = self.parameters[f'amplitude'].value/ jnp.power( x / self.parameters[f'freq_1'].value , self.parameters[f'index_1'].value )
         for i in range(1,1+self.N):
             P /=   (1 + jnp.power( x / self.parameters[f'freq_{i+1}'].value , self.parameters[f'index_{i+1}'].value-self.parameters[f'index_{i}'].value ) )

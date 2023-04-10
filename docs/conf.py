@@ -32,14 +32,12 @@ release = '0.1.0'
 # ones.
 
 
-extensions = [ 'sphinx.ext.autodoc','sphinx.ext.intersphinx','numpydoc',
-                'sphinx.ext.mathjax',
-                'sphinx.ext.autosummary','sphinx_togglebutton',
-                'sphinx.ext.viewcode',    
-                'sphinx.ext.napoleon',
-                'myst_nb', "sphinx_design",
+extensions = [ 'sphinx.ext.autodoc','sphinx.ext.intersphinx',
+                'sphinx.ext.mathjax', 'sphinx.ext.autosummary','sphinx_togglebutton','sphinx.ext.autosectionlabel',
+                'sphinx.ext.viewcode',   'numpydoc', 'sphinx.ext.napoleon',
+                'myst_nb','sphinx.ext.autodoc.typehints',                 "sphinx_design",
                 'sphinx_codeautolink',  
-                'sphinx_copybutton']
+                'sphinx_copybutton','sphinxcontrib.tikz']
 
 intersphinx_mapping = {
     'IPython': ('https://ipython.readthedocs.io/en/stable/', None),
@@ -47,15 +45,20 @@ intersphinx_mapping = {
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
     'python': ('https://docs.python.org/3/', None),
     'jax': ('https://jax.readthedocs.io/en/latest/', None), 
+    'equinox': ('https://docs.kidger.site/equinox/', None),
 }
 
+autodoc_default_options = {
+    'members':          True,
+    'undoc-members':    True,
+}
 source_suffix = {
     '.rst': 'restructuredtext',
+    '.md': 'myst-nb',
     '.ipynb': 'myst-nb',
     '.myst': 'myst-nb',
 }
 
-# myst_enable_extensions = ["amsmath","dollarmath"]  
 myst_enable_extensions = [
     "amsmath",
     "colon_fence",
@@ -71,19 +74,37 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-myst_dmath_allow_labels=True
-autosummary_generate = True
 
+numpydoc_class_members_toctree = False
+
+# # # Add these lines.
+numpydoc_show_class_members = False
+numpydoc_show_inherited_class_members = False
+# # generate autosummary even if no references
+
+autodoc_default_options = {
+    'members':          True,
+    'undoc-members':    True,
+}
+autosummary_generate = True
+# autosummary_imported_members = True
+# autodoc_inherit_docstrings = True
+
+
+myst_dmath_allow_labels = True
 #'sphinx_autodoc_typehints'
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ['_templates/autosummary']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','**.ipynb_checkpoints']
 
-# latex_additional_files = ["aa_macros.sty"]
+
+latex_elements = {'preamble':r'''\usepackage{amsmath}\usepackage{amssymb}\def\stackbelow\#1\#2{\underset{\displaystyle\overset{\displaystyle\shortparallel}{\#2}}{\#1}}'''}
+tikz_latex_preamble = r'''\usepackage{amsmath}\usepackage{amssymb}'''
+
 #autoclass_content = 'both'
 
 # -- Options for HTML output -------------------------------------------------
@@ -93,13 +114,13 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','**.ipynb_checkpoints']
 #
 html_theme = 'furo'
 
-html_theme_options = {
-    'navigation_with_keys': True,
-    "light_css_variables": {
-        "color-brand-primary": "#7C4DFF",
-        "color-brand-content": "#7C4DFF",
-    },
-}
+# html_theme_options = {
+#     'navigation_with_keys': True,
+#     "light_css_variables": {
+#         "color-brand-primary": "#7C4DFF",
+#         "color-brand-content": "#7C4DFF",
+#     },
+# }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

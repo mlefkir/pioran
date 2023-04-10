@@ -12,7 +12,7 @@ class Parameter():
     parameter.
 
     The object of this class is then used to create a list of
-    parameters with the :obj:`ParametersModel` object.
+    parameters with the :class:`~pioran.parameters.ParametersModel` object.
 
     Parameters
     ----------

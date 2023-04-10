@@ -14,10 +14,6 @@ import plotly.graph_objects as go
 from .core import GaussianProcess
 
 
-
-
-# plt.style.use("https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs.mplstyle")
-
 def plot_prediction_plotly(gp, name, figsize=(18, 5), xlabel="Time", ylabel="Flux",title="Light Curve",show=False):
     predict_mean, predict_var = gp.compute_predictive_distribution()
 
@@ -105,23 +101,23 @@ def plot_prediction(GP: GaussianProcess,filename,figsize=(16,6),confidence_bands
 
     Parameters
     ----------
-    GP: GaussianProcess
+    GP : :class:`~pioran.core.GaussianProcess`
         Gaussian Process object.
-    filename: str
+    filename : :obj:`str`
         Name of the file to save the figure.
-    figsize: tuple
+    figsize : :obj:`tuple`, optional
         Size of the figure.
-    confidence_bands: bool, optional
+    confidence_bands : :obj:`bool`, optional
         Plot the confidence bands, by default True
-    title: str, optional
+    title : :obj:`str`, optional
         Title of the plot, by default None
-    xlabel: str, optional
+    xlabel : :obj:`str`, optional
         Label for the x-axis, by default None
-    ylabel: str, optional
+    ylabel : :obj:`str`, optional
         Label for the y-axis, by default None
-    xlim: tuple of floats, optional
+    xlim : :obj:`tuple` of :obj:`float`, optional
         Limits of the x-axis, by default None
-    ylim: tuple of floats, optional
+    ylim : :obj:`tuple` of :obj:`float`, optional
         Limits of the y-axis, by default None
     """  
     show = kwargs.get('show',False)
@@ -160,20 +156,20 @@ def plot_prediction(GP: GaussianProcess,filename,figsize=(16,6),confidence_bands
     
 
 def plot_residuals(GP: GaussianProcess,filename,figsize=(10,10),maxlag=None,title=None,**kwargs):
-    """Plot the residuals of the Gaussian Process inference
+    """Plot the residuals of the Gaussian Process inference.
 
 
     Parameters
     ----------
-    GP: GaussianProcess
+    GP : :class:`~pioran.core.GaussianProcess`
         Gaussian Process object.
-    filename: str
+    filename : :obj:`str`
         Name of the file to save the figure.
-    figsize: tuple
+    figsize : :obj:`tuple`, optional
         Size of the figure.
-    maxlag: int, optional
+    maxlag : :obj:`int`, optional
         Maximum lag to plot, by default None
-    title: str, optional
+    title : :obj:`str`, optional
         Title of the plot, by default None
     """
     show = kwargs.get('show',False)

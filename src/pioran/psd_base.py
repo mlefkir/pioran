@@ -9,14 +9,14 @@ from .parameters import ParametersModel
 
 
 class PowerSpectralDensity(eqx.Module):
-    """Master class for the power density function functions, inherited from the ``equinox.Module`` class.
+    """Master class for the power density function functions, inherited from the :obj:`equinox.Module` class.
 
     Bridge between the parameters and the power spectral density function. The power spectral density functions
     inherit from this class.
     
     Parameters
     ----------
-    param_values : :obj:`ParametersModel` or  :obj:`list of float`
+    param_values : :class:`~pioran.parameters.ParametersModel` or  :obj:`list of float`
         Values of the parameters of the power spectral density function.
     param_names : :obj:`list of str`
         param_names of the parameters of the power spectral density function.
@@ -26,11 +26,11 @@ class PowerSpectralDensity(eqx.Module):
     Raises
     ------
     `TypeError`
-        If param_values is not a :obj:`list of float` or a :obj:`ParametersModel`.
+        If param_values is not a :obj:`list of float` or a :class:`~pioran.parameters.ParametersModel`.
 
     Attributes
     ----------
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the covariance function.
     expression : :obj:`str`
         Expression of the covariance function.
@@ -129,9 +129,9 @@ class ProductPowerSpectralDensity(PowerSpectralDensity):
         First power spectral density.
     psd2 : :obj:`PowerSpectralDensity`
         Second power spectral density.
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the power spectral density.
-    expression : str
+    expression : :obj:`str`
         Expression of the total power spectral density.
 
     Methods
@@ -170,7 +170,7 @@ class ProductPowerSpectralDensity(PowerSpectralDensity):
         
         Parameters
         ----------
-        x : :obj:`jnp.ndarray` 
+        x : :obj:`jax.Array` 
             Points where the power spectral density is computed.
         
         Returns
@@ -196,7 +196,7 @@ class SumPowerSpectralDensity(PowerSpectralDensity):
         First power spectral density.
     psd2 : :obj:`PowerSpectralDensity`
         Second power spectral density.
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the power spectral density.
     expression : :obj:`str`
         Expression of the total power spectral density.
@@ -229,7 +229,7 @@ class SumPowerSpectralDensity(PowerSpectralDensity):
         
         Parameters
         ----------
-        x : :obj:`jnp.ndarray` 
+        x : :obj:`jax.Array` 
             Points where the power spectrum is computed.
         
         Returns

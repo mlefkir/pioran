@@ -11,26 +11,30 @@ from .core import GaussianProcess
 
 
 class Optimizer:
-    """Class to optimize the (hyper)parameters of the Gaussian Process.
+    r"""Class to optimize the (hyper)parameters of the Gaussian Process.
+    
+    Optimize the (hyper)parameters of the Gaussian Process using scipy.optimize.minimize or nested sampling via ultranest.
     
     Attributes
     ----------
-    GP: GaussianProcess
+    
+    GP : :class:`~pioran.core.GaussianProcess`
         Gaussian Process object.
-    initial_guess: list of float
+    initial_guess : list of float
         Initial guess for the (hyper)parameters.
-    bounds: list of tuple
+    bounds : list of tuple
         Bounds for the (hyper)parameters.
-    method: str
+    method : str
         Method to maximise the marginal likelihood.
         - "L-BFGS-B": using scipy.optimize.minimize
         - "nested": using nested sampling via ultranest
     
-    results: dict
+    results : dict
         Results of the optimization.
     
     Methods
     -------
+    
     run:
         Optimize the (hyper)parameters of the Gaussian Process.
     Optimize_ML:
@@ -47,7 +51,7 @@ class Optimizer:
 
         Parameters
         ----------
-        GP: GaussianProcess
+        GP: :class:`~pioran.core.GaussianProcess`
             Gaussian Process object.
         method: str, optional
             Method to maximise the marginal likelihood, by default "L-BFGS-B"

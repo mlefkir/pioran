@@ -85,7 +85,7 @@ def decompose_triangular_matrix(M):
 
     Parameters
     ----------
-    M : :obj:`jnp.ndarray`
+    M : (n,n) :obj:`jnp.ndarray`
         Triangular matrix of shape (n,n).
 
     Returns
@@ -156,19 +156,3 @@ def isPD(B):
         return True
     except la.LinAlgError:
         return False
-
-# ----
-
-
-# from scipy.linalg import eigh
-# EPSILON = np.finfo(float).eps
-#
-# def nearest_positive_definite(A):
-#     """Find the nearest positive-definite :
-#     """
-
-#     B = (A.T + A)/2
-#     w, v = eigh(B)
-#     D = np.diag(np.maximum(w,EPSILON))
-#     APD = v@D@v.T
-#     return APD

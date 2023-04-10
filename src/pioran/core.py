@@ -21,18 +21,18 @@ class GaussianProcess(eqx.Module):
 
     Parameters
     ----------
-    fun : :obj:`CovarianceFunction` or :obj:`PowerSpectralDensity`
+    fun : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity` 
         Model function associated to the Gaussian Process. Can be a covariance function or a power spectral density.
-    training_indexes : :obj:`jnp.array`
+    training_indexes : :obj:`jax.Array`
         Indexes of the training data, in this case it is the time.
-    training_observables : :obj:`jnp.array`
+    training_observables : :obj:`jax.Array`
         Observables of the training data, in this it is flux, count-rate or intensity, etc.
-    training_errors : :obj:`jnp.array`, optional
+    training_errors : :obj:`jax.Array`, optional
         Errors on the observables, by default :obj:`None`
     **kwargs : dict
         nb_prediction_points : :obj:`int`, optional
             Number of points to predict, by default 5 * length(training(indexes)).
-        prediction_indexes : :obj:`jnp.array`, optional
+        prediction_indexes : :obj:`jax.Array`, optional
             Indexes of the prediction data, by default jnp.linspace(jnp.min(training_indexes),jnp.max(training_indexes),nb_prediction_points)
         scale_errors : :obj:`bool`, optional
             Scale the errors on the training data by adding a constant, by default True.
@@ -42,25 +42,6 @@ class GaussianProcess(eqx.Module):
             Scaling factor for the lower bound of the PSD, by default 2. See :obj:`PSDToACV` for more details.
         S_high : :obj:`float`, optional
             Scaling factor for the upper bound of the PSD, by default 2. See :obj:`PSDToACV` for more details.
-
-    Attributes
-    ----------
-    model : :obj:`CovarianceFunction` or :obj:`PowerSpectralDensity`
-        Modelassociated to the Gaussian Process, can be a covariance function or a power spectral density.
-    training_indexes : :obj:`jnp.array` (n,1)
-        Indexes of the training data.
-    training_observables : :obj:`jnp.array` of shape (n,1)
-        Observabled training data.
-    training_errors : :obj:`jnp.array` of shape (n,1)
-        Errors on the training observed data.
-    scale_errors : :obj:`bool`
-        Scale the errors on the training data by adding a constant, by default True.
-    estimate_mean : :obj:`bool`
-        Estimate the mean of the training data, by default True.
-    analytical_cov : :obj:`bool`
-        True if the covariance function is analytical, False if it is estimated from a power spectral density.
-    nb_prediction_points : :obj:`int`
-        Number of points to predict, by default 5 * length(training(indexes)).
 
     Methods
     -------
@@ -75,8 +56,27 @@ class GaussianProcess(eqx.Module):
     wrapper_neg_log_marginal_likelihood(parameters)
         Wrapper to compute the negative log marginal likelihood.
         
+    Attributes
+    ----------
+    model : :class:`~pioran.acvf_base.CovarianceFunction`  or :class:`~pioran.psd_base.PowerSpectralDensity`
+        Model associated to the Gaussian Process, can be a covariance function or a power spectral density.
+    training_indexes : :obj:`jax.Array` (n,1)
+        Indexes of the training data.
+    training_observables : :obj:`jax.Array` of shape (n,1)
+        Observabled training data.
+    training_errors : :obj:`jax.Array` of shape (n,1)
+        Errors on the training observed data.
+    scale_errors : :obj:`bool`
+        Scale the errors on the training data by adding a constant, by default True.
+    estimate_mean : :obj:`bool`
+        Estimate the mean of the training data, by default True.
+    analytical_cov : :obj:`bool`
+        True if the covariance function is analytical, False if it is estimated from a power spectral density.
+    nb_prediction_points : :obj:`int`
+        Number of points to predict, by default 5 * length(training(indexes)).
+
     """
-    model: Union[CovarianceFunction,PowerSpectralDensity]
+    model: Union[CovarianceFunction,PowerSpectralDensity] 
     training_indexes: jnp.ndarray
     training_errors: jnp.ndarray
     training_observables: jnp.ndarray

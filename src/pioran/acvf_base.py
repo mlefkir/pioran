@@ -9,14 +9,14 @@ from .utils import EuclideanDistance
 
 
 class CovarianceFunction(eqx.Module):
-    """Master class for covariance functions, inherited from the ``equinox.Module`` class.
+    """Master class for covariance functions, inherited from the :class:`equinox.Module` class.
 
     Bridge between the parameters and the covariance function. The covariance functions
     inherit from this class.
     
     Parameters
     ----------
-    param_values : :obj:`ParametersModel` or  :obj:`list of float`
+    param_values : :class:`~pioran.parameters.ParametersModel` or  :obj:`list of float`
         Values of the parameters of the covariance function.
     param_names :  :obj:`list of str`
         param_names of the parameters of the covariance function.
@@ -26,11 +26,11 @@ class CovarianceFunction(eqx.Module):
     Raises
     ------
     `TypeError`
-        If param_values is not a `list of float` or a :obj:`ParametersModel`.
+        If param_values is not a `list of float` or a :class:`~pioran.parameters.ParametersModel`.
 
     Attributes
     ----------
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the covariance function.
     expression : :obj:`str`
         Expression of the covariance function.
@@ -91,18 +91,18 @@ class CovarianceFunction(eqx.Module):
     def get_cov_matrix(self, xq, xp) -> jnp.ndarray:
         """Compute the covariance matrix between two arrays xq, xp.
 
-        The term (xq-xp) is computed using the Euclidean distance from the utils module.
+        The term (xq-xp) is computed using the :func:`~pioran.utils.EuclideanDistance` function from the utils module.
 
         Parameters
         ----------
-        xq : array of shape (n,1)
+        xq : (N,1) :obj:`jax.Array`
             First array.
-        xp : array of shape (m,1)
+        xp : (M,1) :obj:`jax.Array`
             Second array.
 
         Returns
         -------
-        K : array of shape (n,m)
+        (N,M) :obj:`jax.Array`
             Covariance matrix.
         """
         # Compute the Euclidean distance between the query and the points
@@ -162,7 +162,7 @@ class ProductCovarianceFunction(CovarianceFunction):
         First covariance function.
     cov2 : :obj:`CovarianceFunction`
         Second covariance function.
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the covariance function.
     expression : `str`
         Expression of the total covariance function.
@@ -204,7 +204,7 @@ class ProductCovarianceFunction(CovarianceFunction):
         
         Parameters
         ----------
-        x : jnp.array 
+        x : :obj:`jax.Array` 
             Points where the covariance function is computed.
         
         Returns
@@ -230,7 +230,7 @@ class SumCovarianceFunction(CovarianceFunction):
         First covariance function.
     cov2 : :obj:`CovarianceFunction`
         Second covariance function.
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the covariance function.
     expression : `str`
         Expression of the total covariance function.
@@ -264,7 +264,7 @@ class SumCovarianceFunction(CovarianceFunction):
         
         Parameters
         ----------
-        x : jnp.array 
+        x : :obj:`jax.Array` 
             Points where the covariance function is computed.
         
         Returns

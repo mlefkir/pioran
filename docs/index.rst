@@ -15,9 +15,11 @@ Welcome to pioran's documentation!
    quickstart
    notebook
    timeseries
-   modelling
+   models_acvf
+   modelling_psd
    simulations
-   modules
+   API
+.. modules
 
 
 Indices and tables

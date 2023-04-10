@@ -1,7 +1,9 @@
-notebooks
+Notebooks
 =========
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
-   numerical_FourierTransform
+   Notebooks/On_the_fft
+   Notebooks/On_the_nufft
+   Notebooks/On_the_interpolation

@@ -3,7 +3,7 @@
 Class to convert a power spectral density to an autocovariance function via the inverse Fourier transform.
 
 """
-
+import jax
 
 import jax.numpy as jnp
 import equinox as eqx
@@ -24,35 +24,35 @@ class PSDToACV(eqx.Module):
 
     Parameters
     ----------
-    PSD : :obj:`PowerSpectralDensity`
+    PSD : :class:`~pioran.psd_base.PowerSpectralDensity`
         Power spectral density object.
-    S_low : float
+    S_low : :obj:`float`
         Lower bound of the frequency grid.
-    S_high : float
+    S_high : :obj:`float`
         Upper bound of the frequency grid.
-    T : float
+    T : :obj:`float`
         Duration of the time series.
-    dt : float
+    dt : :obj:`float`
         Sampling period of the time series.
 
         
     Attributes
     ----------
-    PSD : PowerSpectralDensity
+    PSD : :class:`~pioran.psd_base.PowerSpectralDensity`
         Power spectral density object.
-    parameters : ParametersModel
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the power spectral density.
-    frequencies : jnp.ndarray
+    frequencies : :obj:`jax.Array`
         Frequency grid.
-    n_freq_grid : int
+    n_freq_grid : :obj:`int`
         Number of points in the frequency grid.
-    f0 : float
+    f0 : :obj:`float`
         Lower bound of the frequency grid.
-    fN : float
+    fN : :obj:`float`
         Upper bound of the frequency grid.
-    tau : jnp.ndarray
+    tau : :obj:`jax.Array`
         Time lag grid.
-    dtau : float
+    dtau : :obj:`float`
         Time lag step.
     
     Methods
@@ -106,7 +106,7 @@ class PSDToACV(eqx.Module):
         
         self.method = kwargs.get('method','FFT')
       
-    def calculate(self,t,**kwargs):
+    def calculate(self,t,**kwargs)-> jax.Array:
         """
         Calculate the autocovariance function from the power spectral density.
         
@@ -116,7 +116,7 @@ class PSDToACV(eqx.Module):
         
         Parameters
         ----------
-        t : array
+        t : :obj:`jax.Array`
             Time lags where the autocovariance function is computed.
         
         """
@@ -133,7 +133,7 @@ class PSDToACV(eqx.Module):
             psd = self.PSD.calculate(k)+0j
             return  self.get_acvf_byNuFFT(psd,t*4*jnp.pi**2)
     
-    def get_acvf_byNuFFT(self,psd,t):
+    def get_acvf_byNuFFT(self,psd,t)-> jax.Array:
         """Compute the autocovariance function from the power spectral density using the non uniform Fourier transform.
 
         Parameters
@@ -146,7 +146,7 @@ class PSDToACV(eqx.Module):
         P = 2 * jnp.pi / self.f0
         return nufft2(psd, t/P).real * self.f0
     
-    def get_acvf_byFFT(self,psd):
+    def get_acvf_byFFT(self,psd)-> jax.Array:
         """Compute the autocovariance function from the power spectral density using the inverse Fourier transform.
 
         Parameters
@@ -166,12 +166,12 @@ class PSDToACV(eqx.Module):
         return  acvf
     
     @eqx.filter_jit
-    def interpolation(self, t, acvf):
+    def interpolation(self, t, acvf)-> jax.Array:
         """Interpolate the autocovariance function at the points x.
 
         Parameters
         ----------
-        t : array
+        t : :obj:`jax.Array`
             Points where the autocovariance function is computed.
 
         Returns
@@ -187,7 +187,7 @@ class PSDToACV(eqx.Module):
         return  I
 
     # @eqx.filter_jit
-    def get_cov_matrix(self, xq, xp):
+    def get_cov_matrix(self, xq, xp)-> jax.Array:
         """Compute the covariance matrix between two arrays for the exponential covariance function.
 
         K(xq,xp) = variance * exp( - (xq-xp) / lengthscale )

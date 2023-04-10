@@ -15,7 +15,7 @@ class Exponential(CovarianceFunction):
 
     with the variance :math:`A\ge 0` and length :math:`\gamma>0`.
     
-    The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
+    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object. 
     The values of the parameters can be accessed using the `parameters` attribute via two keys: '`variance`' and '`length`'.
     
     The covariance function is evaluated on an array of lags :math:`\tau` using the `calculate` method.
@@ -31,7 +31,7 @@ class Exponential(CovarianceFunction):
             
     Attributes
     ----------
-    parameters : :obj:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the covariance function.
         
     Methods
@@ -58,7 +58,7 @@ class Exponential(CovarianceFunction):
 
         Parameters
         ----------
-        t : :obj:`jnp.array`
+        t : :obj:`jax.Array`
             Array of lags.
 
         Returns
@@ -78,7 +78,7 @@ class SquaredExponential(CovarianceFunction):
 
     with the variance :math:`A\ge 0` and length :math:`\sigma>0`.
     
-    The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
+    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object. 
     The values of the parameters can be accessed using the `parameters` attribute via two keys: '`variance`' and '`length`'.
     
     The covariance function is evaluated on an array of lags :math:`\tau` using the `calculate` method.
@@ -94,7 +94,7 @@ class SquaredExponential(CovarianceFunction):
             
     Attributes
     ----------
-    parameters : :class:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the covariance function.
     
     Methods
@@ -103,7 +103,7 @@ class SquaredExponential(CovarianceFunction):
         Computes the squared exponential covariance function for an array of lags :math:`\tau`.
     """
     parameters: ParametersModel
-    expression = 'exponential_squared'
+    expression = 'squared_exponential'
 
     def __init__(self, param_values, **kwargs):
         """Constructor of the covariance function inherited from the CovarianceFunction class. """
@@ -121,7 +121,7 @@ class SquaredExponential(CovarianceFunction):
 
         Parameters
         ----------
-        t : :obj:`jnp.array`
+        t : :obj:`jax.Array`
             Array of lags.
 
         Returns
@@ -140,7 +140,7 @@ class Matern32(CovarianceFunction):
        
     with the variance :math:`A\ge 0` and length :math:`\gamma>0`
 
-    The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
+    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object. 
     The values of the parameters can be accessed using the `parameters` attribute via two keys: '`variance`' and '`length`'.
     
     The covariance function is evaluated on an array of lags :math:`\tau` using the `calculate` method.
@@ -156,7 +156,7 @@ class Matern32(CovarianceFunction):
             
     Attributes
     ----------
-    parameters : :class:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the covariance function.
     
     Methods
@@ -183,7 +183,7 @@ class Matern32(CovarianceFunction):
 
         Parameters
         ----------
-        t : `jnp.array`
+        t : :obj:`jax.Array`
             Array of lags.
 
         Returns
@@ -203,7 +203,7 @@ class Matern52(CovarianceFunction):
        
     with the variance :math:`A\ge 0` and length :math:`\gamma>0`.
 
-    The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
+    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object. 
     The values of the parameters can be accessed using the `parameters` attribute via two keys: '`variance`' and '`length`'.
     
     The covariance function is evaluated on an array of lags :math:`\tau` using the `calculate` method.
@@ -219,7 +219,7 @@ class Matern52(CovarianceFunction):
             
     Attributes
     ----------
-    parameters : :class:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the covariance function.
         
     Methods
@@ -248,7 +248,7 @@ class Matern52(CovarianceFunction):
 
         Parameters
         ----------
-        t : `jnp.array`
+        t : :obj:`jax.Array`
             Array of lags.
 
         Returns
@@ -268,7 +268,7 @@ class RationalQuadratic(CovarianceFunction):
        
     with the variance :math:`A\ge 0`, length :math:`\gamma>0` and scale :math:`\alpha>0`
 
-    The parameters are stored in the `parameters` attribute which is a :class:`ParametersModel` object. 
+    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object. 
     The values of the parameters can be accessed using the `parameters` attribute via two keys: '`variance`' and '`length`'.
     
     The covariance function is evaluated on an array of lags :math:`\tau` using the `calculate` method.
@@ -284,7 +284,7 @@ class RationalQuadratic(CovarianceFunction):
             
     Attributes
     ----------
-    parameters : :class:`ParametersModel`
+    parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the covariance function.
         
     Methods
@@ -312,9 +312,9 @@ class RationalQuadratic(CovarianceFunction):
 
         Parameters
         ----------
-        t : `jnp.array`
+        t : :obj:`jax.Array`
             Array of lags.
-
+            
         Returns
         -------
         Covariance function evaluated on the array of lags.

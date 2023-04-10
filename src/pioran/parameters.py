@@ -11,8 +11,8 @@ import jax.numpy as jnp
 class ParametersModel:
     """ Class to store the parameters of a model. 
 
-    This object stores one or several :obj:`Parameter` objects for a model. The model can be 
-    of type :obj:`CovarianceFunction` or :obj:`PowerSpectralDensity`.
+    This object stores one or several :class:`~pioran.parameter_base.Parameter` objects for a model. The model can be 
+    of type :class:`~pioran.acvf_base.CovarianceFunction`  or :class:`~pioran.psd_base.PowerSpectralDensity`.
     Initialised with a list of values for the parameters.
     
     
