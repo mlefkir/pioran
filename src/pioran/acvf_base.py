@@ -1,6 +1,6 @@
 """Module for classes representing the covariance function.
 """
-
+from copy import deepcopy
 import jax.numpy as jnp
 import equinox as eqx
 
@@ -123,6 +123,7 @@ class CovarianceFunction(eqx.Module):
         :obj:`SumCovarianceFunction`
             Sum of the two covariance functions.
         """
+        other = deepcopy(other)
         other.parameters.increment_IDs(len(self.parameters.values))
         other.parameters.increment_component(max(self.parameters.components))
         return SumCovarianceFunction(self, other)
@@ -140,7 +141,7 @@ class CovarianceFunction(eqx.Module):
         :obj:`ProductCovarianceFunction`
             Product of the two covariance functions.
         """
-        
+        other = deepcopy(other)
         other.parameters.increment_IDs(len(self.parameters.values))
         other.parameters.increment_component(max(self.parameters.components))
         return ProductCovarianceFunction(self, other)
