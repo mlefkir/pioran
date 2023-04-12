@@ -6,21 +6,17 @@
 Welcome to pioran's documentation!
 ==================================
 
+`pioran` is a Python package for the analysis of time series data.
+
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Contents:
 
-   introduction
-   installation
-   quickstart
-   timeseries
-   modelling
-   simulations
-   notebooks
-   API
+   userguide/User
+   tutorials/Tutorials
+   references/references.rst
+   apidoc/API
    
-
-
 
 Indices and tables
 ==================

@@ -2,7 +2,7 @@ Gaussian Process
 ================
 
 
- .. currentmodule:: pioran
+ .. currentmodule:: pioran.core
 
 .. autosummary::
     :toctree: summary

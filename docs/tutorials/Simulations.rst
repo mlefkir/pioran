@@ -7,6 +7,5 @@ In the following, we will simulate time series with two different methods. We fi
 .. toctree::
     :maxdepth: 2
 
-    Notebooks/simulations_tk
-    Notebooks/simulations_acv
-    Notebooks/On_the_sample_variance
+    simulations_tk
+    simulations_acv

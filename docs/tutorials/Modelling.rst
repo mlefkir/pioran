@@ -7,5 +7,5 @@ or the power spectral density (PSD). The ACVF is the Fourier transform of the PS
 .. toctree::
    :maxdepth: 2
 
-   Notebooks/models_acvf
-   Notebooks/models_psd
+   models_acvf
+   models_psd
