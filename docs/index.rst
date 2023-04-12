@@ -13,11 +13,12 @@ Welcome to pioran's documentation!
    introduction
    installation
    quickstart
-   notebook
    timeseries
    modelling
-   simulations.rst
+   simulations
+   notebooks
    API
+   
 
 
 
@@ -25,5 +26,4 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

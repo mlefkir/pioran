@@ -6,21 +6,22 @@ import numpy as np
 
 @jit
 def EuclideanDistance(xq, xp):
-    """Compute the Euclidean distance between two arrays.
+    r"""Compute the Euclidean distance between two arrays.
 
+    .. math:: :label: euclidian_distance  
+    
+        D(\boldsymbol{x_q},\boldsymbol{x_p}) = \sqrt{(\boldsymbol{x_q} - \boldsymbol{x_p}^{\mathrm{T}})^2}
 
     Parameters
     ----------
-    xq : array 
-        First array of shape (n, 1)
-    xp : array 
-        Second array of shape (m, 1)
-
+    xq : (n, 1) :obj:`jax.Array`
+        First array.
+    xp : (m, 1) :obj:`jax.Array` 
+        Second array.
     Returns
     -------
-    array of shape (n, m)
+    (n, m) :obj:`jax.Array`
     """
-    #return cdist(xq, xp, metric='euclidean')
     return jnp.sqrt((xq - xp.T)**2)
 
 # ---- Code from Ahmed Fasih ---- https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd
@@ -31,19 +32,18 @@ def nearest_positive_definite(A):
     
     Parameters
     ----------
-    A : array
+    A : (N, N) :obj:`jax.Array`
+        Matrix to find the nearest positive-definite
         
-    
     Returns
     -------
-    array
-        Nearest positive-definite : to A.  
+    (N, N) :obj:`jax.Array`
+        Nearest positive-definite matrix to A.  
     
     Notes
     -----
-    [1] https://www.mathworks.com/matlabcentral/fileexchange/42885-nearestspd
-    [2] N.J. Higham, "Computing a nearest symmetric positive semidefinite
-    :" (1988): https://doi.org/10.1016/0024-3795(88)90223-6
+    1. https://www.mathworks.com/matlabcentral/fileexchange/42885-nearestspd
+    2. N.J. Higham, "Computing a nearest symmetric positive semidefinite" (1988): https://doi.org/10.1016/0024-3795(88)90223-6
     """
 
     B = (A + A.T) / 2
@@ -85,16 +85,16 @@ def decompose_triangular_matrix(M):
 
     Parameters
     ----------
-    M : (n,n) :obj:`jnp.ndarray`
+    M : (n,n) :obj:`jax.Array`
         Triangular matrix of shape (n,n).
 
     Returns
     -------
-    unique : :obj:`jnp.ndarray`
+    unique : :obj:`jax.Array`
         Vector of unique values.
-    reverse_indexes : :obj:`jnp.ndarray`
+    reverse_indexes : :obj:`jax.Array`
         Indexes to reconstruct the original matrix.
-    tril_indexes : :obj:`jnp.ndarray`
+    tril_indexes : :obj:`jax.Array`
         Indexes of the lower triangular matrix.
     n : :obj:`int`
         Size of the original matrix.        
@@ -114,18 +114,18 @@ def reconstruct_triangular_matrix(unique, reverse_indexes, tril_indexes, n):
 
     Parameters
     ----------
-    unique : :obj:`jnp.ndarray`
+    unique : :obj:`jax.Array`
         Vector of unique values.
-    reverse_indexes : :obj:`jnp.ndarray`
+    reverse_indexes : :obj:`jax.Array`
         Indexes to reconstruct the original matrix.
-    tril_indexes : :obj:`jnp.ndarray`
+    tril_indexes : :obj:`jax.Array`
         Indexes of the lower triangular matrix.
     n : :obj:`int`
         Size of the original matrix.
         
     Returns
     -------
-    M : :obj:`jnp.ndarray`
+    :obj:`jax.Array`
         Triangular matrix of shape (n,n).
     
     Raises
@@ -139,17 +139,17 @@ def reconstruct_triangular_matrix(unique, reverse_indexes, tril_indexes, n):
     return M+M.T-jnp.diag(jnp.diag(M))
 
 def isPD(B):
-    """Returns true when input is positive-definite, via Cholesky
+    """Returns true when input is positive-definite, via Cholesky.
     
     Parameters
     ----------
-    B : array
-        : to test.
+    B : (n,n) :obj:`jax.Array`
+        Matrix to test.
         
     Returns
     -------
-    bool
-        True if B is positive-definite. False otherwise.
+    :obj:`bool`
+        `True` if B is positive-definite. `False` otherwise.
     """
     try:
         _ = la.cholesky(B)

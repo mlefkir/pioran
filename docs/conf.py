@@ -103,7 +103,10 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','**.ipynb_checkpoints']
 
 
 latex_elements = {'papersize': 'a4paper',
-    'preamble':r'''\usepackage{graphicx}\usepackage{enumitem}\setlistdepth{99}\usepackage{amsmath}\usepackage{amssymb}\def\stackbelow\#1\#2{\underset{\displaystyle\overset{\displaystyle\shortparallel}{\#2}}{\#1}}'''}
+    'preamble':r'''\usepackage{graphicx}
+    \usepackage{enumitem}
+    \setlistdepth{99}
+    \usepackage{amsmath}\usepackage{amssymb}'''}
 tikz_latex_preamble = r'''\usepackage{amsmath}\usepackage{amssymb}'''
 
 

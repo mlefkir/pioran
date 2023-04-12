@@ -11,3 +11,4 @@ API Reference
    apidocs/Parameters
    apidocs/Plots
    apidocs/Simulate
+   apidocs/Utils

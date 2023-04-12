@@ -34,12 +34,14 @@ class Simulations:
         duration of the time series.
     dt : :obj:`float`
         sampling period of the time series.
-    S_low : :obj:`float`
-        Scale factor for the lower bound of the frequency grid.
-    S_high : :obj:`float`
-        Scale factor for the upper bound of the frequency grid.
     model : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity` 
         The model for the simulation of the process, can be a PSD or an ACVF.
+    S_low : :obj:`float`, optional
+        Scale factor for the lower bound of the frequency grid.
+        If the model is a PSD, this parameter is mandatory.
+    S_high : :obj:`float`, optional
+        Scale factor for the upper bound of the frequency grid.
+        If the model is a PSD, this parameter is mandatory.
 
     Attributes
     ----------
@@ -88,15 +90,15 @@ class Simulations:
         Plot the PSD of the time series.
     plot_acvf(figsize,filename)
         Plot the ACVF of the time series.
-    autocovariance_method()
-        Generate the time series with the autocovariance method.
+    GP_method()
+        Generate the time series with the GP method.
     timmer_Koenig_method()
         Generate the time series with the Timmer-Koenig method.
     sample_time_series(t,y,M,irregular_sampling=False)
         Sample the timeseries.
     extract_subset_timeseries(t,y,M)
         Extract a subset of the time series.
-    simulate(mean=None,variance=None,method='ACV',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs)  
+    simulate(mean=None,variance=None,method='GP',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs)  
         Simulate a time series.
     
     Raises
@@ -105,8 +107,20 @@ class Simulations:
         If the model is not a PSD or ACVF.
     """
     
-    def __init__(self, T, dt, S_low,S_high,model):
+    def __init__(self, T, dt, model,S_low=None,S_high=None):
+        
+        if not isinstance(model,PowerSpectralDensity) and not isinstance(model,CovarianceFunction):
+            raise ValueError(f"You must provide a model which is either a PowerSpectralDensity or a CovarianceFunction, not {type(model)}")
 
+
+        if isinstance(model,PowerSpectralDensity) and (( S_low is None ) or (S_high is None )):
+            raise ValueError("When the model is a PSD, you must provide S_low and S_high for the frequency grid")
+        # case where the model is an ACVF, we dont really care about the frequency grid
+        # nor the S_low and S_high parameters, we just need S_low=2 for plotting purposes
+        elif isinstance(model,CovarianceFunction) and (( S_low is None ) or (S_high is None )):
+            S_low = 2
+            S_high = 1
+            
         self.S_low = S_low
         self.S_high = S_high
         # parameters of the time series
@@ -136,10 +150,10 @@ class Simulations:
             
         if isinstance(model,PowerSpectralDensity):
             self.psd = model.calculate(self.frequencies)
-        elif isinstance(model,CovarianceFunction):
-            self.acvf = model.calculate(self.tau)
         else:
-            raise ValueError(f"You must provide a model which is either a PowerSpectralDensity or a CovarianceFunction, not {type(model)}")
+            self.acvf = model.calculate(self.tau)
+        
+        
         self.model = model
         
     def generate_keys(self,seed=0):
@@ -164,7 +178,7 @@ class Simulations:
         key = random.PRNGKey(seed)
         self.keys['ts'],self.keys['errors'],self.keys['fluxes'],self.keys['subset'],self.keys['sampling'] = random.split(key,5)
     
-    def plot_acvf(self,figsize=(15,3),filename=None):
+    def plot_acvf(self,figsize=(9,5.5),xunit='d',filename=None,title=None):
         """Plot the autocovariance function.
         
         Plot the autocovariance function of the time series.
@@ -187,15 +201,14 @@ class Simulations:
         """
         
         if self.acvf is None:
-            raise NotImplementedError("Plotting the PSD when the model is the ACV is not implemented yet")
+            raise NotImplementedError("Plotting the ACV when the PSD is modelled is not implemented yet")
 
         fig,ax = plt.subplots(1,1,figsize=figsize)
         ax.plot(self.tau,self.acvf,'.-')
-        ax.legend()
         ax.set_xlim(0,self.duration)
-        ax.set_xlabel(r'Time lag $\tau (\mathrm{day})$')
+        ax.set_xlabel(r'Time lag $ \tau'+f'(\mathrm{{{xunit}}})$')
         ax.set_ylabel('ACVF')
-        ax.set_title("A model for the Autocovariance function")
+        if title is not None: ax.set_title(title)
         fig.tight_layout()
         
         if filename is not None:
@@ -247,8 +260,8 @@ class Simulations:
             fig.savefig(f'{filename}',format='pdf')
         return fig,ax
              
-    def autocovariance_method(self,interpolation='cubic'):
-        """Generate a time series using the autocovariance method
+    def GP_method(self,interpolation='cubic'):
+        """Generate a time series using the GP method.
         
         If the ACVF is not already calculated, it is calculated from the PSD 
         using the inverse Fourier transform.
@@ -256,8 +269,7 @@ class Simulations:
         Parameters
         ----------
         interpolation  : :obj:`str`, optional
-            Interpolation method to use for the autocovariance function, by default 'cubic'
-        
+            Interpolation method to use for the GP function, by default 'cubic'
         
         Returns
         -------
@@ -282,10 +294,8 @@ class Simulations:
             dist = EuclideanDistance(t_test.reshape(-1,1),t_test.reshape(-1,1))
             
             if isinstance(self.model,CovarianceFunction):
-                print("Calculating the autocovariance function")
                 K = self.model.calculate(dist)
             else:
-                print("Interpolating the autocovariance function")
                 if interpolation == 'linear':
                     interpo = interp1d(self.tau,self.acvf,'linear')
                 elif interpolation == 'cubic':
@@ -343,7 +353,7 @@ class Simulations:
             hdu.header['ERRORS'] = simulations_kwargs.get('errors','gauss')
             hdu.header['RANDOMI'] = str(simulations_kwargs.get('randomise_fluxes',True))
             hdu.header['MODELTYP'] = 'PSD' if isinstance(self.model,PowerSpectralDensity) else 'ACVF'
-            hdu.header['METHOD'] = simulations_kwargs.get('method','ACV')
+            hdu.header['METHOD'] = simulations_kwargs.get('method','GP')
             hdu.header['MEAN'] = simulations_kwargs.get('mean','None')
             hdu.header['MODEL'] = self.model.expression # or 'Exponential' 'Lorentzian' 'ExponentialSquared'
             for par in self.model.parameters:
@@ -365,10 +375,10 @@ class Simulations:
         hdu = fits.HDUList(hdu_list)
         hdu.writeto(f'{filename}.fits',overwrite=True)       
     
-    def simulate(self, mean=None,method='ACV',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs):
-        """Method to simulate time series using either the ACV method or the TK method.
+    def simulate(self, mean=None,method='GP',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs):
+        """Method to simulate time series using either the GP method or the TK method.
         
-        When using the ACV method, the time series is generated using an analytical autocovariance function or a power spectral density.
+        When using the GP method, the time series is generated using an analytical autocovariance function or a power spectral density.
         If the autocovariance function is not provided, it is calculated from the power spectral density using the inverse Fourier transform
         and interpolated using a linear interpolation to map the autocovariance function on a grid of time lags.
         
@@ -383,7 +393,7 @@ class Simulations:
         mean : :obj:`float`, optional
             Mean of the time series, if None the mean will be set to -2 min(ts)
         method : :obj:`str`, optional
-            method to simulate the time series, by default 'ACV' 
+            method to simulate the time series, by default 'GP' 
             can be 'TK' which uses Timmer and Koening method
         randomise_fluxes : :obj:`bool`, optional
             If True the fluxes will be randomised.
@@ -402,7 +412,7 @@ class Simulations:
         Raises
         ------
         ValueError
-            If the method is not 'ACV' or 'TK'
+            If the method is not 'GP' or 'TK'
         ValueError
             If the errors are not 'gauss' or 'poisson'
         
@@ -418,11 +428,13 @@ class Simulations:
         """
         self.generate_keys(seed=seed)
         
-        if method == 'ACV':
+        if method == 'GP':
+            if irregular_sampling:
+                raise NotImplementedError("The GP method does not support irregular sampling yet")
             if self.n_time > 8000:
                 warnings.warn("The desired number of point in the simulated time series is quite high")
             interp_method = kwargs.get('interp_method','cubic')
-            t,true_timeseries = self.autocovariance_method(interpolation=interp_method)
+            t,true_timeseries = self.GP_method(interpolation=interp_method)
 
         elif method == 'TK':
             if self.psd is None:
@@ -436,7 +448,7 @@ class Simulations:
             t -= t[0]
             
         else:
-            raise ValueError(f"method {method} is not accepted, use either 'ACV' or 'TK'")
+            raise ValueError(f"method {method} is not accepted, use either 'GP' or 'TK'")
 
         if randomise_fluxes:
             if errors == 'gauss':

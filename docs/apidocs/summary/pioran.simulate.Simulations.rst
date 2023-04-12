@@ -13,8 +13,8 @@
 
    .. autosummary::
    
+      ~Simulations.GP_method
       ~Simulations.__init__
-      ~Simulations.autocovariance_method
       ~Simulations.batch_simulations
       ~Simulations.extract_subset_timeseries
       ~Simulations.generate_keys
