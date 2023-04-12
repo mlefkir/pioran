@@ -1,6 +1,7 @@
 """Module for classes representing the covariance function.
 """
 from copy import deepcopy
+from typing import Union, List, Tuple, Optional
 import jax.numpy as jnp
 import equinox as eqx
 
@@ -9,7 +10,7 @@ from .utils import EuclideanDistance
 
 
 class CovarianceFunction(eqx.Module):
-    """Master class for covariance functions, inherited from the :class:`equinox.Module` class.
+    """Base class for covariance functions, inherited from :class:`equinox.Module`.
 
     Bridge between the parameters and the covariance function. The covariance functions
     inherit from this class.
@@ -52,8 +53,18 @@ class CovarianceFunction(eqx.Module):
     parameters: ParametersModel
     expression: str
     
-    def __init__(self, param_values,param_names, free_parameters):
+    def __init__(self, param_values: Union[ParametersModel,List[float]], param_names: List[str], free_parameters: List[bool]):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
+        
+        Parameters
+        ----------
+        param_values : :class:`~pioran.parameters.ParametersModel` or  :obj:`list of float`
+            Values of the parameters of the covariance function.
+        param_names :  :obj:`list of str`
+            param_names of the parameters of the covariance function.
+        free_parameters :  :obj:`list of bool`
+            List of bool to indicate if the parameters are free or not.       
+        
         """ 
         if isinstance(param_values, ParametersModel):
             self.parameters = param_values
@@ -88,7 +99,7 @@ class CovarianceFunction(eqx.Module):
         """    
         return self.__str__()
     
-    def get_cov_matrix(self, xq, xp) -> jnp.ndarray:
+    def get_cov_matrix(self, xq: jnp.ndarray, xp: jnp.ndarray) -> jnp.ndarray:
         """Compute the covariance matrix between two arrays xq, xp.
 
         The term (xq-xp) is computed using the :func:`~pioran.utils.EuclideanDistance` function from the utils module.
@@ -179,7 +190,15 @@ class ProductCovarianceFunction(CovarianceFunction):
     expression: str
     
     def __init__(self, cov1, cov2):
-        """Constructor of the SumCovarianceFunction class."""
+        """Constructor of the SumCovarianceFunction class.
+              
+        Parameters
+        ----------
+        cov1 : :obj:`CovarianceFunction`
+            First covariance function.
+        cov2 : :obj:`CovarianceFunction`
+            Second covariance function.
+        """
         self.cov1 = cov1
         self.cov2 = cov2
         if isinstance(cov1, SumCovarianceFunction) and isinstance(cov2, SumCovarianceFunction):
@@ -247,7 +266,15 @@ class SumCovarianceFunction(CovarianceFunction):
     expression: str
     
     def __init__(self, cov1, cov2):
-        """Constructor of the SumCovarianceFunction class."""
+        """Constructor of the SumCovarianceFunction class.
+                
+        Parameters
+        ----------
+        cov1 : :obj:`CovarianceFunction`
+            First covariance function.
+        cov2 : :obj:`CovarianceFunction`
+            Second covariance function.
+        """
         self.cov1 = cov1
         self.cov2 = cov2
         self.expression = f'{cov1.expression} + {cov2.expression}'
@@ -258,7 +285,7 @@ class SumCovarianceFunction(CovarianceFunction):
                                           _pars=cov1.parameters._pars + cov2.parameters._pars)
     
     @eqx.filter_jit
-    def calculate(self, x) -> jnp.ndarray:
+    def calculate(self, x:jnp.array) -> jnp.ndarray:
         """Compute the covariance function at the points x.
         
         It is the sum of the two covariance functions.

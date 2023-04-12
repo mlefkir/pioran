@@ -6,9 +6,9 @@ Class to convert a power spectral density to an autocovariance function via the 
 import jax
 
 import jax.numpy as jnp
+from jax_finufft import nufft2
 import equinox as eqx
 
-from jax_finufft import nufft2
 from .utils import decompose_triangular_matrix, reconstruct_triangular_matrix
 
 from .psd_base import PowerSpectralDensity
@@ -54,6 +54,9 @@ class PSDToACV(eqx.Module):
         Time lag grid.
     dtau : :obj:`float`
         Time lag step.
+    method : :obj:`str`
+        Method used to compute the autocovariance function. Can be 'FFT' if the inverse Fourier transform is used or 'NuFFT' 
+        if the non uniform Fourier transform is used.
     
     Methods
     -------
@@ -103,10 +106,9 @@ class PSDToACV(eqx.Module):
         tau_max = .5/self.f0#0.5/self.f0
         self.dtau = tau_max/(self.n_freq_grid-1) 
         self.tau = jnp.arange(0,tau_max+self.dtau,self.dtau)
-        
         self.method = kwargs.get('method','FFT')
       
-    def calculate(self,t,**kwargs)-> jax.Array:
+    def calculate(self,t: jnp.array,**kwargs)-> jax.Array:
         """
         Calculate the autocovariance function from the power spectral density.
         
@@ -119,6 +121,10 @@ class PSDToACV(eqx.Module):
         t : :obj:`jax.Array`
             Time lags where the autocovariance function is computed.
         
+        Returns
+        -------
+        :obj:`jax.Array`
+            Autocovariance values at the time lags t.
         """
         if self.method == 'FFT':
             psd = self.PSD.calculate(self.frequencies)
@@ -133,30 +139,36 @@ class PSDToACV(eqx.Module):
             psd = self.PSD.calculate(k)+0j
             return  self.get_acvf_byNuFFT(psd,t*4*jnp.pi**2)
     
-    def get_acvf_byNuFFT(self,psd,t)-> jax.Array:
+    def get_acvf_byNuFFT(self,psd: jnp.array,t: jnp.array)-> jax.Array:
         """Compute the autocovariance function from the power spectral density using the non uniform Fourier transform.
 
         Parameters
         ----------
-        psd : array
-            Power spectral dens
-            
+        psd : :obj:`jax.Array`
+            Power spectral density values.
+        t : :obj:`jax.Array`
+            Time lags where the autocovariance function is computed.
+
+        Returns
+        -------
+        :obj:`jax.Array`
+            Autocovariance values at the time lags t.
             
         """
         P = 2 * jnp.pi / self.f0
         return nufft2(psd, t/P).real * self.f0
     
-    def get_acvf_byFFT(self,psd)-> jax.Array:
+    def get_acvf_byFFT(self, psd: jnp.array)-> jax.Array:
         """Compute the autocovariance function from the power spectral density using the inverse Fourier transform.
 
         Parameters
         ----------
-        psd : array
+        psd : :obj:`jax.Array`
             Power spectral density.
 
         Returns
         -------
-        array
+        :obj:`jax.Array`
             Autocovariance function.
         """
         
@@ -166,44 +178,42 @@ class PSDToACV(eqx.Module):
         return  acvf
     
     @eqx.filter_jit
-    def interpolation(self, t, acvf)-> jax.Array:
-        """Interpolate the autocovariance function at the points x.
+    def interpolation(self, t: jnp.array, acvf: jnp.array)-> jax.Array:
+        """Interpolate the autocovariance function at the points t.
 
         Parameters
         ----------
         t : :obj:`jax.Array`
             Points where the autocovariance function is computed.
+        acvf : :obj:`jax.Array`
+            Autocovariance values at the points tau.
 
         Returns
         -------
-        array
-            Autocovariance function at the points x.
+        :obj:`jax.Array`
+            Autocovariance function at the points t.
         """
-        # if kind=='linear':
         I = jnp.interp(t,self.tau,acvf)
-        # else:
-        #     interpo = interp1d(self.tau,acvf,'linear')
-        #     I = interpo(x)
         return  I
 
-    # @eqx.filter_jit
-    def get_cov_matrix(self, xq, xp)-> jax.Array:
-        """Compute the covariance matrix between two arrays for the exponential covariance function.
+    def get_cov_matrix(self, xq: jnp.array, xp: jnp.array)-> jax.Array:
+        """Compute the covariance matrix between two arrays xq, xp.
 
-        K(xq,xp) = variance * exp( - (xq-xp) / lengthscale )
-
-        The term (xq-xp) is computed using the Euclidean distance from the module covarfun.distance
+        The term (xq-xp) is computed using the :func:`~pioran.utils.EuclideanDistance` function from the utils module.
+        If the method used is 'NuFFT' and if the two arrays have the same shape, the covariance matrix is computed only on the unique values of the distance matrix
+        using the :func:`~pioran.utils.decompose_triangular_matrix` and :func:`~pioran.utils.reconstruct_triangular_matrix` functions from the utils module.
+        Otherwise, the covariance matrix is computed on the full distance matrix.
 
         Parameters
         ----------
-        xq: array of shape (n,1)
+        xq : (N,1) :obj:`jax.Array`
             First array.
-        xp: array of shape (m,1)
+        xp : (M,1) :obj:`jax.Array`
             Second array.
 
         Returns
         -------
-        K: array of shape (n,m)
+        (N,M) :obj:`jax.Array`
             Covariance matrix.
         """
         # Compute the Euclidean distance between the query and the points

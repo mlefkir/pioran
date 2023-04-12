@@ -1,7 +1,7 @@
 Covariance functions
 ====================
 
-Classes for covariance functions.
+Classes for manipulating and creating covariance functions.
  
  .. currentmodule:: pioran.acvf_base
 
@@ -9,7 +9,8 @@ Classes for covariance functions.
 Base class
 ----------
 
-This is the base class for all covariance functions.
+This is the base class for all covariance functions. It is not meant to be used directly, but rather as a base class for other covariance functions. 
+The sum and product of covariance functions are implemented with the ``+`` and ``*`` operators, respectively.
 
 .. autosummary::
     :toctree: summary
@@ -18,15 +19,13 @@ This is the base class for all covariance functions.
 
     CovarianceFunction
 
+
+Implemented covariance functions
+--------------------------------
+
+These are the covariance functions that are currently implemented, they inherit from the base class.
+
 ..  currentmodule:: pioran.acvf
-
-
-
-
-Covariance functions
---------------------
-
-Implemented covariance functions.
 
 .. autosummary::
     :toctree: summary

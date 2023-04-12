@@ -7,7 +7,7 @@ Welcome to pioran's documentation!
 ==================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    introduction
@@ -15,11 +15,10 @@ Welcome to pioran's documentation!
    quickstart
    notebook
    timeseries
-   models_acvf
-   modelling_psd
-   simulations
+   modelling
+   simulations.rst
    API
-.. modules
+
 
 
 Indices and tables

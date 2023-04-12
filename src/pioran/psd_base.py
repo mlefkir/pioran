@@ -1,7 +1,7 @@
 
 """Module to represent the power spectral density functions.
 """
-
+from copy import deepcopy
 import equinox as eqx
 import jax.numpy as jnp
 
@@ -9,7 +9,7 @@ from .parameters import ParametersModel
 
 
 class PowerSpectralDensity(eqx.Module):
-    """Master class for the power density function functions, inherited from the :obj:`equinox.Module` class.
+    """Base class for the power density function functions, inherited from the :obj:`equinox.Module` class.
 
     Bridge between the parameters and the power spectral density function. The power spectral density functions
     inherit from this class.
@@ -91,6 +91,7 @@ class PowerSpectralDensity(eqx.Module):
         :obj:`SumPowerSpectralDensity`
             Sum of the two power spectral densities.
         """
+        other = deepcopy(other)
         other.parameters.increment_IDs(len(self.parameters.values))
         other.parameters.increment_component(max(self.parameters.components))
         return SumPowerSpectralDensity(self, other)
@@ -108,7 +109,7 @@ class PowerSpectralDensity(eqx.Module):
         :obj:`ProductPowerSpectralDensity`
             Product of the two power spectral densities.
         """
-        
+        other = deepcopy(other)
         other.parameters.increment_IDs(len(self.parameters.values))
         other.parameters.increment_component(max(self.parameters.components))
         return ProductPowerSpectralDensity(self, other)

@@ -127,7 +127,7 @@ class ParametersModel:
         for i in range(len(self.IDs)):
             self._pars[i].ID += increment
 
-    def append(self, name,value,free,ID=None,hyperparameter=True,component=None,relation=None):
+    def append(self, name: str,value: float,free: bool,ID=None,hyperparameter=True,component=None,relation=None):
         """ Add a parameter to the list of objects.
  
 
@@ -147,7 +147,7 @@ class ParametersModel:
         component : :obj:`int`, optional
             Component number of the parameter.
         relation : :obj:`str`, optional
-            Relation between the parameter and the hyperparameters.
+            Relation between the parameters.
         """
         if ID is None:
             ID = len(self.IDs)+1
@@ -321,8 +321,11 @@ class ParametersModel:
         """
         if key in self.names:
             return self._pars[self.names.index(key)]
+        
         elif isinstance(key,int):
-            return self._pars[key]
+            if key == 0:
+                raise KeyError(f"Parameter at index 0 does not exist, use index 1 instead.")
+            return self._pars[key-1]
         else:
             raise KeyError(f"Parameter {key} not found.")
             

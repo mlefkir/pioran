@@ -42,6 +42,34 @@ class TestParameterIntegration(unittest.TestCase):
         self.assertEqual(pars['b'].component, 2)
         self.assertEqual(pars['c'].component, 1)
         
+    def test_parameters_attributes2(self):
+        pars = ParametersModel(['a', 'b', 'c'], [1, .2, 4.53],[True, False, True],hyperparameters=[True, False, True],components=[1, 2, 1])
+    
+        self.assertRaises(KeyError, lambda: pars[0])
+        self.assertEqual(pars[1].name, 'a')
+        self.assertEqual(pars[2].name, 'b')
+        self.assertEqual(pars[3].name, 'c')
+        
+        self.assertEqual(pars[1].value, 1)
+        self.assertEqual(pars[2].value, .2)
+        self.assertEqual(pars[3].value, 4.53)
+        
+        self.assertEqual(pars[1].free, True)
+        self.assertEqual(pars[2].free, False)
+        self.assertEqual(pars[3].free, True)
+        
+        self.assertEqual(pars[1].ID, 1)
+        self.assertEqual(pars[2].ID, 2)
+        self.assertEqual(pars[3].ID, 3)
+        
+        self.assertEqual(pars[1].hyperparameter, True)
+        self.assertEqual(pars[2].hyperparameter, False)
+        self.assertEqual(pars[3].hyperparameter, True)
+        
+        self.assertEqual(pars[1].component, 1)
+        self.assertEqual(pars[2].component, 2)
+        self.assertEqual(pars[3].component, 1)
+        
     def test_parameters_pars(self):
         """
         """
@@ -49,6 +77,10 @@ class TestParameterIntegration(unittest.TestCase):
         self.assertEqual(pars['a'], pars._pars[0])
         self.assertEqual(pars['b'], pars._pars[1])
         self.assertEqual(pars['c'], pars._pars[2])
+        
+        self.assertEqual(pars[1], pars._pars[0])
+        self.assertEqual(pars[2], pars._pars[1])
+        self.assertEqual(pars[3], pars._pars[2])
     
     def test_parameters_setfreevalue(self):
         pars = ParametersModel(['a', 'b', 'c'], [1, .2, .53],[True, False, True])

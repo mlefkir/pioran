@@ -107,7 +107,7 @@ class Gaussian(PowerSpectralDensity):
         assert len(parameters_values) == 3, f'The number of parameters for the power spectral density function "{self.expression}" must be 3'
         free_parameters = kwargs.get('free_parameters', [True, True,True])
         # initialise the parameters and check
-        PowerSpectralDensity.__init__(self, parameters_values, names=["position",'amplitude', 'sigma'], boundaries=[[-jnp.inf, jnp.inf], [0, jnp.inf],[0,jnp.inf]], free_parameters=free_parameters)
+        PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=["position",'amplitude', 'sigma'], free_parameters=free_parameters)
     
     def calculate(self,f) -> jnp.ndarray:
         r"""Computes the Gaussian power spectral density function on an array of frequencies :math:`f`.
@@ -187,37 +187,6 @@ class Matern32PSD(PowerSpectralDensity):
         """
         return self.parameters['amplitude'].value  * 12 * jnp.sqrt(3) / self.parameters['scale'].value**3 /  ( 3 / self.parameters['scale'].value**2 + 4 * jnp.pi**2 * f**2 )**2
 
-
-# class PowerLawLim(PowerSpectralDensity):
-#     componentname = 'powerlaw'
-#     ID = 1
-#     n_parameters = 5
-    
-#     def __init__(self, parameters_values, **kwargs):
-#         """
-#         """
-#         assert len(parameters_values) == self.n_parameters, f'The number of parameters for {self.__classname__()} must be {self.n_parameters}, not {len(parameters_values)}'
-#         free_parameters = kwargs.get('free_parameters', [True,True,True, True,True])
-#         # initialise the parameters and check
-#         PowerSpectralDensity.__init__(self, parameters_values, names=['min','max','freq','amplitude', 'index'], boundaries=[[0, jnp.inf], [0, jnp.inf],[0, jnp.inf], [0, jnp.inf],[0,jnp.inf]], free_parameters=free_parameters)
-    
-#     def calculate(self,x):
-#         return jnp.where((x>=self.parameters['min'].value)&(x<self.parameters['max'].value),self.parameters['amplitude'].value * jnp.power( x / self.parameters['freq'].value , -self.parameters['index'].value ), 0)
-    
-# class Scalar(PowerSpectralDensity):
-#     componentname = 'scalar'
-#     ID = 1
-#     n_parameters = 1
-#     def __init__(self, parameters_values, **kwargs):
-#         assert len(parameters_values) == self.n_parameters, f'The number of parameters for {self.__classname__()} must be {self.n_parameters}, not {len(parameters_values)}'
-#         free_parameters = kwargs.get('free_parameters', [True])
-#         # initialise the parameters and check
-#         PowerSpectralDensity.__init__(self, parameters_values, names=['scalar'], boundaries=[[-jnp.inf, jnp.inf]], free_parameters=free_parameters)
-    
-#     def calculate(self,x):
-#         return self.parameters['scalar'].value
-
-
 class MultipleBendingPowerLaw(PowerSpectralDensity):
     r""" Class for the Multiple bending power-law power spectral density.
 
@@ -265,7 +234,7 @@ class MultipleBendingPowerLaw(PowerSpectralDensity):
         
         [(names.append(f'freq_{i+1}'),names.append(f'index_{i+1}')) for i in range(1,1+self.N)]
         
-        PowerSpectralDensity.__init__(self, parameters_values, names=names, boundaries=[[0,jnp.inf]]*self.n_parameters, free_parameters=free_parameters)
+        PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=names, free_parameters=free_parameters)
                                     
     def calculate(self,x):
         r"""Computes the Multiple bending power-law model on an array of frequencies :math:`f`.

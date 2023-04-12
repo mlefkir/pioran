@@ -74,7 +74,7 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-
+autosectionlabel_prefix_document = True
 numpydoc_class_members_toctree = False
 
 # # # Add these lines.
@@ -102,8 +102,10 @@ templates_path = ['_templates/autosummary']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','**.ipynb_checkpoints']
 
 
-latex_elements = {'preamble':r'''\usepackage{amsmath}\usepackage{amssymb}\def\stackbelow\#1\#2{\underset{\displaystyle\overset{\displaystyle\shortparallel}{\#2}}{\#1}}'''}
+latex_elements = {'papersize': 'a4paper',
+    'preamble':r'''\usepackage{graphicx}\usepackage{enumitem}\setlistdepth{99}\usepackage{amsmath}\usepackage{amssymb}\def\stackbelow\#1\#2{\underset{\displaystyle\overset{\displaystyle\shortparallel}{\#2}}{\#1}}'''}
 tikz_latex_preamble = r'''\usepackage{amsmath}\usepackage{amssymb}'''
+
 
 #autoclass_content = 'both'
 

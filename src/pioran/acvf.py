@@ -7,8 +7,8 @@ from .parameters import ParametersModel
 
 
 class Exponential(CovarianceFunction):
-    r"""Class for the exponential covariance function as defined below:
-
+    r"""Class for the exponential covariance function.
+    
     .. math:: :label: expocov  
     
        K(\tau) = \dfrac{A}{2\gamma} \times \exp( {- |\tau| \gamma}).

@@ -1,15 +1,14 @@
-"""General class to represent one parameter of a model.
+
+"""Base class to represent one parameter of a model.
 
 """
 from jax.tree_util import register_pytree_node_class
-
 from .tools import HEADER_PARAMETERS
 
 
 @register_pytree_node_class
 class Parameter():
-    """ Class for one parameters, it can be a hyperparameter or model
-    parameter.
+    """ Class to represent one parameter.
 
     The object of this class is then used to create a list of
     parameters with the :class:`~pioran.parameters.ParametersModel` object.

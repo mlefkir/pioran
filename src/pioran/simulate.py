@@ -1,21 +1,21 @@
 """Generic class and functions for fake time series.
 """
 import sys
+import warnings
+
 
 from jax.config import config
 config.update("jax_enable_x64", True)
-
-from numpy import savetxt
 import jax.numpy as jnp
 from jax import random
 from jax.scipy.linalg import cholesky
 
+from numpy import savetxt
 from astropy.io import fits
 from astropy.table import Table
 
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
-import warnings
 
 from .psd_base import PowerSpectralDensity
 from .acvf_base import CovarianceFunction
@@ -26,9 +26,7 @@ from .utils import EuclideanDistance
 class Simulations: 
     """Class to simulate time series from a given PSD or ACVF.
     
-    
-    Keys to generate the random numbers in the simulations:
-        
+            
 
     Parameters
     ----------
@@ -40,8 +38,8 @@ class Simulations:
         Scale factor for the lower bound of the frequency grid.
     S_high : :obj:`float`
         Scale factor for the upper bound of the frequency grid.
-    model : PowerSpectralDensity or CovarianceFunction
-        The model for the PSD or ACVF.
+    model : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity` 
+        The model for the simulation of the process, can be a PSD or an ACVF.
 
     Attributes
     ----------
@@ -51,7 +49,7 @@ class Simulations:
         sampling period of the time series.
     n_time : :obj:`int`
         number of time indexes.
-    t : :obj:`jnp.ndarray`
+    t : :obj:`jax.Array`
         time :obj:`jnp.array` of the time series.
     f_max_obs : :obj:`float` 
         maximum frequency of the observed frequency grid.
@@ -63,27 +61,22 @@ class Simulations:
         maximum frequency of the total frequency grid.
     n_freq_grid : :obj:`int`
         number of frequency indexes.
-    frequencies : :obj:`jnp.ndarray`
+    frequencies : :obj:`jax.Array`
         frequency array of the total frequency grid.
     tau_max : :obj:`float`
         maximum lag of the autocovariance function.
     dtau : :obj:`float`
         sampling period of the autocovariance function.
-    tau : :obj:`jnp.ndarray`
+    tau : :obj:`jax.Array`
         lag array of the autocovariance function.
-    psd : :obj:`jnp.ndarray`
+    psd : :obj:`jax.Array`
         power spectral density of the time series.
-    acvf : :obj:`jnp.ndarray`
+    acvf : :obj:`jax.Array`
         autocovariance function of the time series.
-    triang : :obj:`jnp.ndarray`
+    triang : :obj:`jax.Array`
         triangular matrix used to generate the time series with the Cholesky decomposition.
     keys : dict
-        dictionary of the keys used to generate the random numbers.
-        'simu_TS' : key for drawing the values of the time series.
-        'errors' : key for drawing the size of the errorbar of the time series from a given distribution.
-        'fluxes' : key for drawing the fluxes of the time series from a given distribution.
-        'subset' : key for randomising the choice of the subset of the time series.
-        'sampling' : key for randomising the choice of the sampling of the time series.
+        dictionary of the keys used to generate the random numbers. See :func:`~pioran.simulate.Simulations.generate_keys` for more details.
         
     Methods
     -------
@@ -121,7 +114,6 @@ class Simulations:
         self.sampling_period = dt
         self.n_time = jnp.rint(T/dt).astype(int)
         self.t = jnp.arange(0,self.duration,self.sampling_period)      
-        # print(f"Number of time indexes desired : {self.n_time}")
          
         # parameters of the **observed** frequency grid 
         self.f_max_obs = 0.5/dt
@@ -131,7 +123,7 @@ class Simulations:
         self.f0 = self.f_min_obs/S_low
         self.fN = self.f_max_obs*S_high
         self.n_freq_grid = jnp.rint(self.fN/self.f0).astype(int) + 1 
-        # print(f"Number of frequency indexes desired : {self.n_freq_grid}")
+
         self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0)
         self.tau_max = 0.5/self.f0 #0.5/self.f0
         self.dtau = 0.5/self.fN #self.tau_max/(self.n_freq_grid-1) 
@@ -155,12 +147,13 @@ class Simulations:
         
         This function generates the keys to generate the random numbers for the simulations and store them in the dictionary self.keys.
         The keys and their meaning are:
+    
         
-        'simu_TS' : key for drawing the values of the time series.
-        'errors' : key for drawing the size of the errorbar of the time series from a given distribution.
-        'fluxes' : key for drawing the fluxes of the time series from a given distribution.
-        'subset' : key for randomising the choice of the subset of the time series.
-        'sampling' : key for randomising the choice of the sampling of the time series.
+        - `simu_TS`  : key for drawing the values of the time series.
+        - `errors`   : key for drawing the size of the errorbar of the time series from a given distribution.
+        - `fluxes`   : key for drawing the fluxes of the time series from a given distribution.
+        - `subset`   : key for randomising the choice of the subset of the time series.
+        - `sampling` : key for randomising the choice of the sampling of the time series.
         
         Parameters
         ----------
@@ -209,7 +202,7 @@ class Simulations:
             fig.savefig(f'{filename}',format='pdf')
         return fig,ax
             
-    def plot_psd(self,figsize=(15,3),filename=None):
+    def plot_psd(self,figsize=(9,5.5),filename=None,title=None,xunit='d',loglog=True):
         """Plot the power spectral density model.
         
         A plot of the power spectral density model is generated.
@@ -218,6 +211,12 @@ class Simulations:
         ----------
         figsize  : :obj:`tuple`, optional
             Size of the figure, by default (15,3)
+        title  : :obj:`str`, optional
+            Title of the plot, by default None
+        xunit  : :obj:`str`, optional
+            Unit of the x-axis, by default 'd'
+        loglog  : :obj:`bool`, optional
+            If True, the plot is in loglog, by default True
         filename  : :obj:`str`, optional
             Name of the file to save the figure, by default None
         
@@ -235,13 +234,13 @@ class Simulations:
         
         fig,ax = plt.subplots(1,1,figsize=figsize)
         ax.plot(self.frequencies,self.psd,'.-')
-        ax.vlines(self.f_max_obs,ymin=jnp.min(self.psd),ymax=jnp.max(self.psd),label=r"$f_{\rm max}$",color='red')
-        ax.vlines(self.f_min_obs,ymin=jnp.min(self.psd),ymax=jnp.max(self.psd),label=r"$f_{\rm min}$",color='g')
-        ax.loglog()
+        ax.axvline(self.f_max_obs,label=r"$f_{\rm max}$",color='C1',ls='--')
+        ax.axvline(self.f_min_obs,label=r"$f_{\rm min}$",color='C4',ls=':')
+        if loglog: ax.loglog()
         ax.legend()
-        ax.set_xlabel(r'Frequency $(\mathrm{day}^{-1})$')
+        ax.set_xlabel(f'Frequency $(\mathrm{{{xunit}}}^{{-1}})$')
         ax.set_ylabel("PSD")
-        ax.set_title("A model for the power spectral density")
+        if title is not None: ax.set_title(title)
         fig.tight_layout()
         
         if filename is not None:
@@ -262,9 +261,9 @@ class Simulations:
         
         Returns
         -------
-        :obj:`jnp.ndarray`
+        :obj:`jax.Array`
             Time array of the time series.
-        :obj:`jnp.ndarray`
+        :obj:`jax.Array`
             Time series.
         
         """
@@ -364,8 +363,7 @@ class Simulations:
         hdu.header['MAINSEED'] = seed  
         hdu_list = [hdu,hdu_seed] + hdu_list
         hdu = fits.HDUList(hdu_list)
-        hdu.writeto(f'{filename}.fits',overwrite=True)
-            
+        hdu.writeto(f'{filename}.fits',overwrite=True)       
     
     def simulate(self, mean=None,method='ACV',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs):
         """Method to simulate time series using either the ACV method or the TK method.
@@ -374,10 +372,10 @@ class Simulations:
         If the autocovariance function is not provided, it is calculated from the power spectral density using the inverse Fourier transform
         and interpolated using a linear interpolation to map the autocovariance function on a grid of time lags.
         
-        When using the TK method, the time series is generated using the Timmer and Koenig method for a larger duration and then the final time series
+        When using the TK method, the time series is generated using the :func:`~pioran.simulate.Simulations.timmer_Koenig_method` method for a larger duration and then the final time series
         is obtained by taking a subset of the generate time series.
         
-        If the irregular_sampling flag is set to `True`, the time series will be sampled at irregular time intervals randomly.
+        If irregular_sampling is set to `True`, the time series will be sampled at random irregular time intervals.
         
 
         Parameters
@@ -410,11 +408,11 @@ class Simulations:
         
         Returns
         -------
-        t : :obj:`jnp.ndarray`
-            Time :obj:`jnp.array`
-        ts : :obj:`jnp.ndarray`
-            Simulated time series
-        ts_err : :obj:`jnp.ndarray`
+        t : :obj:`jax.Array`
+            The time indexes of the time series.
+        ts : :obj:`jax.Array`
+            Values of the simulated time series.
+        ts_err : :obj:`jax.Array`
             Errors on the simulated time series
         
         """
@@ -474,18 +472,18 @@ class Simulations:
             
         Parameters
         ----------
-        t : :obj:`jnp.ndarray`
+        t : :obj:`jax.Array`
             Input time series of size N.
-        y : :obj:`jnp.ndarray`
+        y : :obj:`jax.Array`
             The fluxes of the simulated light curve.
         M : :obj:`int`
             The number of points in the desired time series.
 
         Returns
         -------
-        :obj:`jnp.ndarray`
+        :obj:`jax.Array`
             The time series of size M.
-        :obj:`jnp.ndarray`
+        :obj:`jax.Array`
             The values of the time series of size M.
         """
         N = len(t)
@@ -501,9 +499,9 @@ class Simulations:
         
         Parameters
         ----------
-        t : :obj:`jnp.ndarray`
+        t : :obj:`jax.Array`
             The time indexes of the time series.
-        y : :obj:`jnp.ndarray`
+        y : :obj:`jax.Array`
             The values of the time series.
         M : :obj:`int`
             The number of points in the desired time series.
@@ -512,9 +510,9 @@ class Simulations:
         
         Returns
         -------
-        :obj:`jnp.ndarray`
+        :obj:`jax.Array`
             The time indexes of the sampled time series.
-        :obj:`jnp.ndarray`
+        :obj:`jax.Array`
             The values of the sampled time series.
         """
         input_sampling_period = t[1]-t[0]
@@ -537,7 +535,8 @@ class Simulations:
         stored in the attribute psd. 
         
         Assuming a power-law shaped PSD, the method is as follows:
-        Draw two independent Gaussian random variables with zero mean and unit variance.
+        
+        Draw two independent Gaussian random variables N1 and N2 with zero mean and unit variance.
         The random variables are drawn using the key self.keys['ts'] split into two subkeys.
         
             1. Define A = sqrt(PSD/2) * (N1 + i*N2)
@@ -545,16 +544,16 @@ class Simulations:
             3. Define A[-1] = real(A[-1])
             4. ts = irfft(A)
             5. t is defined as the time indexes of the time series, with a sampling period of 0.5/fN.
-        
-        The duration of the time series is 2*(len(psd)-1).
+            6. ts is multiplied by the 2*len(psd)*sqrt(f0) factor to ensure that the time series has the correct variance.
+            
+        The duration of the output time series is 2*(len(psd)-1).
 
         Returns
         -------
-        :obj:`jnp.ndarray`
+        :obj:`jax.Array`
             The time indexes of the time series.
-        :obj:`jnp.ndarray`
+        :obj:`jax.Array`
             The values of the time series.
-        
         """
         # split the key into two subkeys
         key,subkey = random.split(self.keys['ts']) 
@@ -564,9 +563,8 @@ class Simulations:
         randpsd.at[0].set(0)
         randpsd.at[-1].set(jnp.real(randpsd[-1]))
         
-        # t = jnp.linspace(0,1/self.f0,2*(len(self.psd)-1))
         ts = jnp.fft.irfft(randpsd)
         t = jnp.arange(0,self.dtau*len(ts),self.dtau)
         self.variance = jnp.sum(self.psd*self.f0)
-        ts = 2*ts*jnp.sqrt((len(self.psd))**2 *self.f0)
+        ts = 2*ts*jnp.sqrt(self.f0)*len(self.psd)
         return t,ts
