@@ -76,19 +76,16 @@ myst_enable_extensions = [
 
 autosectionlabel_prefix_document = True
 numpydoc_class_members_toctree = False
-
-# # # Add these lines.
 numpydoc_show_class_members = False
 numpydoc_show_inherited_class_members = False
-# # generate autosummary even if no references
+
 
 autodoc_default_options = {
     'members':          True,
-    'undoc-members':    True,
-}
+    'undoc-members':    True}
+
 autosummary_generate = True
-# autosummary_imported_members = True
-# autodoc_inherit_docstrings = True
+
 
 
 myst_dmath_allow_labels = True
@@ -106,11 +103,11 @@ latex_elements = {'papersize': 'a4paper',
     'preamble':r'''\usepackage{graphicx}
     \usepackage{enumitem}
     \setlistdepth{99}
-    \usepackage{amsmath}\usepackage{amssymb}'''}
+    \usepackage{amsmath}\usepackage{amssymb}''',
+    'figure_align': 'htbp',
+}
 tikz_latex_preamble = r'''\usepackage{amsmath}\usepackage{amssymb}'''
 
-
-#autoclass_content = 'both'
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -118,14 +115,20 @@ tikz_latex_preamble = r'''\usepackage{amsmath}\usepackage{amssymb}'''
 # a list of builtin themes.
 #
 html_theme = 'furo'
+html_title = "pioran"
+html_short_title = "pioran"
+html_logo = '_static/logo_borderbis.png'
+latex_logo = '_static/logo_bg.pdf'
+html_favicon = '_static/favico.ico'
 
-# html_theme_options = {
-#     'navigation_with_keys': True,
-#     "light_css_variables": {
-#         "color-brand-primary": "#7C4DFF",
-#         "color-brand-content": "#7C4DFF",
-#     },
-# }
+html_theme_options = {
+    'navigation_with_keys': True,
+     "theme-color": 'dark',
+    "light_css_variables": {
+        "color-brand-primary": "#0077bb",
+        "color-brand-content": "#0077bb",
+    },
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
