@@ -123,7 +123,6 @@ html_favicon = '_static/favico.ico'
 
 html_theme_options = {
     'navigation_with_keys': True,
-     "theme-color": 'dark',
     "light_css_variables": {
         "color-brand-primary": "#0077bb",
         "color-brand-content": "#0077bb",

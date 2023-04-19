@@ -26,7 +26,9 @@ def EuclideanDistance(xq, xp):
 
 # ---- Code from Ahmed Fasih ---- https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd
 def nearest_positive_definite(A):
-    """Find the nearest positive-definite : to input
+    """Find the nearest positive-definite matrix to input.
+    
+    Code from Ahmed Fasih - https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd
     A Python/Numpy port of John D'Errico's `nearestSPD` MATLAB code [1], which
     credits [2].
     

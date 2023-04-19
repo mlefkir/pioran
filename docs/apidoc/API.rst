@@ -8,6 +8,7 @@ API Reference
    GP
    ACVF
    PSD
+   Inference
    Parameters
    Plots
    Simulate
