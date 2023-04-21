@@ -75,7 +75,8 @@ class ParametersModel:
         String representation of the parameters.
     __repr__()
         Representation of the parameters.
-    
+    __len__()
+        Number of the parameters.
     """
     names: list
     free_parameters: jnp.ndarray
@@ -328,7 +329,16 @@ class ParametersModel:
             return self._pars[key-1]
         else:
             raise KeyError(f"Parameter {key} not found.")
-            
+    
+    def __len__(self):
+        """ Get the number of parameters.
+        
+        Returns
+        -------
+        :obj:`int`
+            Number of parameters.        
+        """
+        return len(self._pars)
 
     def __setitem__(self, key, value : Parameter):
         """ Set a Parameter object using the name of the parameter in square brackets.

@@ -333,7 +333,7 @@ class Simulations:
         hdu_list = []
         seeds_list = []
         
-        print(f" Generating {sample_size} time series")
+        print(f"Generating {sample_size} time series")
         
         for it,cur_seed in enumerate(seeds):
             
@@ -356,7 +356,8 @@ class Simulations:
             hdu.header['METHOD'] = simulations_kwargs.get('method','GP')
             hdu.header['MEAN'] = simulations_kwargs.get('mean','None')
             hdu.header['MODEL'] = self.model.expression # or 'Exponential' 'Lorentzian' 'ExponentialSquared'
-            for par in self.model.parameters:
+            for i in range(len(self.model.parameters)):
+                par = self.model.parameters[i+1]
                 if par.ID < 10:
                     hdu.header[f'{par.name[:7]}{par.ID}'] = par.value
                 else:       
