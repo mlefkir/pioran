@@ -153,7 +153,6 @@ class Simulations:
         else:
             self.acvf = model.calculate(self.tau)
         
-        
         self.model = model
         
     def generate_keys(self,seed=0):
@@ -581,3 +580,160 @@ class Simulations:
         self.variance = jnp.sum(self.psd*self.f0)
         ts = 2*ts*jnp.sqrt(self.f0)*len(self.psd)
         return t,ts
+
+    def split_longtimeseries(self,t,ts,n_slices):
+        """Split a long time series into shorter time series.
+        
+        Break the time series into n_slices shorter time series. The short time series are of equal length.
+        
+        Parameters
+        ----------
+        t : :obj:`jax.Array`
+            The time indexes of the long time series.
+        ts : :obj:`jax.Array`
+            The values of the long time series.
+        n_slices : :obj:`int`
+            The number of slices to break the time series into.
+        
+        Returns
+        -------
+        :obj:`list`
+            A list of the time indexes of the shorter time series.
+        :obj:`list`
+            A list of the values of the shorter time series.
+        
+        """
+        t_slices= []
+        ts_slices = []
+        size_slice = int(len(t)/n_slices)
+        for i in range(n_slices):
+            start_index = i*size_slice
+            end_index = (i+1)*size_slice
+            t_slice,ts_slice = t[start_index:end_index],ts[start_index:end_index]
+            
+            t_slices.append(t_slice)
+            ts_slices.append(ts_slice)
+        return t_slices,ts_slices
+    
+    def resample_longtimeseries(self,t_slices,ts_slices):
+        """Resample the time series to have a regular sampling period with n_time points.
+        
+        Parameters
+        ----------
+        t_slices : :obj:`list`
+            A list of short time series time indexes.
+        ts_slices : :obj:`list`
+            A list of short time series values.
+        
+        Returns
+        -------
+        :obj:`list`
+            A list of the time indexes of the sampled time series.
+        :obj:`list`
+            A list of the values of the sampled time series.
+        
+        """
+        t_resampled, ts_resampled = [], []
+        
+        for t_slice,ts_slice in zip(t_slices,ts_slices):
+   
+            input_sampling_period = t_slice[1]-t_slice[0]
+            output_sampling_period = (t_slice[-1]-t_slice[0])/self.n_time
+
+            index_step_size = jnp.rint(output_sampling_period/input_sampling_period).astype(int)
+            t_resampled.append(t_slice[::index_step_size])
+            ts_resampled.append(ts_slice[::index_step_size])
+        return t_resampled,ts_resampled
+    
+    def simulate_longtimeseries(self, mean=None,randomise_fluxes=True,errors='gauss',seed=0):
+        """Method to simulate several long time series using the Timmer-Koenig method.
+
+        The time series is generated using the :func:`~pioran.simulate.Simulations.timmer_Koenig_method` method for a larger duration and then the final time series
+        are split into segments of length n_time. The shorter time series are then resampled to have a regular sampling period.
+                
+
+        Parameters
+        ----------
+        mean : :obj:`float`, optional
+            Mean of the time series, if None the mean will be set to -2 min(ts)
+        randomise_fluxes : :obj:`bool`, optional
+            If True the fluxes will be randomised.
+        errors : :obj:`str`, optional
+            If 'gauss' the errors will be drawn from a gaussian distribution
+        seed : :obj:`int`, optional
+            Set the seed for the RNG
+            
+        Raises
+        ------
+        ValueError
+            If the errors are not 'gauss' or 'poisson'
+        
+        Returns
+        -------
+        t_segments : :obj:`list`
+            A list of the time indexes of the segments.
+        ts_segments : :obj:`list`
+            A list of the values of the segments.
+        ts_errors : :obj:`list`
+            A list of the errors of the segments.
+        
+        """
+        self.generate_keys(seed=seed)
+        
+        if self.psd is None:
+            raise ValueError("You must provide a PowerSpectralDensity model to use the TK method")
+        # generate a long time series using the TK method
+        long_t,long_true_timeseries = self.timmer_Koenig_method()
+
+        # split the long time series into segments given by the S_low parameter
+        if not isinstance(self.S_low,int):
+            warnings.warn("The number of slices is not an integer, it will be rounded to the nearest integer")
+        n_slices = int(self.S_low)
+        if n_slices < 10:
+            warnings.warn("The number of slices is less than 10, this may cause leakage between the segments")
+        t_slices, ts_slices = self.split_longtimeseries(long_t,long_true_timeseries,n_slices)
+        
+        # resample the segments to have a regular sampling period
+        t_resampled, ts_resampled = self.resample_longtimeseries(t_slices, ts_slices)
+        # set origin of time to 0 for each segment
+        for i in range(len(t_resampled)):
+            t_resampled[i] = t_resampled[i] - t_resampled[i][0]
+        
+        ts_err = []
+        ts = []
+        if randomise_fluxes:
+            # split the keys for the fluxes and errors for each segment
+            keys_errors = random.split(self.keys['errors'],n_slices)
+            keys_fluxes = random.split(self.keys['fluxes'],n_slices) 
+   
+            if errors == 'gauss':
+                for i in range(n_slices):
+                    # generate the variance of the errors
+                    timeseries_error_size = jnp.abs(random.normal(key=keys_errors[i],shape=(len(t_resampled[i]),)))               
+                    # generate the measured time series with the associated fluxes
+                    observed_timeseries = ts_resampled[i] + timeseries_error_size*random.normal(key=keys_fluxes[i],shape=(len(t_resampled[i]),))
+                    
+                    ts.append(observed_timeseries)
+                    ts_err.append(timeseries_error_size)
+                    
+            elif errors == 'poisson':
+                raise NotImplementedError("Poisson errors are not implemented yet")
+                #### IMPLEMENT POISSON ERRORS
+            else:
+                raise ValueError(f"Error type {errors} is not accepted, use either 'gauss' or 'poisson'")
+          
+        else:
+            for i in range(n_slices):
+                ts_err.append(jnp.zeros_like(t_resampled[i]))
+                ts.append(ts_resampled[i])
+                 
+        if mean is not None:            
+            for i in range(n_slices):
+                ts[i] = ts[i] - jnp.mean(ts[i]) + mean
+        else:
+            for i in range(n_slices):
+                ts[i] = ts[i] - 2*jnp.min(ts[i])
+         
+        return t_resampled, ts, ts_err
+      
+    
