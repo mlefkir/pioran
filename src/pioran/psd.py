@@ -236,7 +236,7 @@ class MultipleBendingPowerLaw(PowerSpectralDensity):
         
         PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=names, free_parameters=free_parameters)
                                     
-    def calculate(self,x):
+    def calculate(self,f):
         r"""Computes the Multiple bending power-law model on an array of frequencies :math:`f`.
         
         The expression is given by Equation :math:numref:`multiplebendplpsd`
@@ -252,7 +252,7 @@ class MultipleBendingPowerLaw(PowerSpectralDensity):
         :obj:`jax.Array`
             Power spectral density function evaluated on the array of frequencies.
         """
-        P = self.parameters[f'amplitude'].value/ jnp.power( x / self.parameters[f'freq_1'].value , self.parameters[f'index_1'].value )
+        P = self.parameters[f'amplitude'].value/ jnp.power( f / self.parameters[f'freq_1'].value , self.parameters[f'index_1'].value )
         for i in range(1,1+self.N):
-            P /=   (1 + jnp.power( x / self.parameters[f'freq_{i+1}'].value , self.parameters[f'index_{i+1}'].value-self.parameters[f'index_{i}'].value ) )
+            P /=   (1 + jnp.power( f / self.parameters[f'freq_{i+1}'].value , self.parameters[f'index_{i+1}'].value-self.parameters[f'index_{i}'].value ) )
         return P

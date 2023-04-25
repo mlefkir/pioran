@@ -20,8 +20,11 @@
       ~Simulations.generate_keys
       ~Simulations.plot_acvf
       ~Simulations.plot_psd
+      ~Simulations.resample_longtimeseries
       ~Simulations.sample_timeseries
       ~Simulations.simulate
+      ~Simulations.simulate_longtimeseries
+      ~Simulations.split_longtimeseries
       ~Simulations.timmer_Koenig_method
    
    
