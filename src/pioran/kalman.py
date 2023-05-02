@@ -88,8 +88,8 @@ class KalmanFilter(eqx.Module):
         P : :obj:`jax.Array`
             Covariance matrix of the predicted state vector.
         """
-        X = F@X
-        P = F@P@jnp.conjugate(F.T) + Q
+        X = F @ X
+        P = F @ P @ jnp.conjugate(F.T) + Q
         return X, P
 
     @eqx.filter_jit
@@ -146,12 +146,12 @@ class KalmanFilter(eqx.Module):
         X = X + K * (y_[i]-(mean+mu))
         P = P - var*K@jnp.conj(K.T)"""
         
-        Y = Z - H@X
-        S = R + H@P@jnp.conj(H.T)
-        K = P@jnp.conj(H.T)/S
-        X = X + K@Y
+        Y = Z - H @ X
+        S = R + H @ P @ jnp.conj(H.T)
+        K = P @ jnp.conj(H.T) / S
+        X += K @ Y
         # P = (jnp.eye(self.model.p) - K@H) @ P
-        P = P - S*K@jnp.conj(K.T)
+        P -= S * K @ jnp.conj(K.T)
         
         return X,P,Y,S
     
@@ -232,13 +232,13 @@ class KalmanFilter(eqx.Module):
   
         F = self.model.statespace_representation(dt)
         R = error**2
-        
+
         X,P = self.Predict(X,P-V,F,V)
         X,P,Y,S = self.Update(X,P,value,b_rot,R)
         
-        loglike += -0.5 * jax.lax.cond(self.model.ndims==1,
+        loglike -= 0.5 * jax.lax.cond(self.model.ndims==1,
             lambda: jnp.log(S) + Y**2/S,
-            lambda: jnp.log(jnp.linalg.det(S)) + Y@jnp.linalg.solve(S,jnp.eye(self.model.ndims)@Y.T)) -.5*jnp.log(2*jnp.pi)
+            lambda: jnp.log(jnp.linalg.det(S)) + Y@jnp.linalg.solve(S,jnp.eye(self.model.ndims)@Y.T)) +.5*jnp.log(2*jnp.pi)
                 
         carry = (X, P, V, b_rot, loglike)
         return carry, xs
@@ -248,7 +248,9 @@ class KalmanFilter(eqx.Module):
         
         
         dt = jnp.insert(jnp.diff(self.observation_indexes),0,0.)
-        xs = ([dt,self.observation_values-self.model.parameters['mu'].value,jnp.sqrt(self.model.parameters['nu'].value)*self.observation_errors])
+        xs = ([dt,
+               self.observation_values-self.model.parameters['mu'].value,
+               jnp.sqrt(self.model.parameters['nu'].value)*self.observation_errors])
 
         if self.model.p == 1:
             X, P = self.model.init_statespace()
@@ -257,9 +259,13 @@ class KalmanFilter(eqx.Module):
             D ,_ = jax.lax.scan(self.one_step_loglike_CAR1,carry,xs)
             return jnp.take(D[2],0) 
         
-        X, P, V, b_rot, loglike = self.model.init_statespace(self.observation_errors[0],y_0=self.observation_values[0])
+        X, P, V, b_rot, loglike = self.model.init_statespace(y_0=self.observation_values[0]-self.model.parameters['mu'].value,
+                                    errsize=self.observation_errors[0]*jnp.sqrt(self.model.parameters['nu'].value))
+                            
         carry = (X, P, V, b_rot, loglike)
-        xs = ([dt[1:],self.observation_values[1:],self.observation_errors[1:]])
+        xs = ([jnp.diff(self.observation_indexes),
+               self.observation_values[1:]-self.model.parameters['mu'].value,
+               jnp.sqrt(self.model.parameters['nu'].value)*self.observation_errors[1:]])
         D ,_ = jax.lax.scan(self.one_step_loglike,carry,xs)
         
         return jnp.take(D[4],0) 

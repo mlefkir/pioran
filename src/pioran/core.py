@@ -135,7 +135,6 @@ class GaussianProcess(eqx.Module):
         self.nb_prediction_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
         self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_prediction_points)))
 
-    @eqx.filter_jit
     def get_cov(self, xt, xp, errors=None):
         """ Compute the covariance matrix between two arrays. 
         
@@ -177,7 +176,6 @@ class GaussianProcess(eqx.Module):
         # if we do not want to scale the errors
         return self.model.get_cov_matrix(xt, xp) + jnp.diag(errors**2)
 
-    @eqx.filter_jit
     def get_cov_training(self):
         """ Compute the covariance matrix and other vectors for the training data.
 
@@ -251,7 +249,6 @@ class GaussianProcess(eqx.Module):
 
         return predictive_mean, predictive_covariance
     
-    @eqx.filter_jit
     def compute_log_marginal_likelihood(self) -> float:
         r""" Compute the log marginal likelihood of the Gaussian Process.
 

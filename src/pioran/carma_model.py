@@ -1,3 +1,5 @@
+from typing import Union, Tuple, List, Optional
+
 import equinox as eqx
 import jax
 import jax.numpy as jnp
@@ -76,7 +78,7 @@ class CARMA_model(eqx.Module):
                 if beta is None:
                     raise ValueError("beta is required if q > 1")
                 for i,ma in enumerate(beta):
-                    self.parameters.append(f"beta_{i+1}",ma,True,hyperparameter=True)
+                    self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
             
         elif lorentzian_centroids is not None and lorentzian_widths is not None and weights is not None:
              
@@ -87,7 +89,7 @@ class CARMA_model(eqx.Module):
                     self.parameters.append(f"a_{i+1}",float(ar),True,hyperparameter=True)
             self.parameters.append("beta_0",1,False,hyperparameter=True)
             for i,ma in enumerate(weights):
-                    self.parameters.append(f"beta_{i+1}",ma,True,hyperparameter=True)
+                    self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
         else:
             raise ValueError("Either AR_roots and MA_roots or AR_quad and MA_quad or lorentzian_centroids, lorentzian_widths and weights must be provided")
 
@@ -135,7 +137,6 @@ class CARMA_model(eqx.Module):
         P = (self.parameters["sigma"].value  * jnp.abs(num/den)**2).flatten()
         return P
     
-    # @eqx.filter_jit
     def get_AR_quads(self) -> jax.Array:
         r"""Returns the quadratic coefficients of the AR part of the model.
 
@@ -149,7 +150,6 @@ class CARMA_model(eqx.Module):
         """
         return jnp.array([self.parameters[f"a_{i}"].value for i in range(1,self._p)])
 
-    # @eqx.filter_jit
     def get_MA_quads(self) -> jax.Array:
         """Returns the quadratic coefficients of the MA part of the model.
         
@@ -163,7 +163,6 @@ class CARMA_model(eqx.Module):
         """
         return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self._q)])
        
-    # @eqx.filter_jit
     def get_AR_coeffs(self) -> jax.Array:
         r"""Returns the coefficients of the AR part of the model.
         
@@ -181,7 +180,6 @@ class CARMA_model(eqx.Module):
             alpha = quad_to_coeff(self.get_AR_quads())
         return alpha
     
-    # @eqx.filter_jit
     def get_MA_coeffs(self) -> jax.Array:
         r"""Returns the quadratic coefficients of the AR part of the model.
 
@@ -202,7 +200,6 @@ class CARMA_model(eqx.Module):
         # return beta
         return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self._q)])
     
-    @eqx.filter_jit
     def get_AR_roots(self) -> jax.Array:
         r"""Returns the roots of the AR part of the model.
         
@@ -231,8 +228,8 @@ class CARMA_model(eqx.Module):
             Frac += A*B/Den*jnp.exp(r*tau)
         return self.parameters["sigma"].value * Frac.real    
     
-    @eqx.filter_jit
-    def init_statespace(self,errsize=None,y_0=None):
+    # @eqx.filter_jit
+    def init_statespace(self,y_0=None,errsize=None) -> Tuple[jax.Array,jax.Array] | Tuple[jax.Array,jax.Array,jax.Array,jax.Array,jax.Array]:
         r"""Initialises the state space representation of the model
         
         Parameters
@@ -247,39 +244,38 @@ class CARMA_model(eqx.Module):
         # CARMA(p,q) process in the rotated basis
         if y_0 is None or errsize is None:
             raise ValueError('y_0 and errsize must be provided')
-
+        
         beta = self.get_MA_coeffs()
         b = jnp.append(beta,jnp.zeros(self.p-self.q-1))
         e = jnp.append(jnp.zeros(self.p-1),self.parameters['sigma'].value)
         AR_roots = self.get_AR_roots()
+        
         U = get_U(AR_roots)
-        J = jnp.linalg.solve(U,jnp.eye(self.p))@e
+        J = jnp.linalg.solve(U,jnp.eye(self.p)) @ e
 
-        V = get_V(J,AR_roots)
-        b_rot = (b@U).reshape(1,self.p)
+        V = get_V(J, AR_roots)
+        b_rot = ( b @ U ).reshape(1,self.p)
 
         X = jnp.zeros((self.p,1),dtype=jnp.complex128)
-    
-        P = V
-        var = self.Autocovariance(jnp.array(0.)) + errsize**2
-        K = P@jnp.conj(b_rot.T) / var
-        X = X + K * y_0
-        P = P - var*K@jnp.conj(K.T)
+        var = self.Autocovariance(0) + errsize**2
         
+        K = V @ jnp.conj(b_rot.T) / var
+        X += K * y_0
+        P = V - var * K @ jnp.conj(K.T)
         
-        y_k = (b_rot@X)
-        S_k = (b_rot@P@jnp.conj(b_rot.T) + errsize**2)
+        y_k = b_rot @ X
+        S_k = b_rot @ P @ jnp.conj(b_rot.T) + errsize**2
             
-        loglike =  0.5 * ( jnp.log(S_k) + (y_0 -(y_k))**2 / S_k  + jnp.log(2*jnp.pi) )
+        loglike =  -0.5 * ( jnp.log(S_k) + (y_0 -y_k)**2 / S_k  + jnp.log(2*jnp.pi) )
         
         return X, P, V, b_rot, loglike
 
     @eqx.filter_jit
-    def statespace_representation(self,dt):
+    def statespace_representation(self,dt: jax.Array) -> Tuple[jax.Array,jax.Array,jax.Array] | jax.Array:
         if self.p == 1:
             F = jnp.exp(-self.parameters['a_1'].value*dt)
             Q = jnp.atleast_2d(self.parameters['sigma'].value / (2*self.parameters['a_1'].value)  * (1 - F**2 ))
-            H = jnp.ones((1,1))
+            H = jnp.ones((self.ndims,1))
             return F.reshape(1,1),Q,H
         
         F = jnp.diag(jnp.exp(self.get_AR_roots()*dt))
