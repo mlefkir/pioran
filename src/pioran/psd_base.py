@@ -2,6 +2,7 @@
 """Module to represent the power spectral density functions.
 """
 from copy import deepcopy
+
 import equinox as eqx
 import jax.numpy as jnp
 

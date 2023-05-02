@@ -1,8 +1,8 @@
 import equinox as eqx
 import jax.numpy as jnp
 
-from .psd_base import PowerSpectralDensity
 from .parameters import ParametersModel
+from .psd_base import PowerSpectralDensity
 
 
 class Lorentzian(PowerSpectralDensity):

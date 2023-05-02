@@ -5,7 +5,7 @@ import equinox as eqx
 import jax.numpy as jnp
 from jax.scipy.linalg import cholesky, solve_triangular, solve
 
-from .utils import nearest_positive_definite
+from .utils.gp_utils import nearest_positive_definite
 from .tools import reshape_array,sanity_checks
 from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity
@@ -86,7 +86,7 @@ class GaussianProcess(eqx.Module):
     estimate_mean: bool
     analytical_cov: bool    
     
-    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity], training_indexes, training_observables, training_errors=None, **kwargs):
+    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity], training_indexes, training_observables, training_errors=None, **kwargs) -> None:
         """Constructor method for the GaussianProcess class.
 
         """
@@ -135,7 +135,7 @@ class GaussianProcess(eqx.Module):
         self.nb_prediction_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
         self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_prediction_points)))
 
-    # @eqx.filter_jit
+    @eqx.filter_jit
     def get_cov(self, xt, xp, errors=None):
         """ Compute the covariance matrix between two arrays. 
         
@@ -177,6 +177,7 @@ class GaussianProcess(eqx.Module):
         # if we do not want to scale the errors
         return self.model.get_cov_matrix(xt, xp) + jnp.diag(errors**2)
 
+    @eqx.filter_jit
     def get_cov_training(self):
         """ Compute the covariance matrix and other vectors for the training data.
 
@@ -250,8 +251,8 @@ class GaussianProcess(eqx.Module):
 
         return predictive_mean, predictive_covariance
     
-    
-    def compute_log_marginal_likelihood(self):
+    @eqx.filter_jit
+    def compute_log_marginal_likelihood(self) -> float:
         r""" Compute the log marginal likelihood of the Gaussian Process.
 
         The log marginal likelihood is computed using algorithm (2.1) in Rasmussen and Williams (2006)
@@ -285,10 +286,10 @@ class GaussianProcess(eqx.Module):
         else:
             z = solve_triangular(L, self.training_observables, lower=True)
 
-        return -((jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.training_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z)).flatten()[0])
+        return -jnp.take(jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.training_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z),0)
     
     @eqx.filter_jit
-    def wrapper_log_marginal_likelihood(self, parameters):
+    def wrapper_log_marginal_likelihood(self, parameters) -> float:
         """ Wrapper to compute the log marginal likelihood in function of the (hyper)parameters. 
 
         Parameters
@@ -303,8 +304,9 @@ class GaussianProcess(eqx.Module):
         """
         self.model.parameters.set_free_values(parameters)
         return self.compute_log_marginal_likelihood()
-
-    def wrapper_neg_log_marginal_likelihood(self, parameters):
+    
+    @eqx.filter_jit
+    def wrapper_neg_log_marginal_likelihood(self, parameters) -> float:
         """ Wrapper to compute the negative log marginal likelihood in function of the (hyper)parameters. 
 
         Parameters

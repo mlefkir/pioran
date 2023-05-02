@@ -3,24 +3,18 @@
 import sys
 import warnings
 
-
-from jax.config import config
-config.update("jax_enable_x64", True)
 import jax.numpy as jnp
-from jax import random
-from jax.scipy.linalg import cholesky
-
-from numpy import savetxt
+import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.table import Table
-
+from jax import random
+from jax.scipy.linalg import cholesky
+from numpy import savetxt
 from scipy.interpolate import interp1d
-import matplotlib.pyplot as plt
 
-from .psd_base import PowerSpectralDensity
 from .acvf_base import CovarianceFunction
-from .utils import EuclideanDistance
-
+from .psd_base import PowerSpectralDensity
+from .utils.gp_utils import EuclideanDistance
 
 
 class Simulations: 

@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import equinox as eqx
 
 from .parameters import ParametersModel
-from .utils import EuclideanDistance
+from .utils.gp_utils import EuclideanDistance
 
 
 class CovarianceFunction(eqx.Module):

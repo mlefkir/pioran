@@ -54,6 +54,8 @@ class ParametersModel:
         Relation between the parameters.
     _pars : :obj:`list of Parameter`
         List of Parameter objects.
+    free_values : :obj:`list of float`
+        Values of the free parameters.
         
     Methods
     -------
@@ -276,7 +278,7 @@ class ParametersModel:
         
         return [p.name for p in self._pars if p.free]
     
-    def set_free_values(self,new_free_values):
+    def set_free_values(self,new_free_values) -> None:
         """ Set the values of the free parameters.
 
         Parameters
@@ -289,7 +291,7 @@ class ParametersModel:
         ValueError
             When the number of new values is not the same as the number of free parameters.
         """
-        assert len(new_free_values) == sum(self.free_parameters), f"The number of free parameters ({len(new_free_values)}) is not the same as the number of parameters ({sum(self.free_parameters)})."
+        # assert len(new_free_values) == sum(self.free_parameters), f"The number of free parameters ({len(new_free_values)}) is not the same as the number of parameters ({sum(self.free_parameters)})."
 
         w = 0 
         for i in range(len(self._pars)):

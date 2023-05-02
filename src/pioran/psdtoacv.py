@@ -3,17 +3,15 @@
 Class to convert a power spectral density to an autocovariance function via the inverse Fourier transform.
 
 """
+import equinox as eqx
 import jax
-
 import jax.numpy as jnp
 from jax_finufft import nufft2
-import equinox as eqx
 
-from .utils import decompose_triangular_matrix, reconstruct_triangular_matrix
-
-from .psd_base import PowerSpectralDensity
 from .parameters import ParametersModel
-from .utils import EuclideanDistance
+from .psd_base import PowerSpectralDensity
+from .utils.gp_utils import (EuclideanDistance, decompose_triangular_matrix,
+                             reconstruct_triangular_matrix)
 
 
 class PSDToACV(eqx.Module):
