@@ -1,17 +1,17 @@
 """Core class for Gaussian process regression.
 
 """
+from typing import Union
+
 import equinox as eqx
 import jax.numpy as jnp
-from jax.scipy.linalg import cholesky, solve_triangular, solve
+from jax.scipy.linalg import cholesky, solve, solve_triangular
 
-from .utils.gp_utils import nearest_positive_definite
-from .tools import reshape_array,sanity_checks
 from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
-
-from typing import Union
+from .tools import reshape_array, sanity_checks
+from .utils.gp_utils import nearest_positive_definite
 
 
 class GaussianProcess(eqx.Module):

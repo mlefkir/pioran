@@ -1,11 +1,10 @@
 """Classes to store for the parameters of models.
 
 """
-from .tools import TABLE_LENGTH, HEADER_PARAMETERS
-from .parameter_base import Parameter
-
 import jax.numpy as jnp
 
+from .parameter_base import Parameter
+from .tools import HEADER_PARAMETERS, TABLE_LENGTH
 
 
 class ParametersModel:

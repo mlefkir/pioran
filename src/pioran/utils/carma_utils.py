@@ -1,5 +1,6 @@
-import jax.numpy as jnp
 import jax
+import jax.numpy as jnp
+
 
 @jax.jit
 def quad_to_roots(quad: jax.Array) -> jax.Array:

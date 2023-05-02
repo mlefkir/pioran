@@ -1,9 +1,10 @@
 """Module for classes representing the covariance function.
 """
 from copy import deepcopy
-from typing import Union, List, Tuple, Optional
-import jax.numpy as jnp
+from typing import List, Optional, Tuple, Union
+
 import equinox as eqx
+import jax.numpy as jnp
 
 from .parameters import ParametersModel
 from .utils.gp_utils import EuclideanDistance

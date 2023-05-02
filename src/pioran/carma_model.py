@@ -1,11 +1,12 @@
-import jax
 import equinox as eqx
+import jax
 import jax.numpy as jnp
 
-
 from .parameters import ParametersModel
-from .utils.carma_utils import quad_to_roots, roots_to_quad, quad_to_coeff, lorentzians_to_roots, get_U,get_V
 from .tools import Array_type
+from .utils.carma_utils import (get_U, get_V, lorentzians_to_roots,
+                                quad_to_coeff, quad_to_roots, roots_to_quad)
+
 
 class CARMA_model(eqx.Module):
     r"""Base class for Continuous-time AutoRegressive Moving Average (CARMA) models. Inherits from eqxinox.Module.

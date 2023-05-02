@@ -1,8 +1,9 @@
-import jax
-
 import equinox as eqx
+import jax
 import jax.numpy as jnp
+
 from .carma_model import CARMA_model
+
 
 class KalmanFilter(eqx.Module):
     r"""Base class for Kalman filters. Inherits from eqx.Module.
