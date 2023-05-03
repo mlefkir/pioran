@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 
 
-@jax.jit
+# @jax.jit
 def quad_to_roots(quad: jax.Array) -> jax.Array:
     """Convert the coefficients of the quadratic form to coefficients of the AR polynomial."""
     p = quad.shape[0]
@@ -19,7 +19,7 @@ def quad_to_roots(quad: jax.Array) -> jax.Array:
         roots = jnp.append(roots,-quad[-1])
     return roots
 
-@jax.jit
+# @jax.jit
 def roots_to_quad(roots: jax.Array) -> jax.Array:
     """Convert the roots of the AR polynomial to the coefficients quad of the quadratic polynomial."""
     p = roots.shape[0]
@@ -31,7 +31,7 @@ def roots_to_quad(roots: jax.Array) -> jax.Array:
         quad = jnp.append(quad,-roots[-1].real)
     return quad
 
-@jax.jit
+# @jax.jit
 def quad_to_coeff(quad: jax.Array) -> jax.Array:
     """Convert the coefficients quad of the quadratic polynomial to the coefficients alpha of the AR polynomial
     

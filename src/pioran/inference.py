@@ -1,10 +1,12 @@
 """Class and functions for inference with Gaussian Processes and other methods.
 
 """
+from typing import Union
+
 import ultranest
 
 from .core import GaussianProcess
-
+from .kalman import KalmanFilter
 
 class Inference:
     r"""Class to estimate the (hyper)parameters of the Gaussian Process.
@@ -37,14 +39,14 @@ class Inference:
     
     """
     
-    def __init__(self, GP: GaussianProcess, method="NS"):
+    def __init__(self, Process: Union[GaussianProcess,KalmanFilter], method="NS"):
         r"""Constructor method for the Optimizer class.
 
         Instantiate the Inference class.
 
         Parameters
         ----------
-        GP : :class:`~pioran.core.GaussianProcess`
+        Process : :class:`~pioran.core.GaussianProcess`
             Gaussian Process object.
         method : str, optional
             "NS": using nested sampling via ultranest
@@ -55,7 +57,7 @@ class Inference:
             If the method is not a string.
         """
         
-        self.GP = GP
+        self.process = Process
         
         if isinstance(method, str):
             self.method = method
@@ -95,7 +97,7 @@ class Inference:
         else:
             raise ValueError("The method must be 'NS'.")
         print("\n>>>>>> Optimization done.")
-        print(self.GP)
+        print(self.process)
         return results
         
     def nested_sampling(self,priors,verbose=True,**kwargs):
@@ -126,12 +128,12 @@ class Inference:
         log_dir = kwargs.get('log_dir','GP_ultranest')
         run_kwargs = kwargs.get('run_kwargs',{})
         viz = {} if verbose else  {'show_status': False , 'viz_callback': void}
-        free_names = self.GP.model.parameters.free_names
-        sampler = ultranest.ReactiveNestedSampler(free_names, self.GP.wrapper_log_marginal_likelihood,priors,resume=resume,log_dir=log_dir)
+        free_names = self.process.model.parameters.free_names
+        sampler = ultranest.ReactiveNestedSampler(free_names, self.process.wrapper_log_marginal_likelihood,priors,resume=resume,log_dir=log_dir)
         if verbose: results = sampler.run(**viz)
-        else: sampler.run(**run_kwargs, **viz)
+        else: results = sampler.run(**run_kwargs, **viz)
         sampler.plot()
-        self.GP.model.parameters.set_free_values(results['posterior']['median'])
+        self.process.model.parameters.set_free_values(results['posterior']['median'])
         return results 
     
 def void(*args, **kwargs):

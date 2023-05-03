@@ -85,11 +85,16 @@ class CARMA_model(eqx.Module):
             assert len(lorentzian_centroids) == len(lorentzian_widths), "lorentzian_centroids and lorentzian_widths must have the same length"
             roots = lorentzians_to_roots(lorentzian_widths,lorentzian_centroids)
             AR_quad = roots_to_quad(roots)
+            print(f'roots {len(roots)} {roots}')
+            print(f'AR_quad {len(AR_quad)} {AR_quad}')
             for i,ar in enumerate(AR_quad):
                     self.parameters.append(f"a_{i+1}",float(ar),True,hyperparameter=True)
-            self.parameters.append("beta_0",1,False,hyperparameter=True)
+            self.parameters.append("beta_0",float(1.),False,hyperparameter=True)
+            assert len(weights) == self.q, "weights must have length q"
             for i,ma in enumerate(weights):
                     self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
+            for i in range(self.q,self.p):
+                self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
         else:
             raise ValueError("Either AR_roots and MA_roots or AR_quad and MA_quad or lorentzian_centroids, lorentzian_widths and weights must be provided")
 
@@ -128,13 +133,15 @@ class CARMA_model(eqx.Module):
         
         """
         alpha = self.get_AR_coeffs()
-        beta = self.get_MA_coeffs()
-        
-        L1 = jnp.vander(2j*jnp.pi*f, len(beta))
-        num = beta[::-1] @ L1.T  
-        L2 = jnp.vander(2j*jnp.pi*f, len(alpha))
-        den = alpha @ L2.T
-        P = (self.parameters["sigma"].value  * jnp.abs(num/den)**2).flatten()
+        beta = self.get_MA_coeffs() # remove the first element which is always 1
+
+        # L1 = jnp.vander(2j*jnp.pi*f, len(beta))
+        # num = beta[::-1] @ L1.T  
+        # L2 = jnp.vander(2j*jnp.pi*f, len(alpha))
+        # den = alpha @ L2.T
+        num = jnp.polyval(beta[::-1],2j*jnp.pi*f)
+        den = jnp.polyval(alpha,2j*jnp.pi*f)
+        P = (self.parameters["sigma"].value  * jnp.abs(num)**2 /jnp.abs(den)**2).flatten()
         return P
     
     def get_AR_quads(self) -> jax.Array:
@@ -161,7 +168,7 @@ class CARMA_model(eqx.Module):
         :obj:`jax.Array`
             Quadratic coefficients of the MA part of the model.
         """
-        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self._q)])
+        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self._p)])
        
     def get_AR_coeffs(self) -> jax.Array:
         r"""Returns the coefficients of the AR part of the model.
@@ -198,7 +205,7 @@ class CARMA_model(eqx.Module):
         # else :
         #     beta = jnp.insert(quad_to_coeff(self.get_MA_quads()),0,1)
         # return beta
-        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self._q)])
+        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self._p)])
     
     def get_AR_roots(self) -> jax.Array:
         r"""Returns the roots of the AR part of the model.
@@ -226,7 +233,7 @@ class CARMA_model(eqx.Module):
             for l, root_AR_bis in enumerate(jnp.delete(roots_AR,k)):
                 Den *= (root_AR_bis - r)*(jnp.conjugate(root_AR_bis) + r)
             Frac += A*B/Den*jnp.exp(r*tau)
-        return self.parameters["sigma"].value * Frac.real    
+        return self.parameters["sigma"].value * Frac.real
     
     # @eqx.filter_jit
     def init_statespace(self,y_0=None,errsize=None) -> Tuple[jax.Array,jax.Array] | Tuple[jax.Array,jax.Array,jax.Array,jax.Array,jax.Array]:

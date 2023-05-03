@@ -271,6 +271,6 @@ class KalmanFilter(eqx.Module):
         return jnp.take(D[4],0) 
     
     @eqx.filter_jit
-    def wrapper_loglike(self,params) -> float:
+    def wrapper_log_marginal_likelihood(self,params) -> float:
         self.model.parameters.set_free_values(params)
         return self.log_likelihood().real
