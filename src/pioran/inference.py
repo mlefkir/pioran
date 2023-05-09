@@ -6,7 +6,7 @@ from typing import Union
 import ultranest
 
 from .core import GaussianProcess
-from .kalman import KalmanFilter
+from .carma_core import CARMAProcess
 
 class Inference:
     r"""Class to estimate the (hyper)parameters of the Gaussian Process.
@@ -39,7 +39,7 @@ class Inference:
     
     """
     
-    def __init__(self, Process: Union[GaussianProcess,KalmanFilter], method="NS"):
+    def __init__(self, Process: Union[GaussianProcess,CARMAProcess], method="NS"):
         r"""Constructor method for the Optimizer class.
 
         Instantiate the Inference class.

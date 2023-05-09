@@ -63,37 +63,54 @@ class CARMA_model(eqx.Module):
         
         # if we provide the quadratic coefficients 
         if AR_quad is not None:
+            
             # set the AR parameters
             if isinstance(AR_quad,Array_type):
                 assert len(AR_quad) == self.p, "AR_quad must have length p"
                 for i,ar in enumerate(AR_quad):
                     self.parameters.append(f"a_{i+1}",ar,True,hyperparameter=True)
             else:
+                assert self.p == 1, "p must be 1 if AR_quad is not an array"
                 self.parameters.append(f"a_1",AR_quad,True,hyperparameter=True)
-            # self.parameters.append(f"a_{self.p}",1,False,hyperparameter=True)
             
             # set the MA parameters
+            
+            if self.q == 0:
+                assert beta is None, "beta must be None if q = 0"
             self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
             if self.q > 0:
                 if beta is None:
-                    raise ValueError("beta is required if q > 1")
+                    raise ValueError("beta is required if q >= 1")
+                
+                assert len(beta) == self.q, "weights must have length q"
                 for i,ma in enumerate(beta):
                     self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
-            
+            for i in range(self.q,self.p-1):
+                self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
+                
         elif lorentzian_centroids is not None and lorentzian_widths is not None and weights is not None:
              
             assert len(lorentzian_centroids) == len(lorentzian_widths), "lorentzian_centroids and lorentzian_widths must have the same length"
+            if self.p % 2 == 0:
+                assert jnp.count_nonzero(lorentzian_centroids) == len(lorentzian_centroids), "When p is even, lorentzian_centroids must have non-zero elements"
+                assert len(lorentzian_centroids) == self.p//2, "lorentzian_centroids must have p//2 non-zero elements"
+            else:
+                assert jnp.count_nonzero(lorentzian_centroids)+1 == len(lorentzian_centroids), "When p is odd, lorentzian_centroids must have p//2+1 non-zero elements"
+                assert jnp.count_nonzero(lorentzian_centroids) == (self.p-1)//2, "lorentzian_centroids must have p//2+1 non-zero elements"
+
             roots = lorentzians_to_roots(lorentzian_widths,lorentzian_centroids)
             AR_quad = roots_to_quad(roots)
-            print(f'roots {len(roots)} {roots}')
-            print(f'AR_quad {len(AR_quad)} {AR_quad}')
             for i,ar in enumerate(AR_quad):
                     self.parameters.append(f"a_{i+1}",float(ar),True,hyperparameter=True)
             self.parameters.append("beta_0",float(1.),False,hyperparameter=True)
-            assert len(weights) == self.q, "weights must have length q"
-            for i,ma in enumerate(weights):
-                    self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
-            for i in range(self.q,self.p):
+            
+            if self.q == 0:
+                assert weights is None, "weights must be None if q = 0"
+            else:
+                assert len(weights) == self.q, "weights must have length q"
+                for i,ma in enumerate(weights):
+                        self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
+            for i in range(self.q,self.p-1):
                 self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
         else:
             raise ValueError("Either AR_roots and MA_roots or AR_quad and MA_quad or lorentzian_centroids, lorentzian_widths and weights must be provided")
@@ -117,9 +134,7 @@ class CARMA_model(eqx.Module):
     
     def PowerSpectrum(self,f: jax.Array) -> jax.Array:
         r"""Computes the power spectrum of the CARMA process.
-        
-        
-        
+    
         Parameters
         ----------
         f : :obj:`jax.Array`
@@ -133,12 +148,8 @@ class CARMA_model(eqx.Module):
         
         """
         alpha = self.get_AR_coeffs()
-        beta = self.get_MA_coeffs() # remove the first element which is always 1
+        beta = self.get_MA_coeffs() 
 
-        # L1 = jnp.vander(2j*jnp.pi*f, len(beta))
-        # num = beta[::-1] @ L1.T  
-        # L2 = jnp.vander(2j*jnp.pi*f, len(alpha))
-        # den = alpha @ L2.T
         num = jnp.polyval(beta[::-1],2j*jnp.pi*f)
         den = jnp.polyval(alpha,2j*jnp.pi*f)
         P = (self.parameters["sigma"].value  * jnp.abs(num)**2 /jnp.abs(den)**2).flatten()
@@ -168,7 +179,7 @@ class CARMA_model(eqx.Module):
         :obj:`jax.Array`
             Quadratic coefficients of the MA part of the model.
         """
-        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self._p)])
+        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self.p)])
        
     def get_AR_coeffs(self) -> jax.Array:
         r"""Returns the coefficients of the AR part of the model.
@@ -198,14 +209,7 @@ class CARMA_model(eqx.Module):
         :obj:`jax.Array`
             Quadratic coefficients of the AR part of the model.
         """
-        # if self.q == 0 :
-        #     beta = jnp.array([1])
-        # elif self.q == 1:
-        #     beta = jnp.array([1,self.parameters["b_1"].value])
-        # else :
-        #     beta = jnp.insert(quad_to_coeff(self.get_MA_quads()),0,1)
-        # return beta
-        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self._p)])
+        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self.p)])
     
     def get_AR_roots(self) -> jax.Array:
         r"""Returns the roots of the AR part of the model.
@@ -217,7 +221,6 @@ class CARMA_model(eqx.Module):
         """
         return quad_to_roots(self.get_AR_quads())
     
-    @eqx.filter_jit
     def Autocovariance(self, tau: jax.Array) -> jax.Array:
         r"""Compute the autocovariance function of a CARMA(p,q) process."""
         Frac = 0
@@ -233,9 +236,9 @@ class CARMA_model(eqx.Module):
             for l, root_AR_bis in enumerate(jnp.delete(roots_AR,k)):
                 Den *= (root_AR_bis - r)*(jnp.conjugate(root_AR_bis) + r)
             Frac += A*B/Den*jnp.exp(r*tau)
-        return self.parameters["sigma"].value * Frac.real
+        return self.parameters["sigma"].value**2 * Frac.real
     
-    # @eqx.filter_jit
+    @eqx.filter_jit
     def init_statespace(self,y_0=None,errsize=None) -> Tuple[jax.Array,jax.Array] | Tuple[jax.Array,jax.Array,jax.Array,jax.Array,jax.Array]:
         r"""Initialises the state space representation of the model
         
@@ -252,27 +255,27 @@ class CARMA_model(eqx.Module):
         if y_0 is None or errsize is None:
             raise ValueError('y_0 and errsize must be provided')
         
-        beta = self.get_MA_coeffs()
-        b = jnp.append(beta,jnp.zeros(self.p-self.q-1))
-        e = jnp.append(jnp.zeros(self.p-1),self.parameters['sigma'].value)
+        beta = self.get_MA_coeffs().reshape(1,self.p)
+        e = jnp.append(jnp.zeros(self.p-1),self.parameters['sigma'].value).reshape(self.p,1)
         AR_roots = self.get_AR_roots()
         
         U = get_U(AR_roots)
-        J = jnp.linalg.solve(U,jnp.eye(self.p)) @ e
+        J = jnp.linalg.solve(U,e)
 
         V = get_V(J, AR_roots)
-        b_rot = ( b @ U ).reshape(1,self.p)
+        b_rot = ( beta @ U )
 
         X = jnp.zeros((self.p,1),dtype=jnp.complex128)
-        var = self.Autocovariance(0) + errsize**2
+        var = jnp.real(b_rot@V@jnp.conj(b_rot.T)) + errsize**2
         
+        y_k = jnp.real(b_rot @ X)
+        S_k = jnp.real(b_rot @ V @ jnp.conj(b_rot.T)) + errsize**2
+            
         K = V @ jnp.conj(b_rot.T) / var
         X += K * y_0
         P = V - var * K @ jnp.conj(K.T)
         
-        y_k = b_rot @ X
-        S_k = b_rot @ P @ jnp.conj(b_rot.T) + errsize**2
-            
+
         loglike =  -0.5 * ( jnp.log(S_k) + (y_0 -y_k)**2 / S_k  + jnp.log(2*jnp.pi) )
         
         return X, P, V, b_rot, loglike

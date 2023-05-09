@@ -47,8 +47,8 @@ class KalmanFilter(eqx.Module):
         
         self.model = model
         
-        self.model.parameters.append('nu',1,True,hyperparameter=False)
-        self.model.parameters.append('mu',1,True,hyperparameter=False)
+        # self.model.parameters.append('nu',1,True,hyperparameter=False)
+        # self.model.parameters.append('mu',0,True,hyperparameter=False)
         
         self.observation_values = observation_values
         self.observation_errors = observation_errors
@@ -136,18 +136,8 @@ class KalmanFilter(eqx.Module):
             Innovation covariance matrix.
         """
         
-        """    mean = (b_rot@X)
-        var = ( b_rot@P@jnp.conj(b_rot.T) + model.parameters['nu'].value * Yerr[i]**2)
-        
-        # Kalman gain
-        K = P@jnp.conj(b_rot.T) / var
-        
-        
-        X = X + K * (y_[i]-(mean+mu))
-        P = P - var*K@jnp.conj(K.T)"""
-        
-        Y = Z - H @ X
-        S = R + H @ P @ jnp.conj(H.T)
+        Y = Z - jnp.real(H @ X)
+        S = R + jnp.real(H @ P @ jnp.conj(H.T))
         K = P @ jnp.conj(H.T) / S
         X += K @ Y
         # P = (jnp.eye(self.model.p) - K@H) @ P
@@ -232,25 +222,28 @@ class KalmanFilter(eqx.Module):
   
         F = self.model.statespace_representation(dt)
         R = error**2
-
+  
         X,P = self.Predict(X,P-V,F,V)
         X,P,Y,S = self.Update(X,P,value,b_rot,R)
         
-        loglike -= 0.5 * jax.lax.cond(self.model.ndims==1,
+        loglike -= 0.5 * (jax.lax.cond(self.model.ndims==1,
             lambda: jnp.log(S) + Y**2/S,
-            lambda: jnp.log(jnp.linalg.det(S)) + Y@jnp.linalg.solve(S,jnp.eye(self.model.ndims)@Y.T)) +.5*jnp.log(2*jnp.pi)
+            lambda: jnp.log(jnp.linalg.det(S)) + Y@jnp.linalg.solve(S,jnp.eye(self.model.ndims)@Y.T)) + jnp.log(2*jnp.pi) )
                 
         carry = (X, P, V, b_rot, loglike)
         return carry, xs
     
-    @eqx.filter_jit
     def log_likelihood(self) -> float:
         
         
         dt = jnp.insert(jnp.diff(self.observation_indexes),0,0.)
+        # xs = ([dt,
+        #        self.observation_values-self.model.parameters['mu'].value,
+        #        jnp.sqrt(self.model.parameters['nu'].value)*self.observation_errors])
         xs = ([dt,
-               self.observation_values-self.model.parameters['mu'].value,
-               jnp.sqrt(self.model.parameters['nu'].value)*self.observation_errors])
+               self.observation_values,
+               self.observation_errors])
+
 
         if self.model.p == 1:
             X, P = self.model.init_statespace()
@@ -259,18 +252,22 @@ class KalmanFilter(eqx.Module):
             D ,_ = jax.lax.scan(self.one_step_loglike_CAR1,carry,xs)
             return jnp.take(D[2],0) 
         
-        X, P, V, b_rot, loglike = self.model.init_statespace(y_0=self.observation_values[0]-self.model.parameters['mu'].value,
-                                    errsize=self.observation_errors[0]*jnp.sqrt(self.model.parameters['nu'].value))
-                            
+        # X, P, V, b_rot, loglike = self.model.init_statespace(y_0=self.observation_values[0]-self.model.parameters['mu'].value,
+        #                             errsize=self.observation_errors[0]*jnp.sqrt(self.model.parameters['nu'].value))
+        X, P, V, b_rot, loglike = self.model.init_statespace(y_0=self.observation_values[0],
+                                    errsize=self.observation_errors[0])                    
         carry = (X, P, V, b_rot, loglike)
+        # xs = ([jnp.diff(self.observation_indexes),
+        #        self.observation_values[1:]-self.model.parameters['mu'].value,
+        #        jnp.sqrt(self.model.parameters['nu'].value)*self.observation_errors[1:]])
         xs = ([jnp.diff(self.observation_indexes),
-               self.observation_values[1:]-self.model.parameters['mu'].value,
-               jnp.sqrt(self.model.parameters['nu'].value)*self.observation_errors[1:]])
+               self.observation_values[1:],
+               self.observation_errors[1:]])
         D ,_ = jax.lax.scan(self.one_step_loglike,carry,xs)
         
-        return jnp.take(D[4],0) 
+        return jnp.take(D[4],0).real
     
-    @eqx.filter_jit
-    def wrapper_log_marginal_likelihood(self,params) -> float:
-        self.model.parameters.set_free_values(params)
-        return self.log_likelihood().real
+    # @eqx.filter_jit
+    # def wrapper_log_marginal_likelihood(self,params) -> float:
+    #     self.model.parameters.set_free_values(params)
+    #     return self.log_likelihood()

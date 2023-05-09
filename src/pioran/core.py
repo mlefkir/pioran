@@ -3,6 +3,7 @@
 """
 from typing import Union
 
+import jax
 import equinox as eqx
 import jax.numpy as jnp
 from jax.scipy.linalg import cholesky, solve, solve_triangular
@@ -76,11 +77,11 @@ class GaussianProcess(eqx.Module):
         Number of points to predict, by default 5 * length(training(indexes)).
 
     """
-    model: Union[CovarianceFunction,PowerSpectralDensity] 
-    training_indexes: jnp.ndarray
-    training_errors: jnp.ndarray
-    training_observables: jnp.ndarray
-    prediction_indexes: jnp.ndarray
+    model: Union[CovarianceFunction,PSDToACV] 
+    training_indexes: jax.Array
+    training_errors: jax.Array
+    training_observables: jax.Array
+    prediction_indexes: jax.Array
     nb_prediction_points: int
     scale_errors: bool
     estimate_mean: bool
@@ -114,7 +115,7 @@ class GaussianProcess(eqx.Module):
         
         # add a factor to scale the errors
         self.scale_errors = kwargs.get("scale_errors", True)
-        if self.scale_errors:
+        if self.scale_errors and (training_errors is not None):
             self.model.parameters.append("nu",1.0,True,hyperparameter=False)
 
 

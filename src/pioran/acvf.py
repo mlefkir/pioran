@@ -394,13 +394,27 @@ class CARMA_covariance(CovarianceFunction):
         elif lorentzian_centroids is not None and lorentzian_widths is not None and weights is not None:
              
             assert len(lorentzian_centroids) == len(lorentzian_widths), "lorentzian_centroids and lorentzian_widths must have the same length"
+            if self.p % 2 == 0:
+                assert jnp.count_nonzero(lorentzian_centroids) == len(lorentzian_centroids), "When p is even, lorentzian_centroids must have non-zero elements"
+                assert len(lorentzian_centroids) == self.p//2, "lorentzian_centroids must have p//2 non-zero elements"
+            else:
+                assert jnp.count_nonzero(lorentzian_centroids)+1 == len(lorentzian_centroids), "When p is odd, lorentzian_centroids must have p//2+1 non-zero elements"
+                assert jnp.count_nonzero(lorentzian_centroids) == (self.p-1)//2, "lorentzian_centroids must have p//2+1 non-zero elements"
+
             roots = lorentzians_to_roots(lorentzian_widths,lorentzian_centroids)
             AR_quad = roots_to_quad(roots)
             for i,ar in enumerate(AR_quad):
                     self.parameters.append(f"a_{i+1}",float(ar),True,hyperparameter=True)
-            self.parameters.append("beta_0",1,False,hyperparameter=True)
-            for i,ma in enumerate(weights):
-                    self.parameters.append(f"beta_{i+1}",ma,True,hyperparameter=True)
+            self.parameters.append("beta_0",float(1.),False,hyperparameter=True)
+            
+            if self.q == 0:
+                assert weights is None, "weights must be None if q = 0"
+            else:
+                assert len(weights) == self.q, "weights must have length q"
+                for i,ma in enumerate(weights):
+                        self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
+            for i in range(self.q,self.p-1):
+                self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
         else:
             raise ValueError("Either AR_roots and MA_roots or AR_quad and MA_quad or lorentzian_centroids, lorentzian_widths and weights must be provided")
 
@@ -428,7 +442,7 @@ class CARMA_covariance(CovarianceFunction):
         :obj:`jax.Array`
             Quadratic coefficients of the AR part of the model.
         """
-        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self._q)])
+        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self.p)])
     
     def get_AR_roots(self) -> jax.Array:
         r"""Returns the roots of the AR part of the model.
@@ -455,4 +469,4 @@ class CARMA_covariance(CovarianceFunction):
             for l, root_AR_bis in enumerate(jnp.delete(roots_AR,k)):
                 Den *= (root_AR_bis - r)*(jnp.conjugate(root_AR_bis) + r)
             Frac += A*B/Den*jnp.exp(r*tau)
-        return self.parameters["sigma"].value * Frac.real    
+        return self.parameters["sigma"].value**2 * Frac.real    

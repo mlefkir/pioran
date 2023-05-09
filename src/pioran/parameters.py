@@ -373,6 +373,7 @@ class ParametersModel:
         s += "\n"
         for p in self._pars:
             s += str(p) + '\n'
+        s += f'\nNumber of free parameters : {sum(self.free_parameters)}\n'
         return s+"\n"
     
     def __repr__(self) -> str: # pragma: no cover

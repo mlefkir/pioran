@@ -2,7 +2,6 @@ import jax
 import jax.numpy as jnp
 
 
-# @jax.jit
 def quad_to_roots(quad: jax.Array) -> jax.Array:
     """Convert the coefficients of the quadratic form to coefficients of the AR polynomial."""
     p = quad.shape[0]
@@ -19,7 +18,6 @@ def quad_to_roots(quad: jax.Array) -> jax.Array:
         roots = jnp.append(roots,-quad[-1])
     return roots
 
-# @jax.jit
 def roots_to_quad(roots: jax.Array) -> jax.Array:
     """Convert the roots of the AR polynomial to the coefficients quad of the quadratic polynomial."""
     p = roots.shape[0]
@@ -31,7 +29,6 @@ def roots_to_quad(roots: jax.Array) -> jax.Array:
         quad = jnp.append(quad,-roots[-1].real)
     return quad
 
-# @jax.jit
 def quad_to_coeff(quad: jax.Array) -> jax.Array:
     """Convert the coefficients quad of the quadratic polynomial to the coefficients alpha of the AR polynomial
     
@@ -66,14 +63,12 @@ def lorentzians_to_roots(Widths: jax.Array, Centroids: jax.Array) -> jax.Array:
     roots = -2*jnp.pi * ( Combined_Widths + 1j*Combined_Centroids )
     return roots
 
-@jax.jit
 def get_U(roots_AR: jax.Array) -> jax.Array:
     U = jnp.ones(len(roots_AR))
     for k in range(1,len(roots_AR)):
         U = jnp.vstack((U,roots_AR**k))
     return U
 
-@jax.jit
 def get_V(J: jax.Array, roots_AR: jax.Array) -> jax.Array:
     p = len(roots_AR)
     arr = jnp.zeros((p,p),dtype=jnp.complex128)
