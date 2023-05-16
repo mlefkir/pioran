@@ -238,7 +238,7 @@ class CARMA_model(eqx.Module):
             Frac += A*B/Den*jnp.exp(r*tau)
         return self.parameters["sigma"].value**2 * Frac.real
     
-    @eqx.filter_jit
+    # @eqx.filter_jit
     def init_statespace(self,y_0=None,errsize=None) -> Tuple[jax.Array,jax.Array] | Tuple[jax.Array,jax.Array,jax.Array,jax.Array,jax.Array]:
         r"""Initialises the state space representation of the model
         
@@ -280,7 +280,7 @@ class CARMA_model(eqx.Module):
         
         return X, P, V, b_rot, loglike
 
-    @eqx.filter_jit
+    # @eqx.filter_jit
     def statespace_representation(self,dt: jax.Array) -> Tuple[jax.Array,jax.Array,jax.Array] | jax.Array:
         if self.p == 1:
             F = jnp.exp(-self.parameters['a_1'].value*dt)

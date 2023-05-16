@@ -77,3 +77,29 @@ def get_V(J: jax.Array, roots_AR: jax.Array) -> jax.Array:
     num = -J.reshape(1,p).T*jnp.conj(J).T
     V = jnp.conj(num/den.T)
     return V.T
+
+def PowerSpectrum(f: jax.Array,alpha,beta,sigma) -> jax.Array:
+    r"""Computes the power spectrum of the CARMA process.
+
+    Parameters
+    ----------
+    f : :obj:`jax.Array`
+        Frequencies at which the power spectrum is evaluated.
+    alpha : :obj:`jax.Array`
+        Coefficients of the AR polynomial.
+    beta : :obj:`jax.Array`
+        Coefficients of the MA polynomial.
+    sigma : :obj:`float`
+        Standard deviation of the white noise process.
+    
+    Returns
+    -------
+    P : :obj:`jax.Array`
+        Power spectrum of the CARMA process.
+    
+    """
+
+    num = jnp.polyval(beta[::-1],2j*jnp.pi*f)
+    den = jnp.polyval(alpha,2j*jnp.pi*f)
+    P = (sigma  * jnp.abs(num)**2 /jnp.abs(den)**2).flatten()
+    return P

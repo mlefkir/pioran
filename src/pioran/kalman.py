@@ -42,14 +42,9 @@ class KalmanFilter(eqx.Module):
             CARMA model used for the inference.
         
         """
-        
-        self.observation_indexes = observation_indexes
-        
         self.model = model
         
-        # self.model.parameters.append('nu',1,True,hyperparameter=False)
-        # self.model.parameters.append('mu',0,True,hyperparameter=False)
-        
+        self.observation_indexes = observation_indexes
         self.observation_values = observation_values
         self.observation_errors = observation_errors
 
@@ -139,8 +134,8 @@ class KalmanFilter(eqx.Module):
         Y = Z - jnp.real(H @ X)
         S = R + jnp.real(H @ P @ jnp.conj(H.T))
         K = P @ jnp.conj(H.T) / S
+        
         X += K @ Y
-        # P = (jnp.eye(self.model.p) - K@H) @ P
         P -= S * K @ jnp.conj(K.T)
         
         return X,P,Y,S
@@ -184,13 +179,13 @@ class KalmanFilter(eqx.Module):
         
         loglike += -0.5 * jax.lax.cond(self.model.ndims==1,
                          lambda: jnp.log(S) + Y**2/S,
-                         lambda: jnp.log(jnp.linalg.det(S)) + Y@jnp.linalg.solve(S,jnp.eye(self.model.p)@Y.T)) -.5*jnp.log(2*jnp.pi)
+                         lambda: jnp.log(jnp.linalg.det(S)) + Y@jnp.linalg.solve(S,jnp.eye(self.model.ndims)@Y.T)) -.5*jnp.log(2*jnp.pi)
         
         carry = (X,P,loglike)
         return carry,xs
     
     @eqx.filter_jit
-    def one_step_loglike(self,carry,xs):
+    def one_step_loglike_CARMA(self,carry,xs):
         r"""Compute the log-likelihood of a single observation value. 
         
         This function is used in the :meth:`log_likelihood` method to compute the sequentially the log-likelihood of all the observations values.
@@ -234,40 +229,29 @@ class KalmanFilter(eqx.Module):
         return carry, xs
     
     def log_likelihood(self) -> float:
-        
-        
         dt = jnp.insert(jnp.diff(self.observation_indexes),0,0.)
-        # xs = ([dt,
-        #        self.observation_values-self.model.parameters['mu'].value,
-        #        jnp.sqrt(self.model.parameters['nu'].value)*self.observation_errors])
-        xs = ([dt,
-               self.observation_values,
-               self.observation_errors])
-
-
+        y = self.observation_values-self.model.parameters['mu'].value
+        yerr = jnp.sqrt(self.model.parameters['nu'].value)*self.observation_errors
+        
         if self.model.p == 1:
+            xs = ([dt, y,yerr])
             X, P = self.model.init_statespace()
             loglike = jnp.zeros((1,1))
             carry = (X,P,loglike)
             D ,_ = jax.lax.scan(self.one_step_loglike_CAR1,carry,xs)
             return jnp.take(D[2],0) 
         
-        # X, P, V, b_rot, loglike = self.model.init_statespace(y_0=self.observation_values[0]-self.model.parameters['mu'].value,
-        #                             errsize=self.observation_errors[0]*jnp.sqrt(self.model.parameters['nu'].value))
-        X, P, V, b_rot, loglike = self.model.init_statespace(y_0=self.observation_values[0],
-                                    errsize=self.observation_errors[0])                    
+
+        X, P, V, b_rot, loglike = self.model.init_statespace(y_0=y[0],
+                                    errsize=yerr[0])
+                            
         carry = (X, P, V, b_rot, loglike)
-        # xs = ([jnp.diff(self.observation_indexes),
-        #        self.observation_values[1:]-self.model.parameters['mu'].value,
-        #        jnp.sqrt(self.model.parameters['nu'].value)*self.observation_errors[1:]])
-        xs = ([jnp.diff(self.observation_indexes),
-               self.observation_values[1:],
-               self.observation_errors[1:]])
-        D ,_ = jax.lax.scan(self.one_step_loglike,carry,xs)
+        xs = ([jnp.diff(self.observation_indexes), y[1:],yerr[1:]])
+        D ,_ = jax.lax.scan(self.one_step_loglike_CARMA,carry,xs)
         
         return jnp.take(D[4],0).real
     
-    # @eqx.filter_jit
-    # def wrapper_log_marginal_likelihood(self,params) -> float:
-    #     self.model.parameters.set_free_values(params)
-    #     return self.log_likelihood()
+    @eqx.filter_jit
+    def wrapper_log_marginal_likelihood(self,params) -> float:
+        self.model.parameters.set_free_values(params)
+        return self.log_likelihood()

@@ -374,23 +374,31 @@ class CARMA_covariance(CovarianceFunction):
         
         # if we provide the quadratic coefficients 
         if AR_quad is not None:
+            
             # set the AR parameters
             if isinstance(AR_quad,Array_type):
                 assert len(AR_quad) == self.p, "AR_quad must have length p"
                 for i,ar in enumerate(AR_quad):
                     self.parameters.append(f"a_{i+1}",ar,True,hyperparameter=True)
             else:
+                assert self.p == 1, "p must be 1 if AR_quad is not an array"
                 self.parameters.append(f"a_1",AR_quad,True,hyperparameter=True)
-            # self.parameters.append(f"a_{self.p}",1,False,hyperparameter=True)
             
             # set the MA parameters
+            
+            if self.q == 0:
+                assert beta is None, "beta must be None if q = 0"
             self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
             if self.q > 0:
                 if beta is None:
-                    raise ValueError("beta is required if q > 1")
+                    raise ValueError("beta is required if q >= 1")
+                
+                assert len(beta) == self.q, "weights must have length q"
                 for i,ma in enumerate(beta):
-                    self.parameters.append(f"beta_{i+1}",ma,True,hyperparameter=True)
-            
+                    self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
+            for i in range(self.q,self.p-1):
+                self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
+                
         elif lorentzian_centroids is not None and lorentzian_widths is not None and weights is not None:
              
             assert len(lorentzian_centroids) == len(lorentzian_widths), "lorentzian_centroids and lorentzian_widths must have the same length"

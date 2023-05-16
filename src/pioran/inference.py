@@ -3,10 +3,15 @@
 """
 from typing import Union
 
+from mpi4py import MPI
 import ultranest
 
 from .core import GaussianProcess
 from .carma_core import CARMAProcess
+
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
 
 class Inference:
     r"""Class to estimate the (hyper)parameters of the Gaussian Process.
@@ -93,11 +98,17 @@ class Inference:
         if self.method == "NS":
             if priors is None:
                 raise ValueError("Priors must be provided for nested sampling.")
-            results = self.nested_sampling(priors=priors,verbose=verbose,**kwargs)
+            results, sampler = self.nested_sampling(priors=priors,verbose=verbose,**kwargs)
         else:
             raise ValueError("The method must be 'NS'.")
-        print("\n>>>>>> Optimization done.")
-        print(self.process)
+        comm.Barrier()
+        self.process.model.parameters.set_free_values(results['posterior']['median'])
+        print(self.process.model.parameters.free_values)
+        if rank == 0:
+            print("\n>>>>>> Plotting corner and trace.")
+            sampler.plot()
+            print("\n>>>>>> Optimization done.")
+            print(self.process)
         return results
         
     def nested_sampling(self,priors,verbose=True,**kwargs):
@@ -132,9 +143,8 @@ class Inference:
         sampler = ultranest.ReactiveNestedSampler(free_names, self.process.wrapper_log_marginal_likelihood,priors,resume=resume,log_dir=log_dir)
         if verbose: results = sampler.run(**viz)
         else: results = sampler.run(**run_kwargs, **viz)
-        sampler.plot()
-        self.process.model.parameters.set_free_values(results['posterior']['median'])
-        return results 
+        
+        return results,sampler
     
 def void(*args, **kwargs):
     """ Void function to avoid printing the status of the nested sampling."""
