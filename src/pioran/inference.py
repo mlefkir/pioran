@@ -71,7 +71,7 @@ class Inference:
             raise TypeError("method must be a string.")   
         
          
-    def run(self, priors=None, verbose=True, **kwargs):
+    def run(self, priors=None,verbose=True, **kwargs):
         """ Optimize the (hyper)parameters of the Gaussian Process.
         
         Run the inference method.
@@ -100,7 +100,10 @@ class Inference:
             if priors is None:
                 raise ValueError("Priors must be provided for nested sampling.")
             use_stepsampler = kwargs.pop('use_stepsampler',False)
-            results, sampler = self.nested_sampling(priors=priors,verbose=verbose,use_stepsampler=use_stepsampler,**kwargs)
+            if 'user_likelihood' in kwargs:
+                print("user_likelihood is used please check the documentation.")
+            user_likelihood = kwargs.pop('user_likelihood',self.process.wrapper_log_marginal_likelihood)
+            results, sampler = self.nested_sampling(priors=priors,user_likelihood=user_likelihood,verbose=verbose,use_stepsampler=use_stepsampler,**kwargs)
         else:
             raise ValueError("The method must be 'NS'.")
         comm.Barrier()
@@ -113,7 +116,7 @@ class Inference:
             print(self.process)
         return results
         
-    def nested_sampling(self,priors,verbose=True,use_stepsampler=False,**kwargs):
+    def nested_sampling(self,priors,user_likelihood,verbose=True,use_stepsampler=False,**kwargs):
         r""" Optimize the (hyper)parameters of the Gaussian Process with nested sampling via ultranest.
 
         Perform nested sampling to optimize the (hyper)parameters of the Gaussian Process.    
@@ -143,7 +146,7 @@ class Inference:
         viz = {} if verbose else  {'show_status': False , 'viz_callback': void}
         free_names = self.process.model.parameters.free_names
         slice_steps = kwargs.get('slice_steps',100)
-        sampler = ultranest.ReactiveNestedSampler(free_names, self.process.wrapper_log_marginal_likelihood,priors,resume=resume,log_dir=log_dir)
+        sampler = ultranest.ReactiveNestedSampler(free_names,user_likelihood ,priors,resume=resume,log_dir=log_dir)
         if use_stepsampler: sampler.stepsampler = ultranest.stepsampler.SliceSampler(nsteps=slice_steps,
                                                 generate_direction=ultranest.stepsampler.generate_mixture_random_direction)
         
