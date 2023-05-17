@@ -103,3 +103,17 @@ def PowerSpectrum(f: jax.Array,alpha,beta,sigma) -> jax.Array:
     den = jnp.polyval(alpha,2j*jnp.pi*f)
     P = (sigma  * jnp.abs(num)**2 /jnp.abs(den)**2).flatten()
     return P
+
+def Autocovariance(tau,roots_AR,beta,sigma):
+    Frac = 0
+    q = beta.shape[0]
+    for k, r in enumerate(roots_AR):
+        A, B = 0, 0
+        for l in range(q):
+            A += beta[l]*r**l
+            B += beta[l]*(-r)**l
+        Den = -2*jnp.real(r)
+        for l, root_AR_bis in enumerate(jnp.delete(roots_AR,k)):
+            Den *= (root_AR_bis - r)*(jnp.conjugate(root_AR_bis) + r)
+        Frac += A*B/Den*jnp.exp(r*tau)
+    return sigma**2 * Frac.real

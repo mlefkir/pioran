@@ -97,7 +97,7 @@ class CARMAProcess(eqx.Module):
     def compute_predictive_distribution(self,**kwargs):
         acvf = CARMA_covariance(p=self.model.p,q=self.model.q,
                                 AR_quad=self.model.get_AR_quads(),
-                                beta = self.model.get_MA_coeffs()[1:])
+                                beta = self.model.get_MA_coeffs()[1:] if self.model.q > 0 else None)
         gp = GaussianProcess(function=acvf,observation_indexes=self.observation_indexes,
                              observation_values=self.observation_values,observation_errors=self.observation_errors,
                              estimate_mean=self.estimate_mean,scale_errors=self.scale_errors)
