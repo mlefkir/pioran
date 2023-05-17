@@ -100,7 +100,8 @@ class PSDToACV(eqx.Module):
         self.f0 = f_min_obs/S_low
         self.fN = f_max_obs*S_high
         self.n_freq_grid = int(jnp.ceil(self.fN/self.f0)) + 1 
-        self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0)
+        # self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0) my biggest mistake...
+        self.frequencies = jnp.arange(self.f0,self.fN+self.f0,self.f0)
         tau_max = .5/self.f0#0.5/self.f0
         self.dtau = tau_max/(self.n_freq_grid-1) 
         self.tau = jnp.arange(0,tau_max+self.dtau,self.dtau)

@@ -2,7 +2,7 @@ import jax.numpy as jnp
 
 from .parameters import ParametersModel
 from .psd_base import PowerSpectralDensity
-
+import scipy.special as sp
 
 class Lorentzian(PowerSpectralDensity):
     """Class for the Lorentzian power spectral density.
@@ -251,8 +251,9 @@ class MultipleBendingPowerLaw(PowerSpectralDensity):
         :obj:`jax.Array`
             Power spectral density function evaluated on the array of frequencies.
         """
-        P = self.parameters[f'amplitude'].value/ jnp.power( f / self.parameters[f'freq_0'].value , self.parameters[f'index_0'].value )
+        P = self.parameters[f'amplitude'].value* jnp.power( f / self.parameters[f'freq_0'].value , -self.parameters[f'index_0'].value )
         for i in range(1,1+self.N):
             P /=   (1 + jnp.power( f / self.parameters[f'freq_{i}'].value ,
-                    self.parameters[f'index_{i-1}'].value-self.parameters[f'index_{i}'].value ) )
+                    self.parameters[f'index_{i}'].value-self.parameters[f'index_{i-1}'].value ) )
+        P /= ( jnp.trapz(P)*(f[1]-f[0]))
         return P
