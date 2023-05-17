@@ -5,6 +5,7 @@ from typing import Union
 
 from mpi4py import MPI
 import ultranest
+import ultranest.stepsampler
 
 from .core import GaussianProcess
 from .carma_core import CARMAProcess
@@ -98,7 +99,8 @@ class Inference:
         if self.method == "NS":
             if priors is None:
                 raise ValueError("Priors must be provided for nested sampling.")
-            results, sampler = self.nested_sampling(priors=priors,verbose=verbose,**kwargs)
+            use_stepsampler = kwargs.pop('use_stepsampler',False)
+            results, sampler = self.nested_sampling(priors=priors,verbose=verbose,use_stepsampler=use_stepsampler,**kwargs)
         else:
             raise ValueError("The method must be 'NS'.")
         comm.Barrier()
@@ -111,7 +113,7 @@ class Inference:
             print(self.process)
         return results
         
-    def nested_sampling(self,priors,verbose=True,**kwargs):
+    def nested_sampling(self,priors,verbose=True,use_stepsampler=False,**kwargs):
         r""" Optimize the (hyper)parameters of the Gaussian Process with nested sampling via ultranest.
 
         Perform nested sampling to optimize the (hyper)parameters of the Gaussian Process.    
@@ -140,7 +142,11 @@ class Inference:
         run_kwargs = kwargs.get('run_kwargs',{})
         viz = {} if verbose else  {'show_status': False , 'viz_callback': void}
         free_names = self.process.model.parameters.free_names
+        slice_steps = kwargs.get('slice_steps',100)
         sampler = ultranest.ReactiveNestedSampler(free_names, self.process.wrapper_log_marginal_likelihood,priors,resume=resume,log_dir=log_dir)
+        if use_stepsampler: sampler.stepsampler = ultranest.stepsampler.SliceSampler(nsteps=slice_steps,
+                                                generate_direction=ultranest.stepsampler.generate_mixture_random_direction)
+        
         if verbose: results = sampler.run(**viz)
         else: results = sampler.run(**run_kwargs, **viz)
         
