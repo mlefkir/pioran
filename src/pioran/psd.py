@@ -253,7 +253,7 @@ class MultipleBendingPowerLaw(PowerSpectralDensity):
         """
         P = jnp.power( f / self.parameters[f'freq_0'].value , -self.parameters[f'index_0'].value )
         for i in range(1,1+self.N):
-            P /=   (1 + jnp.power( f / self.parameters[f'freq_{i}'].value ,
+            P *=   1/(1 + jnp.power( f / self.parameters[f'freq_{i}'].value ,
                     self.parameters[f'index_{i}'].value-self.parameters[f'index_{i-1}'].value ) )
-        P /= ( jnp.trapz(P)*(f[1]-f[0]))
+        # P /= ( jnp.trapz(P)*(f[1]-f[0]))
         return P* self.parameters[f'amplitude'].value
