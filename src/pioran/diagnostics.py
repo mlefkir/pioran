@@ -89,6 +89,7 @@ class Visualisations:
             else:
                 if isinstance(self.process.model,PSDToACV):
                     # posterior_PSD = jnp.array([self.process.model.PSD(self.frequencies,params[i]) for i in range(samples.shape[0])])
+                    
                     raise NotImplementedError("Posterior predictive PSDs are not implemented for Gaussian processes.")
                 
             plot_posterior_predictive_PSD(f=self.frequencies,posterior_PSD=posterior_PSD,x=self.x,
