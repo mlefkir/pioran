@@ -56,7 +56,7 @@ class Visualisations:
                 print('Converting CARMA samples to coefficients...')
                 alpha = [quad_to_coeff(samples[i,1:self.process.p+1]) for i in range(samples.shape[0])]
                 sigma = samples[:,0]
-                roots = roots = [jnp.roots(alpha[i])[::-1] for i in range(samples.shape[0])]
+                roots = [jnp.unique(jnp.roots(alpha[i]))[::-1] for i in range(samples.shape[0])]
                 if self.process.q > 0:
                     beta = samples[:,self.process.p+1:self.process.p+1+self.process.q]                
             elif self.process.p == 1:
