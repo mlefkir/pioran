@@ -61,8 +61,11 @@ class CARMAProcess(eqx.Module):
         # set the model
         start_AR_quad = kwargs.get('AR_quad',jnp.ones(self.p))
         start_beta = kwargs.get('beta',jnp.ones(self.q) if self.q > 0 else None)
-        self.model = CARMA_model(p,q,AR_quad=start_AR_quad,beta=start_beta,**kwargs)
-
+        use_beta = kwargs.get('use_beta',True)
+        if use_beta and self.q > 1:
+            self.model = CARMA_model(p,q,AR_quad=start_AR_quad,beta=start_beta,**kwargs)
+        else:
+            self.model = CARMA_model(p,q,AR_quad=start_AR_quad,MA_quad=start_beta,**kwargs)
         # add a factor to scale the errors
         self.scale_errors = kwargs.get("scale_errors", True)
         if self.scale_errors and (observation_errors is not None):

@@ -167,7 +167,7 @@ def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize
         fig.show()
     return fig,ax
 
-def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidence_bands=[68,95],xlabel=r'Time lag (d)',**kwargs):
+def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidence_bands=[68,95],xlabel=r'Time lag (d)',save_data=False,**kwargs):
     
 
     percentiles = jnp.sort(jnp.hstack(((50-np.array(confidence_bands)/2,50+np.array(confidence_bands)/2))))
@@ -187,9 +187,10 @@ def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidenc
     
     # Compute the ICCF of the data
     ccf, taulist, npts = xcor(x,y,x,y,tlagmin=0,tlagmax=x[-1]/2,tunit=np.mean(np.diff(x))/2,imode=0)
-    ax.plot(-taulist,ccf,label='ICCF',c='C2')
     
+    np.savetxt(f'{filename}_posterior_predictive_ACF.txt',jnp.vstack((tau,acf_median,acf_quantiles,-taulist,ccf)).T,header=f'tau,acf_median,acf_quantiles({percentiles}),taulist,ccf')
     
+    ax.plot(-taulist,ccf,label='ICCF',c='C2')   
     ax.legend()
     ax.margins(x=0,y=0)
     ax.set_xlabel(xlabel)
@@ -220,6 +221,9 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,filename,with_mean=False,c
     # compute the Lomb-Scargle periodogram
     LS_periodogram = scipy.signal.lombscargle(x,y,2*np.pi*f,precenter=True)    
     ax.loglog(f,LS_periodogram,color='C2',label='Lomb-Scargle')
+    
+    np.savetxt(f'{filename}_posterior_predictive_PSD.txt',jnp.vstack((f,psd_median,PSD_quantiles,LS_periodogram)).T,
+               header=f'f,psd_median,psd_quantiles({percentiles}),LS_periodogram')
     
     if ylim is None:
         ax.set_ylim(bottom=np.min(LS_periodogram)/1e3)

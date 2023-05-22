@@ -6,7 +6,7 @@ import jax.numpy as jnp
 
 from .parameters import ParametersModel
 from .tools import Array_type
-from .utils.carma_utils import (get_U, get_V, lorentzians_to_roots,
+from .utils.carma_utils import (get_U, get_V, lorentzians_to_roots,MA_quad_to_coeff,
                                 quad_to_coeff, quad_to_roots, roots_to_quad)
 
 
@@ -46,8 +46,9 @@ class CARMA_model(eqx.Module):
     q: int
     _p: int
     _q: int
+    use_beta: bool
     
-    def __init__(self, p, q, AR_quad=None, beta=None, lorentzian_centroids=None, lorentzian_widths=None,weights=None,**kwargs) -> None:
+    def __init__(self, p, q, AR_quad=None,MA_quad=None, beta=None,use_beta=True, lorentzian_centroids=None, lorentzian_widths=None,weights=None,**kwargs) -> None:
         """Constructor method
         """
         sigma = kwargs.get("sigma",1)
@@ -60,7 +61,7 @@ class CARMA_model(eqx.Module):
         self._p = p+1
         self._q = q+1
         self.ndims = 1
-        
+        self.use_beta = use_beta
         # if we provide the quadratic coefficients 
         if AR_quad is not None:
             
@@ -76,19 +77,29 @@ class CARMA_model(eqx.Module):
             # set the MA parameters
             
             if self.q == 0:
-                assert beta is None, "beta must be None if q = 0"
-            self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
+                assert beta is None and MA_quad is None, "beta must be None if q = 0"
+                self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
+
             if self.q > 0:
-                if beta is None:
+                if beta is None and self.use_beta:
                     raise ValueError("beta is required if q >= 1")
+                elif MA_quad is None and not self.use_beta:
+                    raise ValueError("MA_quad is required if q >= 1")
                 
-                assert len(beta) == self.q, "weights must have length q"
-                for i,ma in enumerate(beta):
-                    self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
-            for i in range(self.q,self.p-1):
-                self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
+                if self.use_beta:
+                    self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
+                    assert len(beta) == self.q, "weights must have length q"
+                    for i,ma in enumerate(beta):
+                        self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
+                else:
+                    assert len(MA_quad) == self.q, "MA_quad must have length q"
+                    for i,ma in enumerate(MA_quad):
+                        self.parameters.append(f"b_{i+1}",float(ma),True,hyperparameter=True)
+            if self.use_beta:
+                for i in range(self.q,self.p-1):
+                    self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
                 
-        elif lorentzian_centroids is not None and lorentzian_widths is not None and weights is not None:
+        elif lorentzian_centroids is not None and lorentzian_widths is not None :
              
             assert len(lorentzian_centroids) == len(lorentzian_widths), "lorentzian_centroids and lorentzian_widths must have the same length"
             if self.p % 2 == 0:
@@ -179,7 +190,7 @@ class CARMA_model(eqx.Module):
         :obj:`jax.Array`
             Quadratic coefficients of the MA part of the model.
         """
-        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self.p)])
+        return jnp.array([self.parameters[f"b_{i}"].value for i in range(1,self.q+1)])
        
     def get_AR_coeffs(self) -> jax.Array:
         r"""Returns the coefficients of the AR part of the model.
@@ -209,7 +220,10 @@ class CARMA_model(eqx.Module):
         :obj:`jax.Array`
             Quadratic coefficients of the AR part of the model.
         """
-        return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self.p)])
+        if self.use_beta:
+            return jnp.array([self.parameters[f"beta_{i}"].value for i in range(self.p)])
+        else:
+            return jnp.append(MA_quad_to_coeff(self.q,self.get_MA_quads()),jnp.zeros(self.p-self.q-1))
     
     def get_AR_roots(self) -> jax.Array:
         r"""Returns the roots of the AR part of the model.

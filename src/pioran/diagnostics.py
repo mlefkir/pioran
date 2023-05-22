@@ -1,7 +1,9 @@
+import os
 from typing import Union
 
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
+import numpy as np
 
 from .acvf import CARMA_covariance
 from .acvf_base import CovarianceFunction
@@ -35,6 +37,8 @@ class Visualisations:
         self.frequencies = jnp.logspace(jnp.log10(self.f_min),jnp.log10(self.f_max),n_frequencies)
         self.tau = jnp.linspace(0,self.x[-1],1000)
         self.filename_prefix = filename
+        if not os.path.isdir(f'{self.filename_prefix}/data/'):
+            os.makedirs(f'{self.filename_prefix}/data/')
         
         
     def plot_timeseries_diagnostics(self,**kwargs) -> None:
@@ -58,7 +62,8 @@ class Visualisations:
                 sigma = samples[:,0]
                 roots = [jnp.unique(jnp.roots(alpha[i]))[::-1] for i in range(samples.shape[0])]
                 if self.process.q > 0:
-                    beta = samples[:,self.process.p+1:self.process.p+1+self.process.q]                
+                    beta = samples[:,self.process.p+1:self.process.p+1+self.process.q] 
+                                   
             elif self.process.p == 1:
                 alpha = samples[:,1]
                 sigma = samples[:,0]
@@ -91,9 +96,10 @@ class Visualisations:
                     # posterior_PSD = jnp.array([self.process.model.PSD(self.frequencies,params[i]) for i in range(samples.shape[0])])
                     
                     raise NotImplementedError("Posterior predictive PSDs are not implemented for Gaussian processes.")
-                
+            
+            # plot the posterior predictive PSDs
             plot_posterior_predictive_PSD(f=self.frequencies,posterior_PSD=posterior_PSD,x=self.x,
-                                 y=self.y,filename=self.filename_prefix,**kwargs)
+                                 y=self.y,filename=self.filename_prefix,save_data=True,**kwargs)
         
         # plot the posterior predictive ACFs
         if plot_ACVF:
@@ -112,4 +118,4 @@ class Visualisations:
             
             print("Plotting posterior predictive ACFs...")
             plot_posterior_predictive_ACF(tau=self.tau,acf=posterior_ACVF,
-                                           x=self.x,y=self.y,filename=self.filename_prefix,**kwargs)
+                                           x=self.x,y=self.y,filename=self.filename_prefix,save_data=True,**kwargs)

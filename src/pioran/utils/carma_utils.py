@@ -29,6 +29,34 @@ def roots_to_quad(roots: jax.Array) -> jax.Array:
         quad = jnp.append(quad,-roots[-1].real)
     return quad
 
+def MA_quad_to_coeff(q,quad: jax.Array) -> jax.Array:
+    """Convert the coefficients quad of the quadratic polynomial to the coefficients alpha of the AR polynomial
+    
+    Parameters
+    ----------
+    quad : :obj:`jax.Array`
+        Coefficients quad of the quadratic polynomial
+    
+    Returns
+    -------
+    :obj:`jax.Array`
+        Coefficients alpha of the AR polynomial
+    """
+    MA_roots = quad_to_roots(quad)
+    beta = jnp.poly(MA_roots)
+    # code below does not work with JIT as it uses indexes
+    # n_products = jnp.ceil(q/2).astype(int)
+    # beta = jnp.array([1, quad[1], quad[0]])
+    # print(n_products)
+    # if q >2:
+    #     for k in range(2,n_products):
+    #         beta = jnp.polymul(beta, jnp.array([1, quad[k+1], quad[k]]), trim_leading_zeros=True)
+    #     if q%2==1:
+    #         beta = jnp.polymul(beta, jnp.array([1, quad[-1]]), trim_leading_zeros=True)
+    #     else:
+    #         beta = jnp.polymul(beta, jnp.array([1, quad[-1], quad[-2]]), trim_leading_zeros=True)
+    return (beta/beta[-1])[::-1]
+
 def quad_to_coeff(quad: jax.Array) -> jax.Array:
     """Convert the coefficients quad of the quadratic polynomial to the coefficients alpha of the AR polynomial
     

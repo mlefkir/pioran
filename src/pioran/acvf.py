@@ -399,7 +399,7 @@ class CARMA_covariance(CovarianceFunction):
             for i in range(self.q,self.p-1):
                 self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
                 
-        elif lorentzian_centroids is not None and lorentzian_widths is not None and weights is not None:
+        elif lorentzian_centroids is not None and lorentzian_widths is not None:
              
             assert len(lorentzian_centroids) == len(lorentzian_widths), "lorentzian_centroids and lorentzian_widths must have the same length"
             if self.p % 2 == 0:
