@@ -29,17 +29,7 @@ class CARMAProcess(eqx.Module):
     scale_errors: bool
     nb_prediction_points: int
     S_low: float
-    S_high: float
-    log_max: float
-    log_max_MA: float
-    log_min: float
-    log_min_MA: float
-    prior_sigma: float
-    nu_max: float
-    nu_min: float
-    mu_max: float
-    mu_min: float
-    
+    S_high: float   
     
     def __init__(self,p: int,q: int,observation_indexes: jax.Array,observation_values: jax.Array,observation_errors=None,**kwargs) -> None:
         
@@ -62,11 +52,11 @@ class CARMAProcess(eqx.Module):
         # set the model
         start_AR_quad = kwargs.get('AR_quad',jnp.ones(self.p))
         start_beta = kwargs.get('beta',jnp.ones(self.q) if self.q > 0 else None)
-        self.use_beta = kwargs.get('use_beta',True)
-        if self.use_beta and self.q > 1:
-            self.model = CARMA_model(p,q,AR_quad=start_AR_quad,beta=start_beta,**kwargs)
+        self.use_beta = kwargs.pop('use_beta',True)
+        if self.use_beta and self.q >= 1:
+            self.model = CARMA_model(p,q,AR_quad=start_AR_quad,beta=start_beta,use_beta=self.use_beta,**kwargs)
         else:
-            self.model = CARMA_model(p,q,AR_quad=start_AR_quad,MA_quad=start_beta,**kwargs)
+            self.model = CARMA_model(p,q,AR_quad=start_AR_quad,MA_quad=start_beta,use_beta=self.use_beta,**kwargs)
         # add a factor to scale the errors
         self.scale_errors = kwargs.get("scale_errors", True)
         if self.scale_errors and (observation_errors is not None):
@@ -116,51 +106,7 @@ class CARMAProcess(eqx.Module):
         
     def compute_log_marginal_likelihood(self) -> float:
         return self.kalman.log_likelihood()
-    
-    def set_priors_limits(self):
         
-        # sigma
-        std_obs = jnp.std(self.observation_values)
-        self.prior_sigma = std_obs * 3
-        
-        # AR_quad
-        f_min = 1/(self.observation_indexes[-1]-self.observation_indexes[0])
-        f_max = .5/jnp.min(jnp.diff(self.observation_indexes))
-        self.log_min = (f_min / self.S_low)
-        self.log_max = (f_max * self.S_high)
-        
-        # MA_coefs
-        self.log_min_MA = -2
-        self.log_max_MA = 2
-    
-        # nu
-        self.nu_max = 5
-        self.nu_min = 1e-1
-        
-        # mu
-        self.mu_max = 10*jnp.abs(jnp.mean(self.observation_values))
-        self.mu_min = -10*jnp.abs(jnp.mean(self.observation_values))
-        
-        
-        return
-        
-    
-    # def priors(self,cube):
-    #     params = cube.copy()
-        
-    #     params[0] = params[0]*self.prior_sigma
-    #     for i in range(1,self.p+1):
-    #         params[i] = 10**(params[i]*(self.log_max-self.log_min)+self.log_min)
-    #     for i in range(self.p+1,self.p+self.q+1):
-    #         params[i] = 10**(params[i]*(self.log_max_MA-self.log_min_MA)+self.log_min_MA)
-    #     i = self.p+self.q
-    #     if self.scale_errors:
-    #         params[i+1] = params[i+1]*(self.nu_max-self.nu_min)+self.nu_min
-    #     if self.estimate_mean:
-    #         params[i+2] = params[i+2]*(self.mu_max-self.mu_min)+self.mu_min
-    #     return params    
-        
-    
     @eqx.filter_jit
     def wrapper_log_marginal_likelihood(self,params) -> float:
         self.model.parameters.set_free_values(params)

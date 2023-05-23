@@ -188,8 +188,9 @@ def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidenc
     # Compute the ICCF of the data
     ccf, taulist, npts = xcor(x,y,x,y,tlagmin=0,tlagmax=x[-1]/2,tunit=np.mean(np.diff(x))/2,imode=0)
     
-    np.savetxt(f'{filename}_posterior_predictive_ACF.txt',jnp.vstack((tau,acf_median,acf_quantiles,-taulist,ccf)).T,header=f'tau,acf_median,acf_quantiles({percentiles}),taulist,ccf')
-    
+    if save_data:
+        np.savetxt(f'{filename}_posterior_predictive_ACF.txt',jnp.vstack([tau,acf_median,acf_quantiles]),header='tau,acf_median,acf_quantiles')
+        np.savetxt(f'{filename}_ICCF.txt',jnp.vstack([taulist,ccf]),header='taulist,ccf')    
     ax.plot(-taulist,ccf,label='ICCF',c='C2')   
     ax.legend()
     ax.margins(x=0,y=0)

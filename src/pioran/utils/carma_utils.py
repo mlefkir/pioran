@@ -24,12 +24,12 @@ def initialise_CARMA_object(self, p, q, AR_quad=None,MA_quad=None, beta=None,use
                 self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
 
             if self.q > 0:
-                if beta is None and self.use_beta:
+                if beta is None and use_beta:
                     raise ValueError("beta is required if q >= 1")
                 elif MA_quad is None and not self.use_beta:
                     raise ValueError("MA_quad is required if q >= 1")
                 
-                if self.use_beta:
+                if use_beta:
                     self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
                     assert len(beta) == self.q, "weights must have length q"
                     for i,ma in enumerate(beta):
@@ -38,7 +38,7 @@ def initialise_CARMA_object(self, p, q, AR_quad=None,MA_quad=None, beta=None,use
                     assert len(MA_quad) == self.q, "MA_quad must have length q"
                     for i,ma in enumerate(MA_quad):
                         self.parameters.append(f"b_{i+1}",float(ma),True,hyperparameter=True)
-            if self.use_beta:
+            if use_beta:
                 for i in range(self.q,self.p-1):
                     self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
                 
