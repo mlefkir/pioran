@@ -24,6 +24,7 @@ class CARMAProcess(eqx.Module):
     prediction_indexes: jax.Array
     model: CARMA_model
     kalman: KalmanFilter
+    use_beta: bool
     estimate_mean: bool
     scale_errors: bool
     nb_prediction_points: int
@@ -61,8 +62,8 @@ class CARMAProcess(eqx.Module):
         # set the model
         start_AR_quad = kwargs.get('AR_quad',jnp.ones(self.p))
         start_beta = kwargs.get('beta',jnp.ones(self.q) if self.q > 0 else None)
-        use_beta = kwargs.get('use_beta',True)
-        if use_beta and self.q > 1:
+        self.use_beta = kwargs.get('use_beta',True)
+        if self.use_beta and self.q > 1:
             self.model = CARMA_model(p,q,AR_quad=start_AR_quad,beta=start_beta,**kwargs)
         else:
             self.model = CARMA_model(p,q,AR_quad=start_AR_quad,MA_quad=start_beta,**kwargs)
@@ -98,9 +99,14 @@ class CARMAProcess(eqx.Module):
         
         
     def compute_predictive_distribution(self,**kwargs):
-        acvf = CARMA_covariance(p=self.model.p,q=self.model.q,
-                                AR_quad=self.model.get_AR_quads(),
-                                beta = self.model.get_MA_coeffs()[1:] if self.model.q > 0 else None)
+        if self.use_beta:
+            acvf = CARMA_covariance(p=self.model.p,q=self.model.q,
+                                    AR_quad=self.model.get_AR_quads(),
+                                    beta = self.model.get_MA_coeffs()[1:] if self.model.q > 0 else None,use_beta=True)
+        else:
+            acvf = CARMA_covariance(p=self.model.p,q=self.model.q,
+                                    AR_quad=self.model.get_AR_quads(),
+                                    MA_quad = self.model.get_MA_quads() if self.model.q > 0 else None,use_beta=False)
         gp = GaussianProcess(function=acvf,observation_indexes=self.observation_indexes,
                              observation_values=self.observation_values,observation_errors=self.observation_errors,
                              estimate_mean=self.estimate_mean,scale_errors=self.scale_errors)

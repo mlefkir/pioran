@@ -201,7 +201,7 @@ def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidenc
     return fig,ax
 
 
-def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,filename,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$'):
+def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,filename,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$'):
 
     percentiles = jnp.sort(jnp.hstack(((50-np.array(confidence_bands)/2,50+np.array(confidence_bands)/2))))
     fig,ax = plt.subplots(figsize=(10,5))
@@ -222,7 +222,8 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,filename,with_mean=False,c
     LS_periodogram = scipy.signal.lombscargle(x,y,2*np.pi*f,precenter=True)    
     ax.loglog(f,LS_periodogram,color='C2',label='Lomb-Scargle')
     
-    np.savetxt(f'{filename}_posterior_predictive_PSD.txt',jnp.vstack((f,psd_median,PSD_quantiles,LS_periodogram)).T,
+    if save_data:
+        np.savetxt(f'{filename}_posterior_predictive_PSD.txt',jnp.vstack((f,psd_median,PSD_quantiles,LS_periodogram)).T,
                header=f'f,psd_median,psd_quantiles({percentiles}),LS_periodogram')
     
     if ylim is None:

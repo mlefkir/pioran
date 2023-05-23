@@ -1,6 +1,76 @@
 import jax
 import jax.numpy as jnp
+from ..tools import Array_type
 
+
+def initialise_CARMA_object(self, p, q, AR_quad=None,MA_quad=None, beta=None,use_beta=True, lorentzian_centroids=None, lorentzian_widths=None,weights=None,**kwargs) -> None:
+    
+        # if we provide the quadratic coefficients 
+        if AR_quad is not None:
+            
+            # set the AR parameters
+            if isinstance(AR_quad,Array_type):
+                assert len(AR_quad) == self.p, "AR_quad must have length p"
+                for i,ar in enumerate(AR_quad):
+                    self.parameters.append(f"a_{i+1}",ar,True,hyperparameter=True)
+            else:
+                assert self.p == 1, "p must be 1 if AR_quad is not an array"
+                self.parameters.append(f"a_1",AR_quad,True,hyperparameter=True)
+            
+            # set the MA parameters
+            
+            if self.q == 0:
+                assert beta is None and MA_quad is None, "beta must be None if q = 0"
+                self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
+
+            if self.q > 0:
+                if beta is None and self.use_beta:
+                    raise ValueError("beta is required if q >= 1")
+                elif MA_quad is None and not self.use_beta:
+                    raise ValueError("MA_quad is required if q >= 1")
+                
+                if self.use_beta:
+                    self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
+                    assert len(beta) == self.q, "weights must have length q"
+                    for i,ma in enumerate(beta):
+                        self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
+                else:
+                    assert len(MA_quad) == self.q, "MA_quad must have length q"
+                    for i,ma in enumerate(MA_quad):
+                        self.parameters.append(f"b_{i+1}",float(ma),True,hyperparameter=True)
+            if self.use_beta:
+                for i in range(self.q,self.p-1):
+                    self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
+                
+        elif lorentzian_centroids is not None and lorentzian_widths is not None :
+             
+            assert len(lorentzian_centroids) == len(lorentzian_widths), "lorentzian_centroids and lorentzian_widths must have the same length"
+            if self.p % 2 == 0:
+                assert jnp.count_nonzero(lorentzian_centroids) == len(lorentzian_centroids), "When p is even, lorentzian_centroids must have non-zero elements"
+                assert len(lorentzian_centroids) == self.p//2, "lorentzian_centroids must have p//2 non-zero elements"
+            else:
+                assert jnp.count_nonzero(lorentzian_centroids)+1 == len(lorentzian_centroids), "When p is odd, lorentzian_centroids must have p//2+1 non-zero elements"
+                assert jnp.count_nonzero(lorentzian_centroids) == (self.p-1)//2, "lorentzian_centroids must have p//2+1 non-zero elements"
+
+            roots = lorentzians_to_roots(lorentzian_widths,lorentzian_centroids)
+            AR_quad = roots_to_quad(roots)
+            for i,ar in enumerate(AR_quad):
+                    self.parameters.append(f"a_{i+1}",float(ar),True,hyperparameter=True)
+            self.parameters.append("beta_0",float(1.),False,hyperparameter=True)
+            
+            if self.q == 0:
+                assert weights is None, "weights must be None if q = 0"
+            else:
+                assert len(weights) == self.q, "weights must have length q"
+                for i,ma in enumerate(weights):
+                        self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
+            for i in range(self.q,self.p-1):
+                self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
+        else:
+            raise ValueError("Either AR_roots and MA_roots or AR_quad and MA_quad or lorentzian_centroids, lorentzian_widths and weights must be provided")
+
+    
+    
 
 def quad_to_roots(quad: jax.Array) -> jax.Array:
     """Convert the coefficients of the quadratic form to coefficients of the AR polynomial."""

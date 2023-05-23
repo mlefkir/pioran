@@ -1,13 +1,12 @@
-from typing import Union, Tuple, List, Optional
+from typing import Union, Tuple, Optional
 
 import equinox as eqx
 import jax
 import jax.numpy as jnp
 
 from .parameters import ParametersModel
-from .tools import Array_type
-from .utils.carma_utils import (get_U, get_V, lorentzians_to_roots,MA_quad_to_coeff,
-                                quad_to_coeff, quad_to_roots, roots_to_quad)
+from .utils.carma_utils import (get_U, get_V,MA_quad_to_coeff,
+                                quad_to_coeff, quad_to_roots, initialise_CARMA_object)
 
 
 class CARMA_model(eqx.Module):
@@ -62,69 +61,8 @@ class CARMA_model(eqx.Module):
         self._q = q+1
         self.ndims = 1
         self.use_beta = use_beta
-        # if we provide the quadratic coefficients 
-        if AR_quad is not None:
-            
-            # set the AR parameters
-            if isinstance(AR_quad,Array_type):
-                assert len(AR_quad) == self.p, "AR_quad must have length p"
-                for i,ar in enumerate(AR_quad):
-                    self.parameters.append(f"a_{i+1}",ar,True,hyperparameter=True)
-            else:
-                assert self.p == 1, "p must be 1 if AR_quad is not an array"
-                self.parameters.append(f"a_1",AR_quad,True,hyperparameter=True)
-            
-            # set the MA parameters
-            
-            if self.q == 0:
-                assert beta is None and MA_quad is None, "beta must be None if q = 0"
-                self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
-
-            if self.q > 0:
-                if beta is None and self.use_beta:
-                    raise ValueError("beta is required if q >= 1")
-                elif MA_quad is None and not self.use_beta:
-                    raise ValueError("MA_quad is required if q >= 1")
-                
-                if self.use_beta:
-                    self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
-                    assert len(beta) == self.q, "weights must have length q"
-                    for i,ma in enumerate(beta):
-                        self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
-                else:
-                    assert len(MA_quad) == self.q, "MA_quad must have length q"
-                    for i,ma in enumerate(MA_quad):
-                        self.parameters.append(f"b_{i+1}",float(ma),True,hyperparameter=True)
-            if self.use_beta:
-                for i in range(self.q,self.p-1):
-                    self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
-                
-        elif lorentzian_centroids is not None and lorentzian_widths is not None :
-             
-            assert len(lorentzian_centroids) == len(lorentzian_widths), "lorentzian_centroids and lorentzian_widths must have the same length"
-            if self.p % 2 == 0:
-                assert jnp.count_nonzero(lorentzian_centroids) == len(lorentzian_centroids), "When p is even, lorentzian_centroids must have non-zero elements"
-                assert len(lorentzian_centroids) == self.p//2, "lorentzian_centroids must have p//2 non-zero elements"
-            else:
-                assert jnp.count_nonzero(lorentzian_centroids)+1 == len(lorentzian_centroids), "When p is odd, lorentzian_centroids must have p//2+1 non-zero elements"
-                assert jnp.count_nonzero(lorentzian_centroids) == (self.p-1)//2, "lorentzian_centroids must have p//2+1 non-zero elements"
-
-            roots = lorentzians_to_roots(lorentzian_widths,lorentzian_centroids)
-            AR_quad = roots_to_quad(roots)
-            for i,ar in enumerate(AR_quad):
-                    self.parameters.append(f"a_{i+1}",float(ar),True,hyperparameter=True)
-            self.parameters.append("beta_0",float(1.),False,hyperparameter=True)
-            
-            if self.q == 0:
-                assert weights is None, "weights must be None if q = 0"
-            else:
-                assert len(weights) == self.q, "weights must have length q"
-                for i,ma in enumerate(weights):
-                        self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
-            for i in range(self.q,self.p-1):
-                self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
-        else:
-            raise ValueError("Either AR_roots and MA_roots or AR_quad and MA_quad or lorentzian_centroids, lorentzian_widths and weights must be provided")
+        initialise_CARMA_object(self,p,q, AR_quad,MA_quad, beta,use_beta, lorentzian_centroids, lorentzian_widths,weights,**kwargs)
+        
 
     def __str__(self) ->str:
         r"""String representation of the model.
