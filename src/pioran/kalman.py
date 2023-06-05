@@ -18,7 +18,6 @@ class KalmanFilter(eqx.Module):
         Errors of the observations.
     model : :obj:`CARMA_model`
         CARMA model used for the inference.
-        
     
     """   
     

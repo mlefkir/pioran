@@ -30,9 +30,9 @@
    .. autosummary::
    
       ~GaussianProcess.model
-      ~GaussianProcess.training_indexes
-      ~GaussianProcess.training_errors
-      ~GaussianProcess.training_observables
+      ~GaussianProcess.observation_indexes
+      ~GaussianProcess.observation_errors
+      ~GaussianProcess.observation_values
       ~GaussianProcess.prediction_indexes
       ~GaussianProcess.nb_prediction_points
       ~GaussianProcess.scale_errors

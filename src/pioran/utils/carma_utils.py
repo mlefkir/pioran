@@ -1,76 +1,104 @@
 import jax
 import jax.numpy as jnp
+
 from ..tools import Array_type
 
 
 def initialise_CARMA_object(self, p, q, AR_quad=None,MA_quad=None, beta=None,use_beta=True, lorentzian_centroids=None, lorentzian_widths=None,weights=None,**kwargs) -> None:
+    """Function to initialise the CARMA object for either the CARMA model object or the CARMA covariance function object.
     
-        # if we provide the quadratic coefficients 
-        if AR_quad is not None:
-            
-            # set the AR parameters
-            if isinstance(AR_quad,Array_type):
-                assert len(AR_quad) == self.p, "AR_quad must have length p"
-                for i,ar in enumerate(AR_quad):
-                    self.parameters.append(f"a_{i+1}",ar,True,hyperparameter=True)
-            else:
-                assert self.p == 1, "p must be 1 if AR_quad is not an array"
-                self.parameters.append(f"a_1",AR_quad,True,hyperparameter=True)
-            
-            # set the MA parameters
-            
-            if self.q == 0:
-                assert beta is None and MA_quad is None, "beta must be None if q = 0"
-                self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
-
-            if self.q > 0:
-                if beta is None and use_beta:
-                    raise ValueError("beta is required if q >= 1")
-                elif MA_quad is None and not self.use_beta:
-                    raise ValueError("MA_quad is required if q >= 1")
-                
-                if use_beta:
-                    self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
-                    assert len(beta) == self.q, "weights must have length q"
-                    for i,ma in enumerate(beta):
-                        self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
-                else:
-                    assert len(MA_quad) == self.q, "MA_quad must have length q"
-                    for i,ma in enumerate(MA_quad):
-                        self.parameters.append(f"b_{i+1}",float(ma),True,hyperparameter=True)
-            if use_beta:
-                for i in range(self.q,self.p-1):
-                    self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
-                
-        elif lorentzian_centroids is not None and lorentzian_widths is not None :
-             
-            assert len(lorentzian_centroids) == len(lorentzian_widths), "lorentzian_centroids and lorentzian_widths must have the same length"
-            if self.p % 2 == 0:
-                assert jnp.count_nonzero(lorentzian_centroids) == len(lorentzian_centroids), "When p is even, lorentzian_centroids must have non-zero elements"
-                assert len(lorentzian_centroids) == self.p//2, "lorentzian_centroids must have p//2 non-zero elements"
-            else:
-                assert jnp.count_nonzero(lorentzian_centroids)+1 == len(lorentzian_centroids), "When p is odd, lorentzian_centroids must have p//2+1 non-zero elements"
-                assert jnp.count_nonzero(lorentzian_centroids) == (self.p-1)//2, "lorentzian_centroids must have p//2+1 non-zero elements"
-
-            roots = lorentzians_to_roots(lorentzian_widths,lorentzian_centroids)
-            AR_quad = roots_to_quad(roots)
+    This function is used in the constructor of the CARMA model object and the CARMA covariance function object.
+    
+    Parameters
+    ----------
+    self : :obj:`CARMA_model` or :obj:`CARMA_covariance_function`
+        The CARMA model or covariance function object.
+    p : :obj:`int`
+        Order of the AR polynomial.
+    q : :obj:`int`
+        Order of the MA polynomial.
+    AR_quad : :obj:`Array_type`
+        Quadratic coefficients of the AR polynomial, None if not provided.
+    MA_quad : :obj:`Array_type`
+        Quadratic coefficients of the MA polynomial, None if not provided.
+    beta : :obj:`Array_type`
+        Weights of the MA polynomial, None if not provided.
+    use_beta : :obj:`bool`
+        If True, the MA polynomial is parametrised by the weights beta, otherwise it is parametrised by the quadratic coefficients MA_quad.
+    lorentzian_centroids : :obj:`Array_type`
+        Centroids of the Lorentzian components of the covariance function, None if not provided.
+    lorentzian_widths : :obj:`Array_type`
+        Widths of the Lorentzian components of the covariance function, None if not provided.
+    weights : :obj:`Array_type`
+        Weights of the Lorentzian components of the covariance function, None if not provided, equivalent to beta.
+    **kwargs : :obj:`dict`
+        Keyword arguments for the CARMA model.
+           
+    
+    """
+    # if we provide the quadratic coefficients 
+    if AR_quad is not None:
+        
+        # set the AR parameters
+        if isinstance(AR_quad,Array_type):
+            assert len(AR_quad) == self.p, "AR_quad must have length p"
             for i,ar in enumerate(AR_quad):
-                    self.parameters.append(f"a_{i+1}",float(ar),True,hyperparameter=True)
-            self.parameters.append("beta_0",float(1.),False,hyperparameter=True)
+                self.parameters.append(f"a_{i+1}",ar,True,hyperparameter=True)
+        else:
+            assert self.p == 1, "p must be 1 if AR_quad is not an array"
+            self.parameters.append(f"a_1",AR_quad,True,hyperparameter=True)
+        
+        # set the MA parameters
+        
+        if self.q == 0:
+            assert beta is None and MA_quad is None, "beta must be None if q = 0"
+            self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
+
+        if self.q > 0:
+            if beta is None and use_beta:
+                raise ValueError("beta is required if q >= 1")
+            elif MA_quad is None and not self.use_beta:
+                raise ValueError("MA_quad is required if q >= 1")
             
-            if self.q == 0:
-                assert weights is None, "weights must be None if q = 0"
+            if use_beta:
+                self.parameters.append(f"beta_{0}",1,False,hyperparameter=True)
+                assert len(beta) == self.q, "weights must have length q"
+                for i,ma in enumerate(beta):
+                    self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
             else:
-                assert len(weights) == self.q, "weights must have length q"
-                for i,ma in enumerate(weights):
-                        self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
+                assert len(MA_quad) == self.q, "MA_quad must have length q"
+                for i,ma in enumerate(MA_quad):
+                    self.parameters.append(f"b_{i+1}",float(ma),True,hyperparameter=True)
+        if use_beta:
             for i in range(self.q,self.p-1):
                 self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
+            
+    elif lorentzian_centroids is not None and lorentzian_widths is not None :
+            
+        assert len(lorentzian_centroids) == len(lorentzian_widths), "lorentzian_centroids and lorentzian_widths must have the same length"
+        if self.p % 2 == 0:
+            assert jnp.count_nonzero(lorentzian_centroids) == len(lorentzian_centroids), "When p is even, lorentzian_centroids must have non-zero elements"
+            assert len(lorentzian_centroids) == self.p//2, "lorentzian_centroids must have p//2 non-zero elements"
         else:
-            raise ValueError("Either AR_roots and MA_roots or AR_quad and MA_quad or lorentzian_centroids, lorentzian_widths and weights must be provided")
+            assert jnp.count_nonzero(lorentzian_centroids)+1 == len(lorentzian_centroids), "When p is odd, lorentzian_centroids must have p//2+1 non-zero elements"
+            assert jnp.count_nonzero(lorentzian_centroids) == (self.p-1)//2, "lorentzian_centroids must have p//2+1 non-zero elements"
 
-    
-    
+        roots = lorentzians_to_roots(lorentzian_widths,lorentzian_centroids)
+        AR_quad = roots_to_quad(roots)
+        for i,ar in enumerate(AR_quad):
+                self.parameters.append(f"a_{i+1}",float(ar),True,hyperparameter=True)
+        self.parameters.append("beta_0",float(1.),False,hyperparameter=True)
+        
+        if self.q == 0:
+            assert weights is None, "weights must be None if q = 0"
+        else:
+            assert len(weights) == self.q, "weights must have length q"
+            for i,ma in enumerate(weights):
+                    self.parameters.append(f"beta_{i+1}",float(ma),True,hyperparameter=True)
+        for i in range(self.q,self.p-1):
+            self.parameters.append(f"beta_{i+1}",float(0.),False,hyperparameter=True)
+    else:
+        raise ValueError("Either AR_roots and MA_roots or AR_quad and MA_quad or lorentzian_centroids, lorentzian_widths and weights must be provided")
 
 def quad_to_roots(quad: jax.Array) -> jax.Array:
     """Convert the coefficients of the quadratic form to coefficients of the AR polynomial."""
@@ -152,7 +180,21 @@ def quad_to_coeff(quad: jax.Array) -> jax.Array:
     return alpha
 
 def lorentzians_to_roots(Widths: jax.Array, Centroids: jax.Array) -> jax.Array:
-    """Convert the widths and centroids of the Lorentzian functions to the roots of the AR polynomial."""
+    """Convert the widths and centroids of the Lorentzian functions to the roots of the AR polynomial.
+    
+    Parameters
+    ----------
+    Widths : :obj:`jax.Array`
+        Widths of the Lorentzian functions.
+    Centroids : :obj:`jax.Array`
+        Centroids of the Lorentzian functions.
+    
+    Returns
+    -------
+    :obj:`jax.Array`
+        Roots of the AR polynomial.
+    
+    """
     N = len(Widths)
     _Centroids = jnp.insert(Centroids,jnp.arange(1,N+1),-jnp.roll(Centroids,N))
     Combined_Centroids = jnp.delete(_Centroids,jnp.where(_Centroids==0)[0][1::2])
@@ -176,7 +218,7 @@ def get_V(J: jax.Array, roots_AR: jax.Array) -> jax.Array:
     V = jnp.conj(num/den.T)
     return V.T
 
-def PowerSpectrum(f: jax.Array,alpha,beta,sigma) -> jax.Array:
+def CARMA_powerspectrum(f: jax.Array,alpha,beta,sigma) -> jax.Array:
     r"""Computes the power spectrum of the CARMA process.
 
     Parameters
@@ -199,10 +241,29 @@ def PowerSpectrum(f: jax.Array,alpha,beta,sigma) -> jax.Array:
 
     num = jnp.polyval(beta[::-1],2j*jnp.pi*f)
     den = jnp.polyval(alpha,2j*jnp.pi*f)
-    P = (sigma  * jnp.abs(num)**2 /jnp.abs(den)**2).flatten()
+    P = (sigma**2  * jnp.abs(num)**2 /jnp.abs(den)**2).flatten()
     return P
 
-def Autocovariance(tau,roots_AR,beta,sigma):
+def CARMA_autocovariance(tau,roots_AR,beta,sigma) -> jax.Array:
+    """Computes the autocovariance of the CARMA process.
+    
+    Parameters
+    ----------
+    tau : :obj:`float`
+        Time lag at which the autocovariance is evaluated.
+    roots_AR : :obj:`jax.Array`
+        Roots of the AR polynomial.
+    beta : :obj:`jax.Array`
+        Coefficients of the MA polynomial.
+    sigma : :obj:`float`
+        Standard deviation of the white noise process.
+    
+    Returns
+    -------
+    :obj:`jax.Array`
+        Autocovariance of the CARMA process.
+    """
+    
     Frac = 0
     q = beta.shape[0]
     for k, r in enumerate(roots_AR):

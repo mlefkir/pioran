@@ -14,11 +14,40 @@ from .plots import (plot_posterior_predictive_ACF,
                     plot_residuals)
 from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
-from .utils.carma_utils import Autocovariance, PowerSpectrum, quad_to_coeff
+from .utils.carma_utils import CARMA_autocovariance, CARMA_powerspectrum, quad_to_coeff,MA_quad_to_coeff
 
 
 class Visualisations:
+    """Class for visualising the results after an inference run.
     
+    Parameters
+    ----------
+    process : Union[GaussianProcess,CARMAProcess]
+        The process to be visualised.
+    filename : str
+        The filename prefix for the output plots.
+    **kwargs
+        Additional keyword arguments.
+        
+    Attributes
+    ----------
+    process : Union[GaussianProcess,CARMAProcess]
+        The process to be visualised.
+    x : jnp.ndarray
+        The observation times.
+    y : jnp.ndarray
+        The observation values.
+    yerr : jnp.ndarray
+        The observation errors.
+    predictive_mean : jnp.ndarray
+        The predictive mean.
+    predictive_cov : jnp.ndarray
+        The predictive covariance.
+    x_pred : jnp.ndarray
+        The prediction times.
+    
+    
+    """
     def __init__(self,process: Union[GaussianProcess,CARMAProcess],filename,**kwargs) -> None:
         self.process = process
         
@@ -42,6 +71,12 @@ class Visualisations:
         
         
     def plot_timeseries_diagnostics(self,**kwargs) -> None:
+        """Plot the timeseries diagnostics.
+
+        This function will call the :func:`plot_prediction` and :func:`plot_residuals` functions to 
+        plot the predicted timeseries and the residuals.
+
+        """
    
         fig,ax = plot_prediction(x=self.x.flatten(),y=self.y.flatten(),yerr=self.yerr.flatten(),x_pred = self.x_pred.flatten(),
                         y_pred=self.predictive_mean.flatten(),cov_pred=self.predictive_cov,filename=self.filename_prefix,**kwargs)
@@ -53,7 +88,17 @@ class Visualisations:
                                   filename=self.filename_prefix,**kwargs)
         
     def posterior_predictive_checks(self,samples,plot_PSD=True,plot_ACVF=True,**kwargs):
-        
+        """Plot the posterior predictive checks.
+
+        Parameters
+        ----------
+        samples : jnp.ndarray
+            The samples from the posterior distribution.
+        plot_PSD : bool, optional
+            Plot the posterior predictive PSDs, by default True
+        plot_ACVF : bool, optional
+            Plot the posterior predictive ACVFs, by default True
+        """
         if isinstance(self.process,CARMAProcess):
             if self.process.p >1:
             
@@ -62,8 +107,10 @@ class Visualisations:
                 sigma = samples[:,0]
                 roots = [jnp.unique(jnp.roots(alpha[i]))[::-1] for i in range(samples.shape[0])]
                 if self.process.q > 0:
-                    beta = samples[:,self.process.p+1:self.process.p+1+self.process.q] 
-                                   
+                    if self.process.use_beta:
+                        beta = samples[:,self.process.p+1:self.process.p+1+self.process.q]
+                    else:
+                        beta = [MA_quad_to_coeff(self.process.q,samples[i,self.process.p+1:self.process.p+1+self.process.q]) for i in range(samples.shape[0])]
             elif self.process.p == 1:
                 alpha = samples[:,1]
                 sigma = samples[:,0]
@@ -86,9 +133,9 @@ class Visualisations:
                     posterior_PSD = jnp.array([sigma[i]/(alpha[i]**2 + 4*jnp.pi**2*self.frequencies) for i in range(samples.shape[0])])
                 else:
                     if self.process.q > 0:
-                        posterior_PSD = jnp.array([PowerSpectrum(self.frequencies,alpha[i],beta[i],sigma[i]) for i in range(samples.shape[0])])
+                        posterior_PSD = jnp.array([CARMA_powerspectrum(self.frequencies,alpha[i],beta[i],sigma[i]) for i in range(samples.shape[0])])
                     else:
-                        posterior_PSD = jnp.array([PowerSpectrum(self.frequencies,roots[i],jnp.append(jnp.array([1]),jnp.zeros(self.process.p-1)),sigma[i]) for i in range(samples.shape[0])])
+                        posterior_PSD = jnp.array([CARMA_powerspectrum(self.frequencies,roots[i],jnp.append(jnp.array([1]),jnp.zeros(self.process.p-1)),sigma[i]) for i in range(samples.shape[0])])
                 print("Plotting posterior predictive PSDs...")
 
             else:
@@ -99,7 +146,7 @@ class Visualisations:
             
             # plot the posterior predictive PSDs
             plot_posterior_predictive_PSD(f=self.frequencies,posterior_PSD=posterior_PSD,x=self.x,
-                                 y=self.y,filename=self.filename_prefix,save_data=True,**kwargs)
+                                 y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,**kwargs)
         
         # plot the posterior predictive ACFs
         if plot_ACVF:
@@ -109,9 +156,9 @@ class Visualisations:
                     posterior_ACVF = jnp.array([.5*sigma[i]/alpha[i]*jnp.exp(-alpha[i]*self.tau) for i in range(samples.shape[0])])
                 else:
                     if self.process.q > 0:
-                        posterior_ACVF = jnp.array([Autocovariance(self.tau,roots[i],beta[i],sigma[i]) for i in range(samples.shape[0])])
+                        posterior_ACVF = jnp.array([CARMA_autocovariance(self.tau,roots[i],beta[i],sigma[i]) for i in range(samples.shape[0])])
                     else:
-                        posterior_ACVF = jnp.array([Autocovariance(self.tau,roots[i],jnp.array([1]),sigma[i]) for i in range(samples.shape[0])])
+                        posterior_ACVF = jnp.array([CARMA_autocovariance(self.tau,roots[i],jnp.array([1]),sigma[i]) for i in range(samples.shape[0])])
             else:
                 raise NotImplementedError("Posterior predictive ACFs are not implemented for Gaussian processes.")
             posterior_ACVF /= posterior_ACVF[:,0,None]

@@ -14,6 +14,55 @@ class CARMAProcess(eqx.Module):
 
     Parameters
     ----------
+    p : :obj:`int`
+        Order of the AR polynomial.
+    q : :obj:`int`
+        Order of the MA polynomial.
+    observation_indexes : :obj:`jax.Array`
+        Indexes of the observations.
+    observation_values : :obj:`jax.Array`
+        Values of the observations.
+    observation_errors : :obj:`jax.Array`
+        Errors of the observations, if None, the errors are set to sqrt(eps).
+    kwargs : :obj:`dict`
+        Additional arguments to pass to the CARMA model.
+        - AR_quad : :obj:`jax.Array`
+            Quadratic coefficients of the AR polynomial.
+        - beta : :obj:`jax.Array`
+            Coefficients of the MA polynomial.
+        - use_beta : :obj:`bool`
+            If True, uses the beta coefficients otherwise uses the quadratic coefficients of the MA polynomial.
+        - scale_errors : :obj:`bool`
+            If True, scales the errors by a factor nu.
+        - estimate_mean : :obj:`bool`
+            If True, estimates the mean of the process.
+
+    Attributes
+    ----------
+    p : :obj:`int`
+        Order of the AR polynomial.
+    q : :obj:`int`
+        Order of the MA polynomial.
+    observation_indexes : :obj:`jax.Array`
+        Indexes of the observations.
+    observation_values : :obj:`jax.Array`
+        Values of the observations.
+    observation_errors : :obj:`jax.Array`
+        Errors of the observations, if None, the errors are set to sqrt(eps).
+    prediction_indexes : :obj:`jax.Array`
+        Indexes of the predictions.
+    model : :obj:`CARMA_model`
+        CARMA model.
+    kalman : :obj:`KalmanFilter`
+        Kalman filter associated to the CARMA model.
+    use_beta : :obj:`bool`
+        If True, uses the beta coefficients otherwise uses the quadratic coefficients of the MA polynomial.
+    scale_errors : :obj:`bool`
+        If True, scales the errors by a factor nu.
+    estimate_mean : :obj:`bool`
+        If True, estimates the mean of the process.
+    nb_prediction_points : :obj:`int`
+        Number of prediction points.   
     
     """
     p: int
@@ -27,9 +76,7 @@ class CARMAProcess(eqx.Module):
     use_beta: bool
     estimate_mean: bool
     scale_errors: bool
-    nb_prediction_points: int
-    S_low: float
-    S_high: float   
+    nb_prediction_points: int 
     
     def __init__(self,p: int,q: int,observation_indexes: jax.Array,observation_values: jax.Array,observation_errors=None,**kwargs) -> None:
         
@@ -78,10 +125,6 @@ class CARMAProcess(eqx.Module):
                                    observation_values=self.observation_values,
                                    observation_errors=self.observation_errors)
     
-        # set the prior scales
-        self.S_low = kwargs.get("S_low",2)
-        self.S_high = kwargs.get("S_high",2)
-        self.set_priors_limits()
         
         self.nb_prediction_points = kwargs.get("nb_prediction_points", 5*len(self.observation_indexes))
         self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.observation_indexes), jnp.max(self.observation_indexes), self.nb_prediction_points)))
@@ -109,6 +152,18 @@ class CARMAProcess(eqx.Module):
         
     @eqx.filter_jit
     def wrapper_log_marginal_likelihood(self,params) -> float:
+        """ Wrapper to compute the log marginal likelihood in function of the (hyper)parameters. 
+
+        Parameters
+        ----------
+        parameters: array of shape (n)
+            (Hyper)parameters of the process.
+            
+        Returns
+        -------
+        float 
+            Log marginal likelihood of the CARMA process.
+        """
         self.model.parameters.set_free_values(params)
         return self.kalman.log_likelihood()
 

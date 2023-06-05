@@ -13,11 +13,22 @@ from .utils.ICCF import xcor
 
 
 def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),confidence_bands=True,title=None,xlabel=r'Time',ylabel=None,xlim=None,ylim=None,**kwargs):
-    """Plot the prediction of the Gaussian Process.
+    """Plot the predicted time series and the confidence bands.
 
     Parameters
     ----------
-
+    x : :obj:`numpy.ndarray`
+        Time of the observations.
+    y : :obj:`numpy.ndarray`
+        Values of the observations.
+    yerr : :obj:`numpy.ndarray`
+        Error of the observations.
+    x_pred : :obj:`numpy.ndarray`
+        Time of the prediction.
+    y_pred : :obj:`numpy.ndarray`
+        Values of the prediction.
+    cov_pred : :obj:`numpy.ndarray`
+        Covariance matrix of the prediction.    
     filename : :obj:`str`
         Name of the file to save the figure.
     figsize : :obj:`tuple`, optional
@@ -34,6 +45,13 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
         Limits of the x-axis, by default None
     ylim : :obj:`tuple` of :obj:`float`, optional
         Limits of the y-axis, by default None
+        
+    Returns
+    -------
+    fig : :obj:`matplotlib.figure.Figure`
+        Figure object.
+    ax : :obj:`matplotlib.axes.Axes`
+        Axes object.
     """  
     show = kwargs.get('show',False)
 
@@ -70,21 +88,38 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
     return fig,ax
     
 def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize=(10,10),maxlag=None,title=None,**kwargs):
-    """Plot the residuals of the Gaussian Process inference.
+    """Plot the residuals of a predicted time series.
 
 
     Parameters
     ----------
-
+    x : :obj:`numpy.ndarray`
+        Time of the observations.
+    y : :obj:`numpy.ndarray`
+        Values of the observations.
+    yerr : :obj:`numpy.ndarray`
+        Error of the observations.
+    y_pred : :obj:`numpy.ndarray`
+        Values of the prediction at the time of the observations.
     filename : :obj:`str`
         Name of the file to save the figure.
+    confidence_intervals : :obj:`list` of :obj:`float`, optional
+        Confidence intervals to plot, by default [95,99]
     figsize : :obj:`tuple`, optional
         Size of the figure.
     maxlag : :obj:`int`, optional
         Maximum lag to plot, by default None
     title : :obj:`str`, optional
         Title of the plot, by default None
+        
+    Returns
+    -------
+    fig : :obj:`matplotlib.figure.Figure`
+        Figure object.
+    ax : :obj:`matplotlib.axes.Axes`
+        Axes object.
     """
+
     show = kwargs.get('show',False)
     
     if maxlag is None:
@@ -137,7 +172,6 @@ def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize
 
     lag,acvf,l,b = ax[2].acorr(scaled_residuals,maxlags=maxlag,color='C2',linewidth=2,usevlines=True)
     
-       
     axins = inset_axes(ax[2], width="60%", height="40%", loc='upper right')
     lag,acvf,l,b = axins.acorr(scaled_residuals,maxlags=10,color='C2',linewidth=2)
     for i,sig in enumerate(reversed(sigs)):
@@ -167,8 +201,41 @@ def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize
         fig.show()
     return fig,ax
 
-def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidence_bands=[68,95],xlabel=r'Time lag (d)',save_data=False,**kwargs):
-    
+def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidence_bands=[68,95],xlabel='Time lag (d)',save_data=False,**kwargs):
+    """Plot the posterior predictive Autocorrelation function of the process.
+
+    This function will also compute the interpolated cross-correlation function using the 
+    code from https://bitbucket.org/cgrier/python_ccf_code/src/master/   
+
+    Parameters
+    ----------
+    tau : :obj:`numpy.ndarray`
+        Time lags.
+    acf : :obj:`numpy.ndarray`
+        Array of ACFs posterior samples.
+    x : :obj:`numpy.ndarray`
+        Time indexes.
+    y : :obj:`numpy.ndarray`
+        Time series values.
+    filename : :obj:`str`
+        Filename to save the figure.
+    with_mean : bool, optional
+        Plot the mean of the samples, by default False
+    confidence_bands : list, optional
+        Confidence intervals to plot, by default [95,99]
+    xlabel : str, optional
+        , by default r'Time lag (d)'
+    save_data : bool, optional
+        Save the data to a text file, by default False
+
+    Returns
+    -------
+    fig : :obj:`matplotlib.figure.Figure`
+        Figure object.
+    ax : :obj:`matplotlib.axes.Axes`
+        Axes object.
+    """
+
 
     percentiles = jnp.sort(jnp.hstack(((50-np.array(confidence_bands)/2,50+np.array(confidence_bands)/2))))
 
@@ -202,8 +269,41 @@ def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidenc
     return fig,ax
 
 
-def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,filename,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$'):
+def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$'):
+    """Plot the posterior predictive Power Spectral Density of the process.
 
+    This function will also compute the Lomb-Scargle periodogram on the data.
+
+    Parameters
+    ----------
+    f : :obj:`numpy.ndarray`
+        Frequencies.
+    posterior_PSD : :obj:`numpy.ndarray`
+        Array of PSDs posterior samples.
+    x : :obj:`numpy.ndarray`
+        Time indexes.
+    y : :obj:`numpy.ndarray`
+        Time series values.
+    yerr : :obj:`numpy.ndarray`
+        Time series errors.  
+    filename : :obj:`str`
+        Filename to save the figure.
+    with_mean : bool, optional
+        Plot the mean of the samples, by default False
+    confidence_bands : list, optional
+        Confidence intervals to plot, by default [95,99]
+    xlabel : str, optional
+        , by default r'Time lag (d)'
+    save_data : bool, optional
+        Save the data to a text file, by default False
+
+    Returns
+    -------
+    fig : :obj:`matplotlib.figure.Figure`
+        Figure object.
+    ax : :obj:`matplotlib.axes.Axes`
+        Axes object.
+    """
     percentiles = jnp.sort(jnp.hstack(((50-np.array(confidence_bands)/2,50+np.array(confidence_bands)/2))))
     fig,ax = plt.subplots(figsize=(10,5))
     
@@ -222,6 +322,9 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,filename,save_data=False,w
     # compute the Lomb-Scargle periodogram
     LS_periodogram = scipy.signal.lombscargle(x,y,2*np.pi*f,precenter=True)    
     ax.loglog(f,LS_periodogram,color='C2',label='Lomb-Scargle')
+    
+    noise_level = np.median(np.diff(x))*np.mean(yerr**2)*2
+    ax.axhline(noise_level,color='k',ls='--',label='Noise level')
     
     if save_data:
         np.savetxt(f'{filename}_posterior_predictive_PSD.txt',jnp.vstack((f,psd_median,PSD_quantiles,LS_periodogram)).T,

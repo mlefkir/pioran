@@ -1,12 +1,14 @@
-from typing import Union, Tuple, Optional
+from typing import Optional, Tuple, Union
 
 import equinox as eqx
 import jax
 import jax.numpy as jnp
 
 from .parameters import ParametersModel
-from .utils.carma_utils import (get_U, get_V,MA_quad_to_coeff,
-                                quad_to_coeff, quad_to_roots, initialise_CARMA_object)
+from .utils.carma_utils import (CARMA_autocovariance, CARMA_powerspectrum,
+                                MA_quad_to_coeff, get_U, get_V,
+                                initialise_CARMA_object, quad_to_coeff,
+                                quad_to_roots)
 
 
 class CARMA_model(eqx.Module):
@@ -98,11 +100,11 @@ class CARMA_model(eqx.Module):
         """
         alpha = self.get_AR_coeffs()
         beta = self.get_MA_coeffs() 
-
-        num = jnp.polyval(beta[::-1],2j*jnp.pi*f)
-        den = jnp.polyval(alpha,2j*jnp.pi*f)
-        P = (self.parameters["sigma"].value  * jnp.abs(num)**2 /jnp.abs(den)**2).flatten()
-        return P
+        return CARMA_powerspectrum(f,alpha,beta,self.parameters["sigma"].value)
+        # num = jnp.polyval(beta[::-1],2j*jnp.pi*f)
+        # den = jnp.polyval(alpha,2j*jnp.pi*f)
+        # P = (self.parameters["sigma"].value  * jnp.abs(num)**2 /jnp.abs(den)**2).flatten()
+        # return P
     
     def get_AR_quads(self) -> jax.Array:
         r"""Returns the quadratic coefficients of the AR part of the model.
@@ -178,19 +180,19 @@ class CARMA_model(eqx.Module):
         Frac = 0
         roots_AR = self.get_AR_roots()
         beta = self.get_MA_coeffs()
-        q = beta.shape[0]
-        for k, r in enumerate(roots_AR):
-            A, B = 0, 0
-            for l in range(q):
-                A += beta[l]*r**l
-                B += beta[l]*(-r)**l
-            Den = -2*jnp.real(r)
-            for l, root_AR_bis in enumerate(jnp.delete(roots_AR,k)):
-                Den *= (root_AR_bis - r)*(jnp.conjugate(root_AR_bis) + r)
-            Frac += A*B/Den*jnp.exp(r*tau)
-        return self.parameters["sigma"].value**2 * Frac.real
+        return CARMA_autocovariance(tau,roots_AR,beta,self.parameters["sigma"].value)
+        # q = beta.shape[0]
+        # for k, r in enumerate(roots_AR):
+        #     A, B = 0, 0
+        #     for l in range(q):
+        #         A += beta[l]*r**l
+        #         B += beta[l]*(-r)**l
+        #     Den = -2*jnp.real(r)
+        #     for l, root_AR_bis in enumerate(jnp.delete(roots_AR,k)):
+        #         Den *= (root_AR_bis - r)*(jnp.conjugate(root_AR_bis) + r)
+        #     Frac += A*B/Den*jnp.exp(r*tau)
+        # return self.parameters["sigma"].value**2 * Frac.real
     
-    # @eqx.filter_jit
     def init_statespace(self,y_0=None,errsize=None) -> Tuple[jax.Array,jax.Array] | Tuple[jax.Array,jax.Array,jax.Array,jax.Array,jax.Array]:
         r"""Initialises the state space representation of the model
         
@@ -232,7 +234,6 @@ class CARMA_model(eqx.Module):
         
         return X, P, V, b_rot, loglike
 
-    # @eqx.filter_jit
     def statespace_representation(self,dt: jax.Array) -> Tuple[jax.Array,jax.Array,jax.Array] | jax.Array:
         if self.p == 1:
             F = jnp.exp(-self.parameters['a_1'].value*dt)

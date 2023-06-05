@@ -4,8 +4,8 @@ Plots
  .. currentmodule:: pioran.plots
 
 
-Base class
-----------
+Functions for plotting
+----------------------
 
 .. autosummary::
     :toctree: summary
