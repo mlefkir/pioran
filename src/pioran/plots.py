@@ -331,7 +331,8 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
                header=f'f,psd_median,psd_quantiles({percentiles}),LS_periodogram')
     
     if ylim is None:
-        ax.set_ylim(bottom=np.min(LS_periodogram)/1e3)
+        # ax.set_ylim(bottom=np.min(LS_periodogram)/1e3)
+        ax.set_ylim(bottom=noise_level/5)
         
     ax.legend(bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
     ax.margins(x=0,y=0)
