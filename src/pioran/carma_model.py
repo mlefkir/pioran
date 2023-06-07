@@ -101,11 +101,7 @@ class CARMA_model(eqx.Module):
         alpha = self.get_AR_coeffs()
         beta = self.get_MA_coeffs() 
         return CARMA_powerspectrum(f,alpha,beta,self.parameters["sigma"].value)
-        # num = jnp.polyval(beta[::-1],2j*jnp.pi*f)
-        # den = jnp.polyval(alpha,2j*jnp.pi*f)
-        # P = (self.parameters["sigma"].value  * jnp.abs(num)**2 /jnp.abs(den)**2).flatten()
-        # return P
-    
+
     def get_AR_quads(self) -> jax.Array:
         r"""Returns the quadratic coefficients of the AR part of the model.
 
@@ -181,17 +177,6 @@ class CARMA_model(eqx.Module):
         roots_AR = self.get_AR_roots()
         beta = self.get_MA_coeffs()
         return CARMA_autocovariance(tau,roots_AR,beta,self.parameters["sigma"].value)
-        # q = beta.shape[0]
-        # for k, r in enumerate(roots_AR):
-        #     A, B = 0, 0
-        #     for l in range(q):
-        #         A += beta[l]*r**l
-        #         B += beta[l]*(-r)**l
-        #     Den = -2*jnp.real(r)
-        #     for l, root_AR_bis in enumerate(jnp.delete(roots_AR,k)):
-        #         Den *= (root_AR_bis - r)*(jnp.conjugate(root_AR_bis) + r)
-        #     Frac += A*B/Den*jnp.exp(r*tau)
-        # return self.parameters["sigma"].value**2 * Frac.real
     
     def init_statespace(self,y_0=None,errsize=None) -> Tuple[jax.Array,jax.Array] | Tuple[jax.Array,jax.Array,jax.Array,jax.Array,jax.Array]:
         r"""Initialises the state space representation of the model
@@ -202,7 +187,7 @@ class CARMA_model(eqx.Module):
         # CAR(1) process
         if self.p == 1:    
             X = jnp.zeros((1,1))
-            P = jnp.atleast_2d([[self.parameters['sigma'].value/ (2*self.parameters['a_1'].value)]])
+            P = jnp.atleast_2d([[self.parameters['sigma'].value**2/ (2*self.parameters['a_1'].value)]])
             return X,P
         
         # CARMA(p,q) process in the rotated basis
@@ -237,7 +222,7 @@ class CARMA_model(eqx.Module):
     def statespace_representation(self,dt: jax.Array) -> Tuple[jax.Array,jax.Array,jax.Array] | jax.Array:
         if self.p == 1:
             F = jnp.exp(-self.parameters['a_1'].value*dt)
-            Q = jnp.atleast_2d(self.parameters['sigma'].value / (2*self.parameters['a_1'].value)  * (1 - F**2 ))
+            Q = jnp.atleast_2d(self.parameters['sigma'].value**2 / (2*self.parameters['a_1'].value)  * (1 - F**2 ))
             H = jnp.ones((self.ndims,1))
             return F.reshape(1,1),Q,H
         
