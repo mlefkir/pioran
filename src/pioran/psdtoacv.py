@@ -127,11 +127,12 @@ class PSDToACV(eqx.Module):
         """
         if self.method == 'FFT':
             psd = self.PSD.calculate(self.frequencies[1:])
+            self.parameters['var'].value = jnp.trapz(psd)*self.f0/2
             psd = jnp.insert(psd,0,0) # add a zero at the beginning to account for the zero frequency
             acvf = self.get_acvf_byFFT(psd)
             # normalize by the frequency step 
             # acvf = acvf[:len(acvf)//2+1]/self.dtau was not working properly for odd number of points
-            return  self.interpolation(t,acvf)
+            return  self.interpolation(t,acvf)*self.parameters['var'].value
         
         elif self.method == 'NuFFT':
             N = 2*(self.n_freq_grid-1)
