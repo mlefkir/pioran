@@ -270,7 +270,7 @@ def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidenc
     return fig,ax
 
 
-def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$'):
+def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$',**kwargs):
     """Plot the posterior predictive Power Spectral Density of the process.
 
     This function will also compute the Lomb-Scargle periodogram on the data.
@@ -305,32 +305,39 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     ax : :obj:`matplotlib.axes.Axes`
         Axes object.
     """
+    
+    f_LS = kwargs.get('f_LS',f)
     percentiles = jnp.sort(jnp.hstack(((50-np.array(confidence_bands)/2,50+np.array(confidence_bands)/2))))
-    fig,ax = plt.subplots(figsize=(10,5))
+    
     
     psd_median = jnp.median(posterior_PSD,axis=0)
-    ax.loglog(f,psd_median,c='C0',label='Median')
-    
     PSD_quantiles = jnp.percentile(posterior_PSD,q=percentiles,axis=0)
+
+    # compute the Lomb-Scargle periodogram
+    LS_periodogram = lombscargle(x,y,2*np.pi*f_LS,precenter=True)    
+    
+    if save_data:
+        np.savetxt(f'{filename}_posterior_predictive_PSD.txt',jnp.vstack((f,psd_median,PSD_quantiles)).T,
+               header=f'f,psd_median,psd_quantiles({percentiles})')
+    
+    # plots
+    fig,ax = plt.subplots(figsize=(10,5))
+
+    ax.loglog(f,psd_median,c='C0',label='Median')
+
     for i,ci in enumerate(confidence_bands):
         ax.fill_between(f,PSD_quantiles[i],PSD_quantiles[-(i+1)],color='C0',alpha=.15*(i+1),label=f'{ci}%')
-    
     
     if with_mean:
         psd_mean = jnp.mean(posterior_PSD,axis=0)
         ax.loglog(f,psd_mean,label='Mean',ls='--')
         
-    # compute the Lomb-Scargle periodogram
-    LS_periodogram = lombscargle(x,y,2*np.pi*f,precenter=True)    
-    ax.loglog(f,LS_periodogram,color='C2',label='Lomb-Scargle')
-    
+    ax.loglog(f_LS,LS_periodogram,color='C2',label='Lomb-Scargle')
+
     noise_level = np.median(np.diff(x))*np.mean(yerr**2)*2
     ax.axhline(noise_level,color='k',ls='--',label='Noise level')
     
-    if save_data:
-        np.savetxt(f'{filename}_posterior_predictive_PSD.txt',jnp.vstack((f,psd_median,PSD_quantiles,LS_periodogram)).T,
-               header=f'f,psd_median,psd_quantiles({percentiles}),LS_periodogram')
-    
+
     if ylim is None:
         # ax.set_ylim(bottom=np.min(LS_periodogram)/1e3)
         ax.set_ylim(bottom=noise_level/5)

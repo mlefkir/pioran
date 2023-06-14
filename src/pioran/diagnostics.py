@@ -140,25 +140,30 @@ class Visualisations:
                         posterior_PSD = jnp.array([CARMA_powerspectrum(self.frequencies,alpha[i],jnp.append(jnp.array([1]),jnp.zeros(self.process.p-1)),sigma[i]) for i in range(samples.shape[0])])
                 print("Plotting posterior predictive PSDs...")
                 f = self.frequencies
+                f_LS = self.frequencies
 
             else:
                 if isinstance(self.process.model,PSDToACV):
                     # posterior_PSD = jnp.array([self.process.model.PSD(self.frequencies,params[i]) for i in range(samples.shape[0])])
-                    f = self.process.model.frequencies[::int(self.process.model.S_low*self.process.model.S_high)]
+                    # f = self.process.model.frequencies[::int(self.process.model.S_low*self.process.model.S_high)]
+                    f_min = self.process.model.frequencies[1] # 0 is the first frequency
+                    f_max = self.process.model.frequencies[-1]
+                    f = jnp.logspace(jnp.log10(f_min),jnp.log10(f_max),1000)
                     posterior_PSD = []
                     for it in range(samples.shape[0]):
                         self.process.model.parameters.set_free_values(samples[it])
                         posterior_PSD.append(self.process.model.PSD.calculate(f))  
-                        print(f'{it+1}/{samples.shape[0]}', end='\r')
+                        print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
                         sys.stdout.flush()
                     # kwargs['S_low'] = self.process.model.S_high
-                    
+                    posterior_PSD = np.array(posterior_PSD)
+                    f_LS = self.frequencies
                         
                     # raise NotImplementedError("Posterior predictive PSDs are not implemented for Gaussian processes.")
 
             # plot the posterior predictive PSDs
             plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
-                                 y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,**kwargs)
+                                 y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,f_LS=f_LS,**kwargs)
         
         # plot the posterior predictive ACFs
         if plot_ACVF:

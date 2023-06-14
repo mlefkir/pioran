@@ -107,7 +107,7 @@ class Inference:
         else:
             raise ValueError("The method must be 'NS'.")
         comm.Barrier()
-        self.process.model.parameters.set_free_values(results['posterior']['median'])
+        self.process.model.parameters.set_free_values(results['maximum_likelihood']['point'])#results['posterior']['median'])
         print(self.process.model.parameters.free_values)
         if rank == 0:
             print("\n>>>>>> Plotting corner and trace.")
