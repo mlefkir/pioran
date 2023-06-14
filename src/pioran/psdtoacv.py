@@ -86,7 +86,8 @@ class PSDToACV(eqx.Module):
             raise ValueError("S_low must be greater than 2")
         self.PSD = PSD
         self.parameters = PSD.parameters
-        
+        self.parameters.append('var',1,True,hyperparameter=False)
+
         # parameters of the time series
         duration = T
         sampling_period = dt

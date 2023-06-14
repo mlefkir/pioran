@@ -339,11 +339,11 @@ class BrokenPowerLaw(PowerSpectralDensity):
     N : int
     
     def __init__(self, parameters_values, **kwargs):     
-        assert len(parameters_values)  == 4 , f'The number of parameters for {self.__classname__()} must be 4, not {len(parameters_values)}'
+        assert len(parameters_values)  == 3 , f'The number of parameters for {self.__classname__()} must be 4, not {len(parameters_values)}'
         self.N = len(parameters_values)//2-1
         free_parameters = kwargs.get('free_parameters', [True]*len(parameters_values))
         # initialise the parameters and check
-        names=['amplitude', 'index_1', 'freq_1', 'index_2']
+        names=['index_1', 'freq_1', 'index_2']
                 
         PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=names, free_parameters=free_parameters)
                                     
@@ -364,5 +364,5 @@ class BrokenPowerLaw(PowerSpectralDensity):
             Power spectral density function evaluated on the array of frequencies.
         """
         
-        A,index_1,f_1,index_2 = self.parameters['amplitude'].value, self.parameters['index_1'].value, self.parameters['freq_1'].value, self.parameters['index_2'].value
-        return A*jnp.where(f<f_1, jnp.power(f/f_1,-index_1), jnp.power(f/f_1,-index_2))
+        index_1,f_1,index_2 = self.parameters['index_1'].value, self.parameters['freq_1'].value, self.parameters['index_2'].value
+        return jnp.where(f<f_1, jnp.power(f/f_1,-index_1), jnp.power(f/f_1,-index_2))
