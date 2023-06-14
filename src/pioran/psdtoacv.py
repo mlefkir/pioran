@@ -80,10 +80,10 @@ class PSDToACV(eqx.Module):
     n_freq_grid: int    
     with_var: bool
     
-    def __init__(self, PSD:PowerSpectralDensity, S_low:float, S_high:float,T, dt, **kwargs):
+    def __init__(self, PSD:PowerSpectralDensity, S_low:float, S_high:float,T, dt, estimate_variance=True,**kwargs):
         """Constructor of the PSDToACV class."""
         
-        self.with_var = kwargs.get('with_variance',True)
+        self.with_var = estimate_variance
         if not isinstance(PSD,PowerSpectralDensity):
             raise TypeError("PSD must be a PowerSpectralDensity object")
         if S_low<2:
