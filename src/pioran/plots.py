@@ -270,7 +270,7 @@ def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidenc
     return fig,ax
 
 
-def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$',**kwargs):
+def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$',f_min_obs=None,f_max_obs=None,**kwargs):
     """Plot the posterior predictive Power Spectral Density of the process.
 
     This function will also compute the Lomb-Scargle periodogram on the data.
@@ -337,6 +337,8 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     noise_level = np.median(np.diff(x))*np.mean(yerr**2)*2
     ax.axhline(noise_level,color='k',ls='--',label='Noise level')
     
+    if f_min_obs is not None: ax.axvline(f_min_obs,color='C5',ls='-.',label=r'$f_\mathrm{min}$')
+    if f_max_obs is not None: ax.axvline(f_max_obs,color='C5',ls='-.',label=r'$f_\mathrm{max}$')
 
     if ylim is None:
         # ax.set_ylim(bottom=np.min(LS_periodogram)/1e3)

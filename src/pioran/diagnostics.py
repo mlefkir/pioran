@@ -140,8 +140,9 @@ class Visualisations:
                         posterior_PSD = jnp.array([CARMA_powerspectrum(self.frequencies,alpha[i],jnp.append(jnp.array([1]),jnp.zeros(self.process.p-1)),sigma[i]) for i in range(samples.shape[0])])
                 print("Plotting posterior predictive PSDs...")
                 f = self.frequencies
-                f_LS = self.frequencies
-
+                plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
+                            y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,**kwargs)
+        
             else:
                 if isinstance(self.process.model,PSDToACV):
                     # posterior_PSD = jnp.array([self.process.model.PSD(self.frequencies,params[i]) for i in range(samples.shape[0])])
@@ -158,13 +159,15 @@ class Visualisations:
                     # kwargs['S_low'] = self.process.model.S_high
                     posterior_PSD = np.array(posterior_PSD)
                     f_LS = self.frequencies
-                        
+                    
+                    plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
+                                 y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,
+                                 f_LS=f_LS,f_min_obs=self.f_min,f_max_obs=self.f_max,**kwargs)
+        
                     # raise NotImplementedError("Posterior predictive PSDs are not implemented for Gaussian processes.")
 
             # plot the posterior predictive PSDs
-            plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
-                                 y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,f_LS=f_LS,**kwargs)
-        
+
         # plot the posterior predictive ACFs
         if plot_ACVF:
             print("Computing posterior predictive ACFs...")
