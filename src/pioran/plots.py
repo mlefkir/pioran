@@ -337,12 +337,12 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     noise_level = np.median(np.diff(x))*np.mean(yerr**2)*2
     ax.axhline(noise_level,color='k',ls='--',label='Noise level')
     
-    if f_min_obs is not None: ax.axvline(f_min_obs,color='C5',ls='-.',label=r'$f_\mathrm{min}$')
-    if f_max_obs is not None: ax.axvline(f_max_obs,color='C5',ls='-.',label=r'$f_\mathrm{max}$')
+    if f_min_obs is not None: ax.axvline(f_min_obs,ls='-.',label=r'$f_\mathrm{min}$')
+    if f_max_obs is not None: ax.axvline(f_max_obs,ls='-.',label=r'$f_\mathrm{max}$')
 
     if ylim is None:
         # ax.set_ylim(bottom=np.min(LS_periodogram)/1e3)
-        ax.set_ylim(bottom=noise_level/5)
+        ax.set_ylim(bottom=noise_level/10)
         
     ax.legend(bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
     ax.margins(x=0,y=0)
