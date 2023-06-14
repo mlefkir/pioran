@@ -74,20 +74,26 @@ class PSDToACV(eqx.Module):
     dtau: float
     method: str
     f0: float
+    S_low: float
+    S_high: float
     fN: float
     n_freq_grid: int    
+    with_var: bool
     
     def __init__(self, PSD:PowerSpectralDensity, S_low:float, S_high:float,T, dt, **kwargs):
         """Constructor of the PSDToACV class."""
         
+        self.with_var = kwargs.get('with_variance',True)
         if not isinstance(PSD,PowerSpectralDensity):
             raise TypeError("PSD must be a PowerSpectralDensity object")
         if S_low<2:
             raise ValueError("S_low must be greater than 2")
         self.PSD = PSD
         self.parameters = PSD.parameters
-        self.parameters.append('var',1,True,hyperparameter=False)
-
+        
+        if self.with_var:
+            self.parameters.append('var',1,True,hyperparameter=False)
+        
         # parameters of the time series
         duration = T
         sampling_period = dt
@@ -97,9 +103,11 @@ class PSDToACV(eqx.Module):
         f_max_obs = 0.5/dt
         f_min_obs = 1/T
         
+        self.S_low = S_low
+        self.S_high = S_high
         # parameters of the **total** frequency grid
-        self.f0 = f_min_obs/S_low
-        self.fN = f_max_obs*S_high
+        self.f0 = f_min_obs/self.S_low
+        self.fN = f_max_obs*self.S_high
         self.n_freq_grid = int(jnp.ceil(self.fN/self.f0)) + 1 
         self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0) #my biggest mistake...
         # self.frequencies = jnp.arange(self.f0,self.fN+self.f0,self.f0)
@@ -128,12 +136,14 @@ class PSDToACV(eqx.Module):
         """
         if self.method == 'FFT':
             psd = self.PSD.calculate(self.frequencies[1:])
-            self.parameters['var'].value = jnp.trapz(psd)*self.f0/2
+            if self.with_var: psd /= jnp.trapz(psd)*self.f0/2
             psd = jnp.insert(psd,0,0) # add a zero at the beginning to account for the zero frequency
             acvf = self.get_acvf_byFFT(psd)
             # normalize by the frequency step 
             # acvf = acvf[:len(acvf)//2+1]/self.dtau was not working properly for odd number of points
-            return  self.interpolation(t,acvf)*self.parameters['var'].value
+            if self.with_var:
+                return  self.interpolation(t,acvf)*self.parameters['var'].value
+            return  self.interpolation(t,acvf)
         
         elif self.method == 'NuFFT':
             N = 2*(self.n_freq_grid-1)
