@@ -5,7 +5,8 @@
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy
+from scipy.signal import lombscargle
+from scipy.stats import norm
 from matplotlib.ticker import AutoMinorLocator
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
@@ -131,7 +132,7 @@ def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize
     residuals = y - y_pred
     scaled_residuals = (residuals/yerr).flatten()
     max_scale_res = np.rint(np.max(scaled_residuals))
-    sigs = [scipy.stats.norm.ppf((50+ci/2)/100) for ci in confidence_intervals]
+    sigs = [norm.ppf((50+ci/2)/100) for ci in confidence_intervals]
 
     fig = plt.figure(tight_layout=True,figsize=figsize)
 
@@ -158,9 +159,9 @@ def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize
     ax[1][0].set_xlabel('Time')
     ax[1][0].axhline(0,c='k',ls='--')
 
-    p = scipy.stats.norm.fit(scaled_residuals)
+    p = norm.fit(scaled_residuals)
 
-    ax[1][1].plot(scipy.stats.norm.pdf(np.linspace(-max_scale_res,max_scale_res,100),p[0],p[1]),np.linspace(-max_scale_res,max_scale_res,100))
+    ax[1][1].plot(norm.pdf(np.linspace(-max_scale_res,max_scale_res,100),p[0],p[1]),np.linspace(-max_scale_res,max_scale_res,100))
     ax[1][1].hist(scaled_residuals,bins='auto',orientation='horizontal',density=True,alpha=0.75)
     ax[1][1].set_xticks([])
     ax[1][1].tick_params(axis='y',labelleft=False)
@@ -320,7 +321,7 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
         ax.loglog(f,psd_mean,label='Mean',ls='--')
         
     # compute the Lomb-Scargle periodogram
-    LS_periodogram = scipy.signal.lombscargle(x,y,2*np.pi*f,precenter=True)    
+    LS_periodogram = lombscargle(x,y,2*np.pi*f,precenter=True)    
     ax.loglog(f,LS_periodogram,color='C2',label='Lomb-Scargle')
     
     noise_level = np.median(np.diff(x))*np.mean(yerr**2)*2

@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import Union
 
 import jax.numpy as jnp
@@ -14,7 +15,8 @@ from .plots import (plot_posterior_predictive_ACF,
                     plot_residuals)
 from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
-from .utils.carma_utils import CARMA_autocovariance, CARMA_powerspectrum, quad_to_coeff,MA_quad_to_coeff
+from .utils.carma_utils import (CARMA_autocovariance, CARMA_powerspectrum,
+                                MA_quad_to_coeff, quad_to_coeff)
 
 
 class Visualisations:
@@ -135,17 +137,27 @@ class Visualisations:
                     if self.process.q > 0:
                         posterior_PSD = jnp.array([CARMA_powerspectrum(self.frequencies,alpha[i],beta[i],sigma[i]) for i in range(samples.shape[0])])
                     else:
-                        posterior_PSD = jnp.array([CARMA_powerspectrum(self.frequencies,roots[i],jnp.append(jnp.array([1]),jnp.zeros(self.process.p-1)),sigma[i]) for i in range(samples.shape[0])])
+                        posterior_PSD = jnp.array([CARMA_powerspectrum(self.frequencies,alpha[i],jnp.append(jnp.array([1]),jnp.zeros(self.process.p-1)),sigma[i]) for i in range(samples.shape[0])])
                 print("Plotting posterior predictive PSDs...")
+                f = self.frequencies
 
             else:
                 if isinstance(self.process.model,PSDToACV):
                     # posterior_PSD = jnp.array([self.process.model.PSD(self.frequencies,params[i]) for i in range(samples.shape[0])])
+                    f = self.process.model.frequencies[::int(self.process.model.S_low*self.process.model.S_high)]
+                    posterior_PSD = []
+                    for it in range(samples.shape[0]):
+                        self.process.model.parameters.set_free_values(samples[it])
+                        posterior_PSD.append(self.process.model.PSD.calculate(f))  
+                        print(f'{it+1}/{samples.shape[0]}', end='\r')
+                        sys.stdout.flush()
+                    # kwargs['S_low'] = self.process.model.S_high
                     
-                    raise NotImplementedError("Posterior predictive PSDs are not implemented for Gaussian processes.")
-            
+                        
+                    # raise NotImplementedError("Posterior predictive PSDs are not implemented for Gaussian processes.")
+
             # plot the posterior predictive PSDs
-            plot_posterior_predictive_PSD(f=self.frequencies,posterior_PSD=posterior_PSD,x=self.x,
+            plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
                                  y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,**kwargs)
         
         # plot the posterior predictive ACFs
