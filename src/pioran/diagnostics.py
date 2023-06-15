@@ -156,6 +156,7 @@ class Visualisations:
                         posterior_PSD.append(self.process.model.PSD.calculate(f))  
                         print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
                         sys.stdout.flush()
+                    
                     # kwargs['S_low'] = self.process.model.S_high
                     posterior_PSD = np.array(posterior_PSD)
                     f_LS = self.frequencies
