@@ -318,8 +318,7 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     
     if save_data:
         np.savetxt(f'{filename}_LS_periodogram.txt',jnp.vstack((f_LS,LS_periodogram)).T,header='f_LS,LS_periodogram')
-    else:
-        np.savetxt(f'{filename}_posterior_predictive_PSD.txt',jnp.vstack((f,psd_median,PSD_quantiles)).T,
+    np.savetxt(f'{filename}_posterior_predictive_PSD.txt',jnp.vstack((f,psd_median,PSD_quantiles)).T,
                header=f'f,psd_median,psd_quantiles({percentiles})')
     
     # plots

@@ -100,6 +100,10 @@ class Visualisations:
             Plot the posterior predictive PSDs, by default True
         plot_ACVF : bool, optional
             Plot the posterior predictive ACVFs, by default True
+        **kwargs
+            Additional keyword arguments.
+            frequencies : jnp.ndarray, optional
+                The frequencies at which to evaluate the PSDs of CARMA process, by default self.frequencies
         """
         if isinstance(self.process,CARMAProcess):
             if self.process.p >1:
@@ -129,18 +133,17 @@ class Visualisations:
         # plot the posterior predictive PSDs
         if plot_PSD:
             print("Computing posterior predictive PSDs...")
-            
+            f = kwargs.get('frequencies',self.frequencies)
             if isinstance(self.process,CARMAProcess):
                 if self.process.p == 1:
-                    posterior_PSD = jnp.array([sigma[i]/(alpha[i]**2 + 4*jnp.pi**2*self.frequencies) for i in range(samples.shape[0])])
+                    posterior_PSD = jnp.array([sigma[i]/(alpha[i]**2 + 4*jnp.pi**2*f) for i in range(samples.shape[0])])
                 else:
                     if self.process.q > 0:
-                        posterior_PSD = jnp.array([CARMA_powerspectrum(self.frequencies,alpha[i],beta[i],sigma[i]) for i in range(samples.shape[0])])
+                        posterior_PSD = jnp.array([CARMA_powerspectrum(f,alpha[i],beta[i],sigma[i]) for i in range(samples.shape[0])])
                     else:
-                        posterior_PSD = jnp.array([CARMA_powerspectrum(self.frequencies,alpha[i],jnp.append(jnp.array([1]),jnp.zeros(self.process.p-1)),sigma[i]) for i in range(samples.shape[0])])
+                        posterior_PSD = jnp.array([CARMA_powerspectrum(f,alpha[i],jnp.append(jnp.array([1]),jnp.zeros(self.process.p-1)),sigma[i]) for i in range(samples.shape[0])])
                 print("Plotting posterior predictive PSDs...")
-                f = self.frequencies
-                plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
+                plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,f_LS=self.frequencies,
                             y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,**kwargs)
         
             else:
@@ -157,7 +160,6 @@ class Visualisations:
                         print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
                         sys.stdout.flush()
                     
-                    # kwargs['S_low'] = self.process.model.S_high
                     posterior_PSD = np.array(posterior_PSD)
                     f_LS = self.frequencies
                     

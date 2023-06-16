@@ -55,6 +55,8 @@ class PSDToACV(eqx.Module):
     method : :obj:`str`
         Method used to compute the autocovariance function. Can be 'FFT' if the inverse Fourier transform is used or 'NuFFT' 
         if the non uniform Fourier transform is used.
+    with_var : :obj:`bool`
+        If True, the variance of the autocovariance function is estimated.
     
     Methods
     -------
@@ -136,7 +138,7 @@ class PSDToACV(eqx.Module):
         """
         if self.method == 'FFT':
             psd = self.PSD.calculate(self.frequencies[1:])
-            if self.with_var: psd /= jnp.trapz(psd)*self.f0/2
+            if self.with_var: psd /= jnp.trapz(psd)*self.f0
             psd = jnp.insert(psd,0,0) # add a zero at the beginning to account for the zero frequency
             acvf = self.get_acvf_byFFT(psd)
             # normalize by the frequency step 

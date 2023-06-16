@@ -39,6 +39,8 @@ class GaussianProcess(eqx.Module):
             Scale the errors on the training data by adding a constant, by default True.
         estimate_mean : :obj:`bool`, optional
             Estimate the mean of the training data, by default True.
+        estimate_variance : :obj:`bool`, optional
+            Estimate the variance of the training data, by default True.
         S_low : :obj:`float`, optional
             Scaling factor for the lower bound of the PSD, by default 2. See :obj:`PSDToACV` for more details.
         S_high : :obj:`float`, optional
