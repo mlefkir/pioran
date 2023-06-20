@@ -124,11 +124,18 @@ class Visualisations:
             
             if self.process.scale_errors and self.process.estimate_mean:
                 params = samples[:,:-2]
+                if self.process.estimate_variance:
+                    variance = samples[:,-3]
         
             elif self.process.scale_errors or self.process.estimate_mean:
                 params = samples[:,:-1]
+                if self.process.estimate_variance:
+                    variance = samples[:,-2]
             else:
                 params = samples
+                if self.process.estimate_variance:
+                    variance = samples[:,-1]
+            
         
         # plot the posterior predictive PSDs
         if plot_PSD:
@@ -154,12 +161,28 @@ class Visualisations:
                     f_max = self.process.model.frequencies[-1]
                     f = jnp.logspace(jnp.log10(f_min),jnp.log10(f_max),1000)
                     posterior_PSD = []
-                    for it in range(samples.shape[0]):
-                        self.process.model.parameters.set_free_values(samples[it])
-                        posterior_PSD.append(self.process.model.PSD.calculate(f))  
-                        print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
-                        sys.stdout.flush()
-                    
+
+                    if self.process.estimate_variance:
+                        sumP = np.array([])
+
+                        for it in range(samples.shape[0]):
+                            self.process.model.parameters.set_free_values(samples[it])
+                            P = self.process.model.PSD.calculate(self.process.model.frequencies[1:])
+                            sumP = np.append(sumP,np.trapz(P)*f_min)
+                            P = self.process.model.PSD.calculate(f)
+                            P *= variance[it]/sumP[-1]
+                            posterior_PSD.append(P)  
+                            print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
+                            sys.stdout.flush()
+                        np.savetxt(f'{self.filename_prefix}normalisation_factor.txt',np.array(sumP))
+                    else:
+                        
+                        for it in range(samples.shape[0]):
+                            self.process.model.parameters.set_free_values(samples[it])
+                            posterior_PSD.append(self.process.model.PSD.calculate(f))  
+                            print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
+                            sys.stdout.flush()
+                        
                     posterior_PSD = np.array(posterior_PSD)
                     f_LS = self.frequencies
                     

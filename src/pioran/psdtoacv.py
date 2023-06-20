@@ -138,7 +138,7 @@ class PSDToACV(eqx.Module):
         """
         if self.method == 'FFT':
             psd = self.PSD.calculate(self.frequencies[1:])
-            if self.with_var: psd /= jnp.trapz(psd)*self.f0
+            if self.with_var: psd /= jnp.trapz(psd)*self.f0/2
             psd = jnp.insert(psd,0,0) # add a zero at the beginning to account for the zero frequency
             acvf = self.get_acvf_byFFT(psd)
             # normalize by the frequency step 
