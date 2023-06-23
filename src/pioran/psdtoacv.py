@@ -118,6 +118,15 @@ class PSDToACV(eqx.Module):
         self.tau = jnp.arange(0,tau_max+self.dtau,self.dtau)
         self.method = kwargs.get('method','FFT')
       
+    def print_info(self):
+        print("PSD to ACV conversion")
+        print("Method: ",self.method)
+        print('S_low: ',self.S_low)
+        print('S_high: ',self.S_high)
+        print('f0: ',self.f0)
+        print('fN: ',self.fN)
+        print('n_freq_grid: ',self.n_freq_grid)
+        
     def calculate(self,t: jnp.array,**kwargs)-> jax.Array:
         """
         Calculate the autocovariance function from the power spectral density.

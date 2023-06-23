@@ -113,6 +113,7 @@ class GaussianProcess(eqx.Module):
             method = kwargs.get("method", "FFT")
             self.estimate_variance = kwargs.get("estimate_variance", True)
             self.model = PSDToACV(function, S_low=S_low, S_high=S_high,T = observation_indexes[-1]-observation_indexes[0],dt =jnp.min(jnp.diff(observation_indexes)),method=method,estimate_variance=self.estimate_variance)
+            self.model.print_info()
         else:
             raise TypeError("The input model must be a CovarianceFunction or a PowerSpectralDensity.")
         
