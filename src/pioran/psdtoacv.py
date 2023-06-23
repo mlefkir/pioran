@@ -3,17 +3,15 @@
 Class to convert a power spectral density to an autocovariance function via the inverse Fourier transform.
 
 """
+import equinox as eqx
 import jax
-
 import jax.numpy as jnp
 from jax_finufft import nufft2
-import equinox as eqx
 
-from .utils import decompose_triangular_matrix, reconstruct_triangular_matrix
-
-from .psd_base import PowerSpectralDensity
 from .parameters import ParametersModel
-from .utils import EuclideanDistance
+from .psd_base import PowerSpectralDensity
+from .utils.gp_utils import (EuclideanDistance, decompose_triangular_matrix,
+                             reconstruct_triangular_matrix)
 
 
 class PSDToACV(eqx.Module):
@@ -57,6 +55,8 @@ class PSDToACV(eqx.Module):
     method : :obj:`str`
         Method used to compute the autocovariance function. Can be 'FFT' if the inverse Fourier transform is used or 'NuFFT' 
         if the non uniform Fourier transform is used.
+    with_var : :obj:`bool`
+        If True, the variance of the autocovariance function is estimated.
     
     Methods
     -------
@@ -76,18 +76,25 @@ class PSDToACV(eqx.Module):
     dtau: float
     method: str
     f0: float
+    S_low: float
+    S_high: float
     fN: float
     n_freq_grid: int    
+    with_var: bool
     
-    def __init__(self, PSD:PowerSpectralDensity, S_low:float, S_high:float,T, dt, **kwargs):
+    def __init__(self, PSD:PowerSpectralDensity, S_low:float, S_high:float,T, dt, estimate_variance=True,**kwargs):
         """Constructor of the PSDToACV class."""
         
+        self.with_var = estimate_variance
         if not isinstance(PSD,PowerSpectralDensity):
             raise TypeError("PSD must be a PowerSpectralDensity object")
         if S_low<2:
             raise ValueError("S_low must be greater than 2")
         self.PSD = PSD
         self.parameters = PSD.parameters
+        
+        if self.with_var:
+            self.parameters.append('var',1,True,hyperparameter=False)
         
         # parameters of the time series
         duration = T
@@ -98,16 +105,28 @@ class PSDToACV(eqx.Module):
         f_max_obs = 0.5/dt
         f_min_obs = 1/T
         
+        self.S_low = S_low
+        self.S_high = S_high
         # parameters of the **total** frequency grid
-        self.f0 = f_min_obs/S_low
-        self.fN = f_max_obs*S_high
+        self.f0 = f_min_obs/self.S_low
+        self.fN = f_max_obs*self.S_high
         self.n_freq_grid = int(jnp.ceil(self.fN/self.f0)) + 1 
-        self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0)
+        self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0) #my biggest mistake...
+        # self.frequencies = jnp.arange(self.f0,self.fN+self.f0,self.f0)
         tau_max = .5/self.f0#0.5/self.f0
         self.dtau = tau_max/(self.n_freq_grid-1) 
         self.tau = jnp.arange(0,tau_max+self.dtau,self.dtau)
         self.method = kwargs.get('method','FFT')
       
+    def print_info(self):
+        print("PSD to ACV conversion")
+        print("Method: ",self.method)
+        print('S_low: ',self.S_low)
+        print('S_high: ',self.S_high)
+        print('f0: ',self.f0)
+        print('fN: ',self.fN)
+        print('n_freq_grid: ',self.n_freq_grid)
+        
     def calculate(self,t: jnp.array,**kwargs)-> jax.Array:
         """
         Calculate the autocovariance function from the power spectral density.
@@ -127,10 +146,14 @@ class PSDToACV(eqx.Module):
             Autocovariance values at the time lags t.
         """
         if self.method == 'FFT':
-            psd = self.PSD.calculate(self.frequencies)
+            psd = self.PSD.calculate(self.frequencies[1:])
+            if self.with_var: psd /= jnp.trapz(psd)*self.f0
+            psd = jnp.insert(psd,0,0) # add a zero at the beginning to account for the zero frequency
             acvf = self.get_acvf_byFFT(psd)
             # normalize by the frequency step 
             # acvf = acvf[:len(acvf)//2+1]/self.dtau was not working properly for odd number of points
+            if self.with_var:
+                return  self.interpolation(t,acvf)*self.parameters['var'].value
             return  self.interpolation(t,acvf)
         
         elif self.method == 'NuFFT':

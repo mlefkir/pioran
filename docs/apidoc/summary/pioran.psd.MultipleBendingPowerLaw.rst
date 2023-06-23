@@ -26,5 +26,6 @@
    
       ~MultipleBendingPowerLaw.expression
       ~MultipleBendingPowerLaw.parameters
+      ~MultipleBendingPowerLaw.N
    
    

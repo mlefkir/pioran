@@ -5,8 +5,8 @@ import sys
 sys.path.append('../../src')
 
 import jax.numpy as jnp
-from pioran import CovarianceFunction
-from pioran import Exponential,SquaredExponential
+from pioran.acvf_base import CovarianceFunction
+from pioran.acvf import Exponential,SquaredExponential
 
 
 class TestCovarianceFunction(unittest.TestCase):

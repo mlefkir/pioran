@@ -1,17 +1,18 @@
 """Core class for Gaussian process regression.
 
 """
+from typing import Union
+
+import jax
 import equinox as eqx
 import jax.numpy as jnp
-from jax.scipy.linalg import cholesky, solve_triangular, solve
+from jax.scipy.linalg import cholesky, solve, solve_triangular
 
-from .utils import nearest_positive_definite
-from .tools import reshape_array,sanity_checks
 from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
-
-from typing import Union
+from .tools import reshape_array, sanity_checks
+from .utils.gp_utils import nearest_positive_definite
 
 
 class GaussianProcess(eqx.Module):
@@ -23,21 +24,23 @@ class GaussianProcess(eqx.Module):
     ----------
     fun : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity` 
         Model function associated to the Gaussian Process. Can be a covariance function or a power spectral density.
-    training_indexes : :obj:`jax.Array`
+    observation_indexes : :obj:`jax.Array`
         Indexes of the training data, in this case it is the time.
-    training_observables : :obj:`jax.Array`
+    observation_values : :obj:`jax.Array`
         Observables of the training data, in this it is flux, count-rate or intensity, etc.
-    training_errors : :obj:`jax.Array`, optional
+    observation_errors : :obj:`jax.Array`, optional
         Errors on the observables, by default :obj:`None`
     **kwargs : dict
         nb_prediction_points : :obj:`int`, optional
             Number of points to predict, by default 5 * length(training(indexes)).
         prediction_indexes : :obj:`jax.Array`, optional
-            Indexes of the prediction data, by default jnp.linspace(jnp.min(training_indexes),jnp.max(training_indexes),nb_prediction_points)
+            Indexes of the prediction data, by default jnp.linspace(jnp.min(observation_indexes),jnp.max(observation_indexes),nb_prediction_points)
         scale_errors : :obj:`bool`, optional
             Scale the errors on the training data by adding a constant, by default True.
         estimate_mean : :obj:`bool`, optional
             Estimate the mean of the training data, by default True.
+        estimate_variance : :obj:`bool`, optional
+            Estimate the variance of the training data, by default True.
         S_low : :obj:`float`, optional
             Scaling factor for the lower bound of the PSD, by default 2. See :obj:`PSDToACV` for more details.
         S_high : :obj:`float`, optional
@@ -60,11 +63,11 @@ class GaussianProcess(eqx.Module):
     ----------
     model : :class:`~pioran.acvf_base.CovarianceFunction`  or :class:`~pioran.psd_base.PowerSpectralDensity`
         Model associated to the Gaussian Process, can be a covariance function or a power spectral density.
-    training_indexes : :obj:`jax.Array` (n,1)
+    observation_indexes : :obj:`jax.Array` (n,1)
         Indexes of the training data.
-    training_observables : :obj:`jax.Array` of shape (n,1)
+    observation_values : :obj:`jax.Array` of shape (n,1)
         Observabled training data.
-    training_errors : :obj:`jax.Array` of shape (n,1)
+    observation_errors : :obj:`jax.Array` of shape (n,1)
         Errors on the training observed data.
     scale_errors : :obj:`bool`
         Scale the errors on the training data by adding a constant, by default True.
@@ -76,26 +79,27 @@ class GaussianProcess(eqx.Module):
         Number of points to predict, by default 5 * length(training(indexes)).
 
     """
-    model: Union[CovarianceFunction,PowerSpectralDensity] 
-    training_indexes: jnp.ndarray
-    training_errors: jnp.ndarray
-    training_observables: jnp.ndarray
-    prediction_indexes: jnp.ndarray
+    model: Union[CovarianceFunction,PSDToACV] 
+    observation_indexes: jax.Array
+    observation_errors: jax.Array
+    observation_values: jax.Array
+    prediction_indexes: jax.Array
     nb_prediction_points: int
     scale_errors: bool
     estimate_mean: bool
     analytical_cov: bool    
+    estimate_variance: bool = False
     
-    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity], training_indexes, training_observables, training_errors=None, **kwargs):
+    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity], observation_indexes, observation_values, observation_errors=None, **kwargs) -> None:
         """Constructor method for the GaussianProcess class.
 
         """
         # Check if the training arrays have the same shape
-        if training_errors is None:
-            sanity_checks(training_indexes, training_observables)
+        if observation_errors is None:
+            sanity_checks(observation_indexes, observation_values)
         else:
-            sanity_checks(training_indexes, training_observables)
-            sanity_checks(training_observables, training_errors)
+            sanity_checks(observation_indexes, observation_values)
+            sanity_checks(observation_values, observation_errors)
 
 
         if isinstance(function, CovarianceFunction):
@@ -107,35 +111,35 @@ class GaussianProcess(eqx.Module):
             S_low = kwargs.get("S_low", 10)
             S_high = kwargs.get("S_high", 10)
             method = kwargs.get("method", "FFT")
-            
-            self.model = PSDToACV(function, S_low=S_low, S_high=S_high,T = training_indexes[-1]-training_indexes[0],dt =jnp.min(jnp.diff(training_indexes)),method=method)
+            self.estimate_variance = kwargs.get("estimate_variance", True)
+            self.model = PSDToACV(function, S_low=S_low, S_high=S_high,T = observation_indexes[-1]-observation_indexes[0],dt =jnp.min(jnp.diff(observation_indexes)),method=method,estimate_variance=self.estimate_variance)
+            self.model.print_info()
         else:
             raise TypeError("The input model must be a CovarianceFunction or a PowerSpectralDensity.")
         
         # add a factor to scale the errors
         self.scale_errors = kwargs.get("scale_errors", True)
-        if self.scale_errors:
+        if self.scale_errors and (observation_errors is not None):
             self.model.parameters.append("nu",1.0,True,hyperparameter=False)
 
 
         # Reshape the arrays
-        self.training_indexes = reshape_array(training_indexes)
-        self.training_observables = reshape_array(training_observables)
+        self.observation_indexes = reshape_array(observation_indexes)
+        self.observation_values = reshape_array(observation_values)
         # add a small number to the errors to avoid singular matrices in the cholesky decomposition
-        self.training_errors = training_errors.flatten() if training_errors is not None else jnp.ones_like(self.training_observables)*jnp.sqrt(jnp.finfo(float).eps)
+        self.observation_errors = observation_errors.flatten() if observation_errors is not None else jnp.ones_like(self.observation_values)*jnp.sqrt(jnp.finfo(float).eps)
 
         # add the mean of the observed data as a parameter
         self.estimate_mean = kwargs.get("estimate_mean", True)
         if self.estimate_mean:
-            self.model.parameters.append("mu",jnp.mean(self.training_observables),True,hyperparameter=False)
+            self.model.parameters.append("mu",jnp.mean(self.observation_values),True,hyperparameter=False)
         else:
             print("The mean of the training data is not estimated. Be careful of the data included in the training set.")
 
         # Prediction of data
-        self.nb_prediction_points = kwargs.get("nb_prediction_points", 5*len(self.training_indexes))
-        self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.training_indexes), jnp.max(self.training_indexes), self.nb_prediction_points)))
+        self.nb_prediction_points = kwargs.get("nb_prediction_points", 5*len(self.observation_indexes))
+        self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.observation_indexes), jnp.max(self.observation_indexes), self.nb_prediction_points)))
 
-    # @eqx.filter_jit
     def get_cov(self, xt, xp, errors=None):
         """ Compute the covariance matrix between two arrays. 
         
@@ -187,17 +191,17 @@ class GaussianProcess(eqx.Module):
         Cov_inv: array of shape (n,n)
             Inverse of Cov_xx.
         alpha: array of shape (n,1)
-            alpha = Cov_inv * training_observables (- mu if mu is estimated)
+            alpha = Cov_inv * observation_values (- mu if mu is estimated)
         """
 
         Cov_xx = self.get_cov(
-            self.training_indexes, self.training_indexes, errors=self.training_errors)
-        Cov_inv = solve(Cov_xx, jnp.eye(len(self.training_indexes)))
+            self.observation_indexes, self.observation_indexes, errors=self.observation_errors)
+        Cov_inv = solve(Cov_xx, jnp.eye(len(self.observation_indexes)))
         if self.estimate_mean:
-            alpha = Cov_inv@(self.training_observables -
+            alpha = Cov_inv@(self.observation_values -
                              self.model.parameters["mu"].value)
         else:
-            alpha = Cov_inv@(self.training_observables)
+            alpha = Cov_inv@(self.observation_values)
         return Cov_xx, Cov_inv, alpha
 
     def compute_predictive_distribution(self, **kwargs):
@@ -208,7 +212,7 @@ class GaussianProcess(eqx.Module):
         k the covariance function, sig the noise in the observation.
         The predictive distribution is computed as:
 
-        alpha = inv( k(x,x) + sig^2 * I ) * training_observables
+        alpha = inv( k(x,x) + sig^2 * I ) * observation_values
         mean = k(x*,x) * alpha
         cov = k(x*,x*) - k(x*,x) * inv( k(x,x) + sig^2 * I ) * k(x,x*)
 
@@ -217,7 +221,7 @@ class GaussianProcess(eqx.Module):
         ----------
         **kwargs: dict
             prediction_indexes: array of length m, optional
-                Indexes of the prediction data, by default jnp.linspace(jnp.min(training_indexes),jnp.max(training_indexes),nb_prediction_points)
+                Indexes of the prediction data, by default jnp.linspace(jnp.min(observation_indexes),jnp.max(observation_indexes),nb_prediction_points)
 
         Returns
         -------
@@ -234,7 +238,7 @@ class GaussianProcess(eqx.Module):
         # Compute the covariance matrix between the training indexes
         _, Cov_inv, alpha = self.get_cov_training()
         # Compute the covariance matrix between the training indexes and the prediction indexes
-        Cov_xxp = self.get_cov(self.training_indexes, prediction_indexes)
+        Cov_xxp = self.get_cov(self.observation_indexes, prediction_indexes)
         Cov_xpxp = self.get_cov(prediction_indexes,
                                 prediction_indexes)
 
@@ -250,8 +254,7 @@ class GaussianProcess(eqx.Module):
 
         return predictive_mean, predictive_covariance
     
-    
-    def compute_log_marginal_likelihood(self):
+    def compute_log_marginal_likelihood(self) -> float:
         r""" Compute the log marginal likelihood of the Gaussian Process.
 
         The log marginal likelihood is computed using algorithm (2.1) in Rasmussen and Williams (2006)
@@ -272,8 +275,8 @@ class GaussianProcess(eqx.Module):
             Log marginal likelihood of the GP.
 
         """
-        Cov_xx = self.get_cov(self.training_indexes, self.training_indexes,
-                              errors=self.training_errors)
+        Cov_xx = self.get_cov(self.observation_indexes, self.observation_indexes,
+                              errors=self.observation_errors)
         # Compute the covariance matrix between the training indexes
         try:
             L = cholesky(Cov_xx, lower=True)
@@ -281,14 +284,14 @@ class GaussianProcess(eqx.Module):
             L = cholesky(nearest_positive_definite(Cov_xx), lower=True)
 
         if self.estimate_mean:
-            z = solve_triangular(L, self.training_observables-self.model.parameters["mu"].value, lower=True)
+            z = solve_triangular(L, self.observation_values-self.model.parameters["mu"].value, lower=True)
         else:
-            z = solve_triangular(L, self.training_observables, lower=True)
+            z = solve_triangular(L, self.observation_values, lower=True)
 
-        return -((jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.training_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z)).flatten()[0])
+        return -jnp.take(jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.observation_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z),0)
     
     @eqx.filter_jit
-    def wrapper_log_marginal_likelihood(self, parameters):
+    def wrapper_log_marginal_likelihood(self, parameters) -> float:
         """ Wrapper to compute the log marginal likelihood in function of the (hyper)parameters. 
 
         Parameters
@@ -303,8 +306,9 @@ class GaussianProcess(eqx.Module):
         """
         self.model.parameters.set_free_values(parameters)
         return self.compute_log_marginal_likelihood()
-
-    def wrapper_neg_log_marginal_likelihood(self, parameters):
+    
+    @eqx.filter_jit
+    def wrapper_neg_log_marginal_likelihood(self, parameters) -> float:
         """ Wrapper to compute the negative log marginal likelihood in function of the (hyper)parameters. 
 
         Parameters

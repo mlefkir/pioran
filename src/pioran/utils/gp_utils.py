@@ -1,8 +1,9 @@
+import jax.numpy as jnp
+import numpy as np
+from jax import jit
 from jax.numpy import linalg as la
 from scipy.spatial.distance import cdist
-import jax.numpy as jnp
-from jax import jit
-import numpy as np
+
 
 @jit
 def EuclideanDistance(xq, xp):

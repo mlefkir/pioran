@@ -1,3 +1,6 @@
+from jax.config import config
+config.update("jax_enable_x64", True)
+
 from .core import GaussianProcess
 
 from .acvf_base import CovarianceFunction

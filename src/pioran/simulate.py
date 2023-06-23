@@ -3,24 +3,18 @@
 import sys
 import warnings
 
-
-from jax.config import config
-config.update("jax_enable_x64", True)
 import jax.numpy as jnp
-from jax import random
-from jax.scipy.linalg import cholesky
-
-from numpy import savetxt
+import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.table import Table
-
+from jax import random
+from jax.scipy.linalg import cholesky
+from numpy import savetxt
 from scipy.interpolate import interp1d
-import matplotlib.pyplot as plt
 
-from .psd_base import PowerSpectralDensity
 from .acvf_base import CovarianceFunction
-from .utils import EuclideanDistance
-
+from .psd_base import PowerSpectralDensity
+from .utils.gp_utils import EuclideanDistance
 
 
 class Simulations: 
@@ -107,7 +101,7 @@ class Simulations:
         If the model is not a PSD or ACVF.
     """
     
-    def __init__(self, T, dt, model,S_low=None,S_high=None):
+    def __init__(self, T,dt, model,N=None,S_low=None,S_high=None):
         
         if not isinstance(model,PowerSpectralDensity) and not isinstance(model,CovarianceFunction):
             raise ValueError(f"You must provide a model which is either a PowerSpectralDensity or a CovarianceFunction, not {type(model)}")
@@ -126,7 +120,7 @@ class Simulations:
         # parameters of the time series
         self.duration = T
         self.sampling_period = dt
-        self.n_time = jnp.rint(T/dt).astype(int)
+        self.n_time = jnp.rint(T/dt).astype(int) if N is None else N
         self.t = jnp.arange(0,self.duration,self.sampling_period)      
          
         # parameters of the **observed** frequency grid 
@@ -259,7 +253,7 @@ class Simulations:
             fig.savefig(f'{filename}',format='pdf')
         return fig,ax
              
-    def GP_method(self,interpolation='cubic'):
+    def GP_method(self,t_test,interpolation='cubic'):
         """Generate a time series using the GP method.
         
         If the ACVF is not already calculated, it is calculated from the PSD 
@@ -285,7 +279,6 @@ class Simulations:
             self.acvf = acv[:len(acv)//2+1]/self.dtau
         
         
-        t_test = jnp.arange(0,self.duration,self.sampling_period)      
 
         # if the cholesky decomposition of the autocovariance function is not already calculated, we calculate it
         if self.triang is None:
@@ -430,11 +423,18 @@ class Simulations:
         
         if method == 'GP':
             if irregular_sampling:
-                raise NotImplementedError("The GP method does not support irregular sampling yet")
+                t_test = jnp.sort(random.uniform(key=self.keys['sampling'],shape=(self.n_time,),minval=0,maxval=self.duration))
+                while not t_test.shape == jnp.unique(t_test).shape:
+                    warnings.warn("The time series is not sampled at unique time intervals, resampling")
+                    self.keys['sampling']+=1
+                    t_test = jnp.sort(random.uniform(key=self.keys['sampling'],shape=(self.n_time,),minval=0,maxval=self.duration))
+            else:
+                t_test = jnp.arange(0,self.duration,self.sampling_period)      
+                # raise NotImplementedError("The GP method does not support irregular sampling yet")
             if self.n_time > 8000:
                 warnings.warn("The desired number of point in the simulated time series is quite high")
             interp_method = kwargs.get('interp_method','cubic')
-            t,true_timeseries = self.GP_method(interpolation=interp_method)
+            t,true_timeseries = self.GP_method(interpolation=interp_method,t_test=t_test)
 
         elif method == 'TK':
             if self.psd is None:

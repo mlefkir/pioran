@@ -37,3 +37,4 @@ These are the covariance functions that are currently implemented, they inherit 
     Matern32
     Matern52
     RationalQuadratic
+    CARMA_covariance

@@ -1,10 +1,12 @@
 """ Various tools for the Gaussian Process module."""
-import jax.numpy as jnp
-
-# constants
-# TYPE_NUMBER = (float,int,jnp.number)
 from typing import Union
+
+import jax
+import jax.numpy as jnp
+import numpy as np
+
 TYPE_NUMBER = Union[float,int,jnp.number]
+Array_type = Union[jax.Array,list,np.ndarray]
 
 
 TABLE_LENGTH = 76

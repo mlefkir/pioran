@@ -1,22 +1,7 @@
-Utils and tools
-===============
+Tools
+=====
  
- .. currentmodule:: pioran.utils
 
-
-Utils module
-------------
-
-.. autosummary::
-    :toctree: summary
-    :recursive:
-    :nosignatures:
-
-    EuclideanDistance
-    nearest_positive_definite
-    decompose_triangular_matrix
-    reconstruct_triangular_matrix
-    isPD
 
 
 Tools module
@@ -30,3 +15,4 @@ Tools module
 
     reshape_array
     sanity_checks
+

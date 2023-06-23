@@ -3,6 +3,7 @@
 
 """
 from jax.tree_util import register_pytree_node_class
+
 from .tools import HEADER_PARAMETERS
 
 
