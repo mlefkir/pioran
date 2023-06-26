@@ -147,12 +147,10 @@ class PSDToACV(eqx.Module):
         """
         if self.method == 'FFT':
             psd = self.PSD.calculate(self.frequencies[1:])
-            if self.with_var: psd /= jnp.trapz(psd)*self.f0
             psd = jnp.insert(psd,0,0) # add a zero at the beginning to account for the zero frequency
             acvf = self.get_acvf_byFFT(psd)
-            # normalize by the frequency step 
-            # acvf = acvf[:len(acvf)//2+1]/self.dtau was not working properly for odd number of points
             if self.with_var:
+                acvf = acvf / acvf[0] # normalize by the variance instead of integrating the PSD with the trapezium rule
                 return  self.interpolation(t,acvf)*self.parameters['var'].value
             return  self.interpolation(t,acvf)
         

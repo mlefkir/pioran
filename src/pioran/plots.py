@@ -71,8 +71,8 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
     ax.plot(x_pred,y_pred, label='Prediction',color='k')
 
     ax.set_title(title) if title is not None else None
-    ax.set_xlabel(xlabel) if title is not None else None
-    ax.set_ylabel(ylabel) if title is not None else None
+    ax.set_xlabel(xlabel) if xlabel is not None else None
+    ax.set_ylabel(ylabel) if ylabel is not None else None
     ax.set_xlim(xlim) if xlim is not None else None
     ax.set_ylim(ylim) if ylim is not None else None
     
