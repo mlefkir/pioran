@@ -89,6 +89,7 @@ class GaussianProcess(eqx.Module):
     estimate_mean: bool
     analytical_cov: bool    
     estimate_variance: bool = False
+    log_warping: bool = False
     
     def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity], observation_indexes, observation_values, observation_errors=None, **kwargs) -> None:
         """Constructor method for the GaussianProcess class.
@@ -99,9 +100,8 @@ class GaussianProcess(eqx.Module):
             sanity_checks(observation_indexes, observation_values)
         else:
             sanity_checks(observation_indexes, observation_values)
-            sanity_checks(observation_values, observation_errors)
-
-
+            sanity_checks(observation_values, observation_errors)            
+        
         if isinstance(function, CovarianceFunction):
             self.analytical_cov = True
             self.model = function
@@ -135,6 +135,11 @@ class GaussianProcess(eqx.Module):
             self.model.parameters.append("mu",jnp.mean(self.observation_values),True,hyperparameter=False)
         else:
             print("The mean of the training data is not estimated. Be careful of the data included in the training set.")
+        
+        self.log_warping = kwargs.get("log_warping", False)
+        if self.log_warping:
+            assert self.estimate_mean, "The mean of the training data must be estimated to use a log transformation."
+            self.model.parameters.append("const",jnp.min(self.observation_values),True,hyperparameter=False)
 
         # Prediction of data
         self.nb_prediction_points = kwargs.get("nb_prediction_points", 5*len(self.observation_indexes))
@@ -275,20 +280,40 @@ class GaussianProcess(eqx.Module):
             Log marginal likelihood of the GP.
 
         """
-        Cov_xx = self.get_cov(self.observation_indexes, self.observation_indexes,
-                              errors=self.observation_errors)
-        # Compute the covariance matrix between the training indexes
-        try:
-            L = cholesky(Cov_xx, lower=True)
-        except:
-            L = cholesky(nearest_positive_definite(Cov_xx), lower=True)
+        if not self.log_warping:
+            Cov_xx = self.get_cov(self.observation_indexes, self.observation_indexes,
+                                errors=self.observation_errors)
+            # Compute the covariance matrix between the training indexes
+            try:
+                L = cholesky(Cov_xx, lower=True)
+            except:
+                L = cholesky(nearest_positive_definite(Cov_xx), lower=True)
 
-        if self.estimate_mean:
-            z = solve_triangular(L, self.observation_values-self.model.parameters["mu"].value, lower=True)
+            if self.estimate_mean:
+                z = solve_triangular(L, self.observation_values-self.model.parameters["mu"].value, lower=True)
+            else:
+                z = solve_triangular(L, self.observation_values, lower=True)
+
+            return -jnp.take(jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.observation_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z),0)
         else:
-            z = solve_triangular(L, self.observation_values, lower=True)
+            latent_errors = self.observation_errors.flatten() / (self.observation_values.flatten() - self.model.parameters["const"].value)
+            latent_values = jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value))-self.model.parameters['mu'].value
+        
+            Cov_xx = self.get_cov(self.observation_indexes, self.observation_indexes, errors=latent_errors)
+            
+            try:
+                L = cholesky(Cov_xx, lower=True)
+            except:
+                print("Cholesky failed")
+                L = cholesky(nearest_positive_definite(Cov_xx), lower=True)
 
-        return -jnp.take(jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.observation_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z),0)
+            z = solve_triangular(L, latent_values, lower=True)
+            
+            l = jnp.take(jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.observation_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z),0)
+            correction =  jnp.sum(jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value)))
+            
+            return -l + correction
+            
     
     @eqx.filter_jit
     def wrapper_log_marginal_likelihood(self, parameters) -> float:
