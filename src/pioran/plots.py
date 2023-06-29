@@ -336,6 +336,8 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     ax.loglog(f_LS,LS_periodogram,color='C2',label='Lomb-Scargle')
 
     noise_level = np.median(np.diff(x))*np.mean(yerr**2)*2
+    noise_level_max = np.max(np.diff(x))*np.max(yerr**2)*2
+    ax.axhspan(noise_level,noise_level_max,color='k',alpha=.1)
     ax.axhline(noise_level,color='k',ls='--',label='Noise level')
     
     if f_min_obs is not None: ax.axvline(f_min_obs,ls='-.',label=r'$f_\mathrm{min}$')
@@ -343,7 +345,7 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
 
     if ylim is None:
         # ax.set_ylim(bottom=np.min(LS_periodogram)/1e3)
-        ax.set_ylim(bottom=noise_level/10)
+        ax.set_ylim(bottom=noise_level/10,top=np.max(psd_median)*2)
         
     ax.legend(bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
     ax.margins(x=0,y=0)

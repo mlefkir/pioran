@@ -126,8 +126,18 @@ class PSDToACV(eqx.Module):
         print('f0: ',self.f0)
         print('fN: ',self.fN)
         print('n_freq_grid: ',self.n_freq_grid)
+    
+    def calculate_rescale(self,t: jnp.array,**kwargs)-> jax.Array:
+
+        if self.method == 'FFT':
+            psd = self.PSD.calculate(self.frequencies[1:])
+            psd = jnp.insert(psd,0,0) # add a zero at the beginning to account for the zero frequency
+            acvf = self.get_acvf_byFFT(psd)
+            if self.with_var:
+                return acvf[0] # normalize by the variance instead of integrating the PSD with the trapezium rule
         
-    def calculate(self,t: jnp.array,**kwargs)-> jax.Array:
+        
+    def calculate(self,t: jnp.array,with_ACVF_factor=False,**kwargs)-> jax.Array:
         """
         Calculate the autocovariance function from the power spectral density.
         
@@ -150,8 +160,11 @@ class PSDToACV(eqx.Module):
             psd = jnp.insert(psd,0,0) # add a zero at the beginning to account for the zero frequency
             acvf = self.get_acvf_byFFT(psd)
             if self.with_var:
-                acvf = acvf / acvf[0] # normalize by the variance instead of integrating the PSD with the trapezium rule
-                return  self.interpolation(t,acvf)*self.parameters['var'].value
+                R = acvf / acvf[0]  # normalize by the variance instead of integrating the PSD with the trapezium rule
+                if not with_ACVF_factor:
+                    return  self.interpolation(t,R)*self.parameters['var'].value
+                else:
+                    return  self.interpolation(t,R)*self.parameters['var'].value, acvf[0]
             return  self.interpolation(t,acvf)
         
         elif self.method == 'NuFFT':

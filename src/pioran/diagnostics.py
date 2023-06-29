@@ -162,23 +162,26 @@ class Visualisations:
                     f = jnp.logspace(jnp.log10(f_min),jnp.log10(f_max),1000)
                     
                     posterior_PSD = []
+                    posterior_ACVF = []
 
                     if self.process.estimate_variance:
                         sumP = np.array([])
                         posterior_ACVF = []
                         for it in range(samples.shape[0]):
-                            self.process.model.parameters.set_free_values(samples[it])
-                            R = self.process.model.calculate(self.tau)
-                            sumP = np.append(sumP,R[0])
-                            posterior_ACVF.append(R/R[0]*variance[it])
                             
-                            P = self.process.model.PSD.calculate(self.process.model.frequencies[1:])
-                            P *= variance[it]/sumP[-1]
-                            posterior_PSD.append(P)  
+                            self.process.model.parameters.set_free_values(samples[it])
+                            R,factor = self.process.model.calculate(self.tau,with_ACVF_factor=True)
+                            sumP = np.append(sumP,factor)
+                            posterior_ACVF.append(R)
+                            
+                            P = self.process.model.PSD.calculate(f)#self.process.model.frequencies[1:])
+                            P /= sumP[-1]/variance[it]
+                            posterior_PSD.append(P) 
                             print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
                             sys.stdout.flush()
                         np.savetxt(f'{self.filename_prefix}normalisation_factor.txt',np.array(sumP))
                         posterior_ACVF = np.array(posterior_ACVF)
+                        np.savetxt(f'{self.filename_prefix}posterior_predictive_ACFV.txt',posterior_ACVF)
                     else:
                         
                         for it in range(samples.shape[0]):
@@ -210,9 +213,19 @@ class Visualisations:
                     else:
                         posterior_ACVF = jnp.array([CARMA_autocovariance(self.tau,roots[i],jnp.array([1]),sigma[i]) for i in range(samples.shape[0])])
             elif isinstance(self.process.model,PSDToACV):
-                pass                
+                pass
+                # if self.process.estimate_variance:
+                #         posterior_ACVF = []
+                #         for it in range(samples.shape[0]):
+                #             self.process.model.parameters.set_free_values(samples[it])
+                #             R = self.process.model.calculate(self.tau)
+                #             posterior_ACVF.append(R/R[0]*variance[it])
+                #             print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
+                #             sys.stdout.flush()
+                #         posterior_ACVF = np.array(posterior_ACVF)                
             else:
                 raise NotImplementedError("Posterior predictive ACFs are not implemented for Gaussian processes.")
+            
             posterior_ACVF /= posterior_ACVF[:,0,None]
             
             print("Plotting posterior predictive ACFs...")
