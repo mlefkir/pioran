@@ -181,7 +181,7 @@ class Visualisations:
                             sys.stdout.flush()
                         np.savetxt(f'{self.filename_prefix}normalisation_factor.txt',np.array(sumP))
                         posterior_ACVF = np.array(posterior_ACVF)
-                        np.savetxt(f'{self.filename_prefix}posterior_predictive_ACFV.txt',posterior_ACVF)
+                        # np.savetxt(f'{self.filename_prefix}posterior_predictive_ACFV.txt',posterior_ACVF)
                     else:
                         
                         for it in range(samples.shape[0]):

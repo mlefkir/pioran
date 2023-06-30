@@ -198,15 +198,26 @@ class GaussianProcess(eqx.Module):
         alpha: array of shape (n,1)
             alpha = Cov_inv * observation_values (- mu if mu is estimated)
         """
-
-        Cov_xx = self.get_cov(
-            self.observation_indexes, self.observation_indexes, errors=self.observation_errors)
-        Cov_inv = solve(Cov_xx, jnp.eye(len(self.observation_indexes)))
-        if self.estimate_mean:
-            alpha = Cov_inv@(self.observation_values -
-                             self.model.parameters["mu"].value)
+        if not self.log_warping:
+            Cov_xx = self.get_cov(
+                self.observation_indexes, self.observation_indexes, errors=self.observation_errors)
+            Cov_inv = solve(Cov_xx, jnp.eye(len(self.observation_indexes)))
+            if self.estimate_mean:
+                alpha = Cov_inv@(self.observation_values -
+                                self.model.parameters["mu"].value)
+            else:
+                alpha = Cov_inv@(self.observation_values)
         else:
-            alpha = Cov_inv@(self.observation_values)
+            latent_errors = self.observation_errors.flatten() / (self.observation_values.flatten() - self.model.parameters["const"].value)
+            latent_values = jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value))-self.model.parameters['mu'].value
+        
+            Cov_xx = self.get_cov(
+                self.observation_indexes, self.observation_indexes, errors=latent_errors)
+            Cov_inv = solve(Cov_xx, jnp.eye(len(self.observation_indexes)))
+            if self.estimate_mean:
+                alpha = Cov_inv@latent_values
+            else:
+                alpha = Cov_inv@latent_values
         return Cov_xx, Cov_inv, alpha
 
     def compute_predictive_distribution(self, **kwargs):
@@ -249,8 +260,12 @@ class GaussianProcess(eqx.Module):
 
         # Compute the predictive mean
         if self.estimate_mean:
-            predictive_mean = Cov_xxp.T@alpha + \
-                self.model.parameters["mu"].value
+            if not self.log_warping:
+                predictive_mean = Cov_xxp.T@alpha + \
+                    self.model.parameters["mu"].value
+            else:
+                predictive_mean = jnp.exp(Cov_xxp.T@alpha + \
+                    self.model.parameters["mu"].value) 
         else:
             predictive_mean = Cov_xxp.T@alpha
         # Compute the predictive covariance and ensure that the covariance matrix is positive definite
