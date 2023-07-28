@@ -143,7 +143,8 @@ class Simulations:
         self.keys = {}
             
         if isinstance(model,PowerSpectralDensity):
-            self.psd = model.calculate(self.frequencies)
+            self.psd = model.calculate(self.frequencies[1:])
+            self.psd = jnp.insert(self.psd,0,0)
         else:
             self.acvf = model.calculate(self.tau)
         
