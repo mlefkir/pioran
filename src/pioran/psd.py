@@ -549,14 +549,12 @@ class OneBendingPowerLaw(PowerSpectralDensity):
 class OneBendingPowerLawNorm(PowerSpectralDensity):
     expression = 'onebendingpowerlaw_norm'
     parameters: ParametersModel    
-    N : int
-    
+
     def __init__(self, parameters_values, **kwargs):     
-        assert len(parameters_values)  == 4 , f'The number of parameters for {self.__classname__()} must be 3, not {len(parameters_values)}'
-        self.N = len(parameters_values)//2-1
+        assert len(parameters_values)  == 4 , f'The number of parameters for {self.__classname__()} must be 4, not {len(parameters_values)}'
         free_parameters = kwargs.get('free_parameters', [True]*len(parameters_values))
         # initialise the parameters and check
-        names=['norm','index_1', 'freq_1', 'delindex_2']
+        names=['norm','index_1', 'freq_1', 'index_2']
                 
         PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=names, free_parameters=free_parameters)
                                     
@@ -577,14 +575,9 @@ class OneBendingPowerLawNorm(PowerSpectralDensity):
             Power spectral density function evaluated on the array of frequencies.
         """
         
-        index_1,f_1,delindex_1,norm = self.parameters['index_1'].value, self.parameters['freq_1'].value, self.parameters['delindex_2'].value, self.parameters['norm'].value
-        index_2 = index_1 + delindex_1
-        P = jnp.power(f,-index_1) / (1+jnp.power(f/f_1,index_2))
-        # s = jnp.trapz(jnp.power(f,-index_1) / (1+jnp.power(f/f_1,index_2)) / (1+jnp.power(f/f_2,index_3)))
+        index_1,f_1,index_2,norm = self.parameters['index_1'].value, self.parameters['freq_1'].value, self.parameters['index_2'].value, self.parameters['norm'].value
+        P = jnp.power( f/f_1 , index_1 ) * jnp.power( 1 + jnp.power ( f / f_1 , index_1-index_2 ),-1 )
         return P*norm
-        # P = jnp.power( f , -self.parameters[f'index_1'].value )
-        # P *=   1/(1 + jnp.power( f / self.parameters[f'freq_1'].value ,(selfself.parameters[f'2'].value ) )
-        # return P* self.parameters[f'amplitude'].value
         
 class OneBendingPowerLaw(PowerSpectralDensity):
     expression = 'onebendingpowerlaw'
@@ -617,5 +610,4 @@ class OneBendingPowerLaw(PowerSpectralDensity):
         
         index_1,f_1,index_2 = self.parameters['index_1'].value, self.parameters['freq_1'].value, self.parameters['index_2'].value
         P = jnp.power( f/f_1 , index_1 ) * jnp.power( 1 + jnp.power ( f / f_1 , index_1-index_2 ),-1 )
-        # s = jnp.trapz(jnp.power(f,-index_1) / (1+jnp.power(f/f_1,index_2)) / (1+jnp.power(f/f_2,index_3)))
         return P

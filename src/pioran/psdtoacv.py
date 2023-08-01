@@ -156,6 +156,13 @@ class PSDToACV(eqx.Module):
         a = jnp.linalg.solve(self.spectral_matrix, psd_normalised)
         return a, self.spectral_points
       
+    def get_SHO_coefs(self):
+        psd = self.PSD.calculate(self.spectral_points)
+        psd /= psd[0]
+        
+        a, f = self.decompose_model(psd)
+        return a, f
+    
     def build_SHO_model(self,amplitudes: jax.Array,frequencies: jax.Array) :
         """Build the semi-separable SHO model from the amplitudes and frequencies.
         
@@ -342,7 +349,15 @@ class PSDToACV(eqx.Module):
         else:
             raise ValueError(f"Method {self.method} not implemented")
     def __str__(self) -> str:
-        return f"PSDToACV\n{self.PSD.__str__()}"
-    
+        s = f"PSDToACV\n"
+        if self.method != 'NuFFT' and self.method !='FFT':
+            s += f"method: {self.method} decomposition\n"
+
+            s+= f"N_components: {self.n_components}\n"
+        else:
+            s += f"method: {self.method}\n"
+            s+= f"N_freq_grid: {self.n_freq_grid}\n"
+        s += self.PSD.__str__() 
+        return s
     def __repr__(self) -> str:
         return self.__str__()

@@ -15,7 +15,7 @@ from .psdtoacv import PSDToACV
 from .tools import reshape_array, sanity_checks
 from .utils.gp_utils import nearest_positive_definite
 
-allowed_methods = ['FFT','NuFFT', 'decomposition']
+allowed_methods = ['FFT','NuFFT', 'SHO']
 
 class GaussianProcess(eqx.Module):
     r""" Class for the Gaussian Process Regression of 1D data. 
@@ -110,10 +110,10 @@ class GaussianProcess(eqx.Module):
         if method not in allowed_methods:
             raise ValueError(f"Method {method} not allowed. Choose between {allowed_methods}")
         self.use_tinygp = use_tinygp
-        if method == 'decomposition' and not use_tinygp:
-            raise ValueError("Method 'decomposition' can only be used with Tinygp")
-        if method != 'decomposition' and use_tinygp:
-            raise ValueError("tinygp is only compatible with method 'decomposition'")
+        if method == 'SHO' and not use_tinygp:
+            raise ValueError("Method 'SHO' can only be used with Tinygp")
+        if method != 'SHO' and use_tinygp:
+            raise ValueError("tinygp is only compatible with method 'SHO'")
         if self.use_tinygp and (n_components is None):
             raise ValueError("The number of components must be specified when using Tinygp")
         
@@ -133,7 +133,7 @@ class GaussianProcess(eqx.Module):
             self.analytical_cov = False
 
             if use_tinygp:
-                method = 'decomposition'
+                method = 'SHO'
             self.estimate_variance = estimate_variance
             self.model = PSDToACV(function, S_low=S_low, S_high=S_high,
                                   T = observation_indexes[-1]-observation_indexes[0],
@@ -147,6 +147,8 @@ class GaussianProcess(eqx.Module):
         
         # add a factor to scale the errors
         self.scale_errors = scale_errors
+        if observation_errors is None:
+            self.scale_errors = False
         if self.scale_errors and (observation_errors is not None):
             self.model.parameters.append("nu",1.0,True,hyperparameter=False)
 
@@ -361,10 +363,29 @@ class GaussianProcess(eqx.Module):
             return -l + correction
             
     def compute_log_marginal_likelihood_tinygp(self) -> float:
+        r"""Compute the log marginal likelihood of the Gaussian Process using tinygp.
         
-        gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
+        This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
+        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep.SHO`. 
+        
+        
+        Returns
+        -------
+        log_marginal_likelihood: float
+            Log marginal likelihood of the GP.
+        
+        """
+        if self.estimate_mean and self.scale_errors:
+            gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
                                     noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*self.observation_errors**2),
                                     mean=self.model.parameters['mu'].value)
+        elif self.estimate_mean:
+            gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
+                                    mean=self.model.parameters['mu'].value)
+        elif self.scale_errors:
+            gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
+                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*self.observation_errors**2))
+        
         return gp.log_probability(self.observation_values)
     
     

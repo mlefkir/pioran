@@ -4,6 +4,7 @@
 from typing import Union
 
 from mpi4py import MPI
+
 import ultranest
 import ultranest.stepsampler
 
