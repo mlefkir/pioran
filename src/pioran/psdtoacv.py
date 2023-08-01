@@ -13,6 +13,8 @@ from .psd_base import PowerSpectralDensity
 from .utils.gp_utils import (EuclideanDistance, decompose_triangular_matrix,
                              reconstruct_triangular_matrix)
 
+import tinygp
+from tinygp.kernels.quasisep import SHO as SHO_term
 
 class PSDToACV(eqx.Module):
     """Class for the conversion of a power spectral density to an autocovariance function.
@@ -55,7 +57,7 @@ class PSDToACV(eqx.Module):
     method : :obj:`str`
         Method used to compute the autocovariance function. Can be 'FFT' if the inverse Fourier transform is used or 'NuFFT' 
         if the non uniform Fourier transform is used.
-    with_var : :obj:`bool`
+    estimate_variance : :obj:`bool`
         If True, the variance of the autocovariance function is estimated.
     
     Methods
@@ -71,21 +73,26 @@ class PSDToACV(eqx.Module):
     
     PSD: PowerSpectralDensity
     parameters: ParametersModel
-    frequencies: jnp.ndarray
-    tau: jnp.ndarray
-    dtau: float
-    method: str
+    frequencies: jax.Array = None
+    tau: jax.Array = None
+    dtau: float = None
+    method: str 
     f0: float
     S_low: float
     S_high: float
     fN: float
-    n_freq_grid: int    
-    with_var: bool
+    n_freq_grid: int = None  
+    estimate_variance: bool
+    use_decomposition: bool = False
+    n_components: int = None
+    spectral_points: jax.Array = None
+    spectral_matrix: jax.Array = None
+    ACVF: tinygp.kernels.quasisep.SHO = None
     
-    def __init__(self, PSD:PowerSpectralDensity, S_low:float, S_high:float,T, dt, estimate_variance=True,**kwargs):
+    def __init__(self, PSD:PowerSpectralDensity, S_low:float, S_high:float,T, dt, method,n_components,estimate_variance=True):
         """Constructor of the PSDToACV class."""
         
-        self.with_var = estimate_variance
+        self.estimate_variance = estimate_variance
         if not isinstance(PSD,PowerSpectralDensity):
             raise TypeError("PSD must be a PowerSpectralDensity object")
         if S_low<2:
@@ -93,13 +100,13 @@ class PSDToACV(eqx.Module):
         self.PSD = PSD
         self.parameters = PSD.parameters
         
-        if self.with_var:
+        if self.estimate_variance:
             self.parameters.append('var',1,True,hyperparameter=False)
         
         # parameters of the time series
-        duration = T
-        sampling_period = dt
-        n_time = int(T/dt)
+        # duration = T
+        # sampling_period = dt
+        # n_time = int(T/dt)
         
         # parameters of the **observed** frequency grid 
         f_max_obs = 0.5/dt
@@ -110,13 +117,78 @@ class PSDToACV(eqx.Module):
         # parameters of the **total** frequency grid
         self.f0 = f_min_obs/self.S_low
         self.fN = f_max_obs*self.S_high
-        self.n_freq_grid = int(jnp.ceil(self.fN/self.f0)) + 1 
-        self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0) #my biggest mistake...
-        # self.frequencies = jnp.arange(self.f0,self.fN+self.f0,self.f0)
-        tau_max = .5/self.f0#0.5/self.f0
-        self.dtau = tau_max/(self.n_freq_grid-1) 
-        self.tau = jnp.arange(0,tau_max+self.dtau,self.dtau)
-        self.method = kwargs.get('method','FFT')
+        
+        self.method = method
+
+        if self.method == 'FFT' or self.method=='NuFFT':
+            self.n_freq_grid = jnp.rint(jnp.ceil(self.fN/self.f0)) + 1 
+            self.frequencies = jnp.arange(0,self.fN+self.f0,self.f0) #my biggest mistake...
+            # self.frequencies = jnp.arange(self.f0,self.fN+self.f0,self.f0)
+            tau_max = .5/self.f0#0.5/self.f0
+            self.dtau = tau_max/(self.n_freq_grid-1) 
+            self.tau = jnp.arange(0,tau_max+self.dtau,self.dtau)
+        else:
+            self.n_components = n_components
+            self.spectral_points = jnp.geomspace(self.f0,self.fN,self.n_components)
+            self.spectral_matrix = 1 / (1 + jnp.power(jnp.atleast_2d(self.spectral_points).T / self.spectral_points, 4) )
+            
+    def decompose_model(self,psd_normalised: jax.Array):
+        """Decompose the model into a sum of SHO kernels.
+        
+        Assuming that the model is written as a sum of SHO kernels, this method
+        solve the linear system to find the amplitude of each kernel.
+        
+        ADD EQUATION ETC...
+        
+        Parameters
+        ----------
+        psd_normalised : :obj:`jax.Array`
+            Normalised power spectral density by the first value.
+        
+        Returns
+        -------
+        amplitudes : :obj:`jax.Array`
+            Amplitudes of the SHO kernels.
+        frequencies : :obj:`jax.Array`
+            Frequencies of the SHO kernels.        
+        """
+        
+        a = jnp.linalg.solve(self.spectral_matrix, psd_normalised)
+        return a, self.spectral_points
+      
+    def build_SHO_model(self,amplitudes: jax.Array,frequencies: jax.Array) :
+        """Build the semi-separable SHO model from the amplitudes and frequencies.
+        
+        Parameters
+        ----------
+        amplitudes : :obj:`jax.Array`
+            Amplitudes of the SHO kernels.
+        frequencies : :obj:`jax.Array`
+            Frequencies of the SHO kernels.
+            
+        Returns
+        -------
+        kernel : :obj:`tinygp.kernels.quasisep.SHO`        
+            Constructed SHO kernel.
+        """
+        
+        kernel = 0
+        for j in range(self.n_components):
+            kernel += amplitudes[j]*SHO_term(quality=1/jnp.sqrt(2),omega= 2*jnp.pi*frequencies[j])
+        return kernel
+    
+    @property
+    def ACVF(self):
+        psd = self.PSD.calculate(self.spectral_points)
+        psd /= psd[0]
+        
+        a, f = self.decompose_model(psd)
+        kernel = self.build_SHO_model(a*f,f)
+        if self.estimate_variance:
+            return kernel*(self.parameters['var'].value/jnp.sum(a*f))
+        return kernel
+
+      
       
     def print_info(self):
         print("PSD to ACV conversion")
@@ -127,17 +199,17 @@ class PSDToACV(eqx.Module):
         print('fN: ',self.fN)
         print('n_freq_grid: ',self.n_freq_grid)
     
-    def calculate_rescale(self,t: jnp.array,**kwargs)-> jax.Array:
+    def calculate_rescale(self,t: jax.Array)-> jax.Array:
 
         if self.method == 'FFT':
             psd = self.PSD.calculate(self.frequencies[1:])
             psd = jnp.insert(psd,0,0) # add a zero at the beginning to account for the zero frequency
             acvf = self.get_acvf_byFFT(psd)
-            if self.with_var:
+            if self.estimate_variance:
                 return acvf[0] # normalize by the variance instead of integrating the PSD with the trapezium rule
         
         
-    def calculate(self,t: jnp.array,with_ACVF_factor=False,**kwargs)-> jax.Array:
+    def calculate(self,t: jax.Array,with_ACVF_factor=False)-> jax.Array:
         """
         Calculate the autocovariance function from the power spectral density.
         
@@ -159,7 +231,7 @@ class PSDToACV(eqx.Module):
             psd = self.PSD.calculate(self.frequencies[1:])
             psd = jnp.insert(psd,0,0) # add a zero at the beginning to account for the zero frequency
             acvf = self.get_acvf_byFFT(psd)
-            if self.with_var:
+            if self.estimate_variance:
                 R = acvf / acvf[0]  # normalize by the variance instead of integrating the PSD with the trapezium rule
                 if not with_ACVF_factor:
                     return  self.interpolation(t,R)*self.parameters['var'].value
@@ -172,7 +244,10 @@ class PSDToACV(eqx.Module):
             k = jnp.arange(-N/2,N/2)*self.f0
             psd = self.PSD.calculate(k)+0j
             return  self.get_acvf_byNuFFT(psd,t*4*jnp.pi**2)
-    
+        
+        else:
+            raise ValueError(f'Method {self.method} not implemented')
+            
     def get_acvf_byNuFFT(self,psd: jnp.array,t: jnp.array)-> jax.Array:
         """Compute the autocovariance function from the power spectral density using the non uniform Fourier transform.
 
@@ -192,7 +267,7 @@ class PSDToACV(eqx.Module):
         P = 2 * jnp.pi / self.f0
         return nufft2(psd, t/P).real * self.f0
     
-    def get_acvf_byFFT(self, psd: jnp.array)-> jax.Array:
+    def get_acvf_byFFT(self, psd: jax.Array)-> jax.Array:
         """Compute the autocovariance function from the power spectral density using the inverse Fourier transform.
 
         Parameters
@@ -212,7 +287,7 @@ class PSDToACV(eqx.Module):
         return  acvf
     
     @eqx.filter_jit
-    def interpolation(self, t: jnp.array, acvf: jnp.array)-> jax.Array:
+    def interpolation(self, t: jax.Array, acvf: jax.Array)-> jax.Array:
         """Interpolate the autocovariance function at the points t.
 
         Parameters
@@ -230,7 +305,7 @@ class PSDToACV(eqx.Module):
         I = jnp.interp(t,self.tau,acvf)
         return  I
 
-    def get_cov_matrix(self, xq: jnp.array, xp: jnp.array)-> jax.Array:
+    def get_cov_matrix(self, xq: jax.Array, xp: jax.Array)-> jax.Array:
         """Compute the covariance matrix between two arrays xq, xp.
 
         The term (xq-xp) is computed using the :func:`~pioran.utils.EuclideanDistance` function from the utils module.
@@ -261,13 +336,13 @@ class PSDToACV(eqx.Module):
             else:
                 d = dist.flatten()
                 return self.calculate(d).reshape(dist.shape)
-        else:
+        elif self.method == 'FFT':
             # Compute the covariance matrix
             return self.calculate(dist)
-
+        else:
+            raise ValueError(f"Method {self.method} not implemented")
     def __str__(self) -> str:
         return f"PSDToACV\n{self.PSD.__str__()}"
     
     def __repr__(self) -> str:
         return self.__str__()
-    

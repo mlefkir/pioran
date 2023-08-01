@@ -3,9 +3,10 @@
 """
 from typing import Union
 
-import jax
 import equinox as eqx
+import jax
 import jax.numpy as jnp
+import tinygp
 from jax.scipy.linalg import cholesky, solve, solve_triangular
 
 from .acvf_base import CovarianceFunction
@@ -14,6 +15,7 @@ from .psdtoacv import PSDToACV
 from .tools import reshape_array, sanity_checks
 from .utils.gp_utils import nearest_positive_definite
 
+allowed_methods = ['FFT','NuFFT', 'decomposition']
 
 class GaussianProcess(eqx.Module):
     r""" Class for the Gaussian Process Regression of 1D data. 
@@ -90,11 +92,32 @@ class GaussianProcess(eqx.Module):
     analytical_cov: bool    
     estimate_variance: bool = False
     log_warping: bool = False
+    use_tinygp: bool = False
     
-    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity], observation_indexes, observation_values, observation_errors=None, **kwargs) -> None:
+    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity],
+                 observation_indexes, observation_values, 
+                 observation_errors=None, S_low = 10,S_high=10,
+                 method = 'FFT',
+                 use_tinygp = False,
+                 n_components = None,
+                 estimate_variance = True,
+                 estimate_mean = True,
+                 scale_errors = True,
+                 log_warping = False,**kwargs) -> None:
         """Constructor method for the GaussianProcess class.
 
         """
+        if method not in allowed_methods:
+            raise ValueError(f"Method {method} not allowed. Choose between {allowed_methods}")
+        self.use_tinygp = use_tinygp
+        if method == 'decomposition' and not use_tinygp:
+            raise ValueError("Method 'decomposition' can only be used with Tinygp")
+        if method != 'decomposition' and use_tinygp:
+            raise ValueError("tinygp is only compatible with method 'decomposition'")
+        if self.use_tinygp and (n_components is None):
+            raise ValueError("The number of components must be specified when using Tinygp")
+        
+        
         # Check if the training arrays have the same shape
         if observation_errors is None:
             sanity_checks(observation_indexes, observation_values)
@@ -108,35 +131,43 @@ class GaussianProcess(eqx.Module):
 
         elif isinstance(function, PowerSpectralDensity):
             self.analytical_cov = False
-            S_low = kwargs.get("S_low", 10)
-            S_high = kwargs.get("S_high", 10)
-            method = kwargs.get("method", "FFT")
-            self.estimate_variance = kwargs.get("estimate_variance", True)
-            self.model = PSDToACV(function, S_low=S_low, S_high=S_high,T = observation_indexes[-1]-observation_indexes[0],dt =jnp.min(jnp.diff(observation_indexes)),method=method,estimate_variance=self.estimate_variance)
-            self.model.print_info()
+
+            if use_tinygp:
+                method = 'decomposition'
+            self.estimate_variance = estimate_variance
+            self.model = PSDToACV(function, S_low=S_low, S_high=S_high,
+                                  T = observation_indexes[-1]-observation_indexes[0],
+                                  dt =jnp.min(jnp.diff(observation_indexes)),
+                                  method=method,
+                                  n_components=n_components,
+                                  estimate_variance=self.estimate_variance)
+            # self.model.print_info()
         else:
             raise TypeError("The input model must be a CovarianceFunction or a PowerSpectralDensity.")
         
         # add a factor to scale the errors
-        self.scale_errors = kwargs.get("scale_errors", True)
+        self.scale_errors = scale_errors
         if self.scale_errors and (observation_errors is not None):
             self.model.parameters.append("nu",1.0,True,hyperparameter=False)
 
-
-        # Reshape the arrays
-        self.observation_indexes = reshape_array(observation_indexes)
-        self.observation_values = reshape_array(observation_values)
-        # add a small number to the errors to avoid singular matrices in the cholesky decomposition
-        self.observation_errors = observation_errors.flatten() if observation_errors is not None else jnp.ones_like(self.observation_values)*jnp.sqrt(jnp.finfo(float).eps)
-
+        if not use_tinygp:
+          # Reshape the arrays
+            self.observation_indexes = reshape_array(observation_indexes)
+            self.observation_values = reshape_array(observation_values)
+            # add a small number to the errors to avoid singular matrices in the cholesky decomposition
+            self.observation_errors = observation_errors.flatten() if observation_errors is not None else jnp.ones_like(self.observation_values)*jnp.sqrt(jnp.finfo(float).eps)
+        else:
+            self.observation_indexes = observation_indexes.flatten()
+            self.observation_values = observation_values.flatten()
+            self.observation_errors = observation_errors.flatten() if observation_errors is not None else jnp.ones_like(self.observation_values)*jnp.sqrt(jnp.finfo(float).eps)
         # add the mean of the observed data as a parameter
-        self.estimate_mean = kwargs.get("estimate_mean", True)
+        self.estimate_mean = estimate_mean
         if self.estimate_mean:
             self.model.parameters.append("mu",jnp.mean(self.observation_values),True,hyperparameter=False)
         else:
             print("The mean of the training data is not estimated. Be careful of the data included in the training set.")
         
-        self.log_warping = kwargs.get("log_warping", False)
+        self.log_warping = log_warping
         if self.log_warping:
             assert self.estimate_mean, "The mean of the training data must be estimated to use a log transformation."
             self.model.parameters.append("const",jnp.min(self.observation_values),True,hyperparameter=False)
@@ -220,7 +251,7 @@ class GaussianProcess(eqx.Module):
                 alpha = Cov_inv@latent_values
         return Cov_xx, Cov_inv, alpha
 
-    def compute_predictive_distribution(self, **kwargs):
+    def compute_predictive_distribution(self, prediction_indexes=None):
         """ Compute the predictive mean and the predictive covariance of the GP. 
 
         The predictive distribution are computed using equations (2.25)  and (2.26) in Rasmussen and Williams (2006)
@@ -247,8 +278,8 @@ class GaussianProcess(eqx.Module):
             Predictive covariance of the GP.
         """
         # if we want to change the prediction indexes
-        if "prediction_indexes" in kwargs:
-            prediction_indexes = reshape_array(kwargs["prediction_indexes"])
+        if prediction_indexes is not None:
+            prediction_indexes = reshape_array(prediction_indexes)
         else:
             prediction_indexes = self.prediction_indexes
         # Compute the covariance matrix between the training indexes
@@ -274,7 +305,7 @@ class GaussianProcess(eqx.Module):
 
         return predictive_mean, predictive_covariance
     
-    def compute_log_marginal_likelihood(self) -> float:
+    def compute_log_marginal_likelihood_pioran(self) -> float:
         r""" Compute the log marginal likelihood of the Gaussian Process.
 
         The log marginal likelihood is computed using algorithm (2.1) in Rasmussen and Williams (2006)
@@ -329,6 +360,19 @@ class GaussianProcess(eqx.Module):
             
             return -l + correction
             
+    def compute_log_marginal_likelihood_tinygp(self) -> float:
+        
+        gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
+                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*self.observation_errors**2),
+                                    mean=self.model.parameters['mu'].value)
+        return gp.log_probability(self.observation_values)
+    
+    
+    
+    def compute_log_marginal_likelihood(self) -> float:
+        if self.use_tinygp:
+            return self.compute_log_marginal_likelihood_tinygp()
+        return self.compute_log_marginal_likelihood_pioran()
     
     @eqx.filter_jit
     def wrapper_log_marginal_likelihood(self, parameters) -> float:
@@ -347,7 +391,7 @@ class GaussianProcess(eqx.Module):
         self.model.parameters.set_free_values(parameters)
         return self.compute_log_marginal_likelihood()
     
-    @eqx.filter_jit
+    # @eqx.filter_jit
     def wrapper_neg_log_marginal_likelihood(self, parameters) -> float:
         """ Wrapper to compute the negative log marginal likelihood in function of the (hyper)parameters. 
 
@@ -373,6 +417,6 @@ class GaussianProcess(eqx.Module):
             String representation of the GP object.        
         """
         s = 31*"=" +" Gaussian Process "+31*"="+"\n\n"
-        s += f"Marginal log likelihood: {self.compute_log_marginal_likelihood():.5f}\n"
+        # s += f"Marginal log likelihood: {self.compute_log_marginal_likelihood():.5f}\n"
         s += self.model.__str__()
         return s

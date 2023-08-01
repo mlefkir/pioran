@@ -586,3 +586,36 @@ class OneBendingPowerLawNorm(PowerSpectralDensity):
         # P *=   1/(1 + jnp.power( f / self.parameters[f'freq_1'].value ,(selfself.parameters[f'2'].value ) )
         # return P* self.parameters[f'amplitude'].value
         
+class OneBendingPowerLaw(PowerSpectralDensity):
+    expression = 'onebendingpowerlaw'
+    parameters: ParametersModel    
+    
+    def __init__(self, parameters_values, **kwargs):     
+        assert len(parameters_values)  == 3 , f'The number of parameters for {self.__classname__()} must be 3, not {len(parameters_values)}'
+        free_parameters = kwargs.get('free_parameters', [True]*len(parameters_values))
+        # initialise the parameters and check
+        names=['index_1', 'freq_1', 'index_2']
+                
+        PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=names, free_parameters=free_parameters)
+                                    
+    def calculate(self,f):
+        r"""Computes the Multiple bending power-law model on an array of frequencies :math:`f`.
+        
+        The expression is given by Equation :math:numref:`multiplebendplpsd`
+        with the variance :math:`A\ge 0` and the scale :math:`\gamma>0`.
+
+        Parameters
+        ----------
+        f : :obj:`jax.Array`
+            Array of frequencies.
+
+        Returns
+        -------
+        :obj:`jax.Array`
+            Power spectral density function evaluated on the array of frequencies.
+        """
+        
+        index_1,f_1,index_2 = self.parameters['index_1'].value, self.parameters['freq_1'].value, self.parameters['index_2'].value
+        P = jnp.power( f/f_1 , index_1 ) * jnp.power( 1 + jnp.power ( f / f_1 , index_1-index_2 ),-1 )
+        # s = jnp.trapz(jnp.power(f,-index_1) / (1+jnp.power(f/f_1,index_2)) / (1+jnp.power(f/f_2,index_3)))
+        return P
