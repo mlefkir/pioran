@@ -30,8 +30,7 @@ class Inference:
     bounds : list of tuple
         Bounds for the (hyper)parameters.
     method : :obj:`str`
-        - "L-BFGS-B": using scipy.optimize.minimize
-        - "nested": using nested sampling via ultranest
+        - "NS": using nested sampling via ultranest
     
     results : dict
         Results of the optimization.
@@ -46,7 +45,7 @@ class Inference:
     
     """
     
-    def __init__(self, Process: Union[GaussianProcess,CARMAProcess], method="NS"):
+    def __init__(self, Process: Union[GaussianProcess,CARMAProcess],priors, method="NS"):
         r"""Constructor method for the Optimizer class.
 
         Instantiate the Inference class.
@@ -65,14 +64,16 @@ class Inference:
         """
         
         self.process = Process
+        self.priors = priors
+        
         
         if isinstance(method, str):
             self.method = method
         else:
-            raise TypeError("method must be a string.")   
-        
+            raise TypeError("method must be a string.")  
          
-    def run(self, priors=None,verbose=True, **kwargs):
+         
+    def run(self, verbose=True, **kwargs):
         """ Optimize the (hyper)parameters of the Gaussian Process.
         
         Run the inference method.
@@ -98,13 +99,11 @@ class Inference:
             Results of the optimization. Different keys depending on the method.
         """
         if self.method == "NS":
-            if priors is None:
-                raise ValueError("Priors must be provided for nested sampling.")
             use_stepsampler = kwargs.pop('use_stepsampler',False)
             if 'user_likelihood' in kwargs:
                 print("user_likelihood is used please check the documentation.")
             user_likelihood = kwargs.pop('user_likelihood',self.process.wrapper_log_marginal_likelihood)
-            results, sampler = self.nested_sampling(priors=priors,user_likelihood=user_likelihood,verbose=verbose,use_stepsampler=use_stepsampler,**kwargs)
+            results, sampler = self.nested_sampling(priors=self.priors,user_likelihood=user_likelihood,verbose=verbose,use_stepsampler=use_stepsampler,**kwargs)
         else:
             raise ValueError("The method must be 'NS'.")
         comm.Barrier()

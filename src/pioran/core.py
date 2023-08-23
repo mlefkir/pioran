@@ -13,9 +13,7 @@ from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
 from .tools import reshape_array, sanity_checks
-from .utils.gp_utils import nearest_positive_definite
-
-allowed_methods = ['FFT','NuFFT', 'SHO']
+from .utils.gp_utils import nearest_positive_definite, allowed_methods
 
 class GaussianProcess(eqx.Module):
     r""" Class for the Gaussian Process Regression of 1D data. 

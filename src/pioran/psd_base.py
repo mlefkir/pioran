@@ -35,6 +35,8 @@ class PowerSpectralDensity(eqx.Module):
         Parameters of the covariance function.
     expression : :obj:`str`
         Expression of the covariance function.
+    analytical : :obj:`bool`
+        If True, the covariance function is analytical, otherwise it is not.
 
     Methods
     -------
@@ -52,6 +54,7 @@ class PowerSpectralDensity(eqx.Module):
     """    
     parameters: ParametersModel
     expression: str
+    analytical: bool = False
     
     def __init__(self, param_values,param_names, free_parameters):
 
@@ -77,7 +80,8 @@ class PowerSpectralDensity(eqx.Module):
         s += self.parameters.__str__()
         return s
     
-    
+    def __repr__(self) -> str:
+        return self.__str__()
     
     def __add__(self, other)->"SumPowerSpectralDensity":
         """Overload of the + operator for the power spectral densities.
