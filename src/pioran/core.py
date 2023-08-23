@@ -94,7 +94,9 @@ class GaussianProcess(eqx.Module):
     
     def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity],
                  observation_indexes, observation_values, 
-                 observation_errors=None, S_low = 10,S_high=10,
+                 observation_errors = None,
+                 S_low = 10,
+                 S_high = 10,
                  method = 'FFT',
                  use_tinygp = False,
                  n_components = None,
@@ -109,19 +111,11 @@ class GaussianProcess(eqx.Module):
             raise ValueError(f"Method {method} not allowed. Choose between {allowed_methods}")
         self.use_tinygp = use_tinygp
         if method == 'SHO' and not use_tinygp:
-            raise ValueError("Method 'SHO' can only be used with Tinygp")
+            raise ValueError("Method 'SHO' can only be used with tinygp, please set `use_tinygp=True`")
         if method != 'SHO' and use_tinygp:
             raise ValueError("tinygp is only compatible with method 'SHO'")
         if self.use_tinygp and (n_components is None):
-            raise ValueError("The number of components must be specified when using Tinygp")
-        
-        
-        # Check if the training arrays have the same shape
-        if observation_errors is None:
-            sanity_checks(observation_indexes, observation_values)
-        else:
-            sanity_checks(observation_indexes, observation_values)
-            sanity_checks(observation_values, observation_errors)            
+            raise ValueError("The number of components must be specified when using tinygp, please set `n_components=...`")
         
         if isinstance(function, CovarianceFunction):
             self.analytical_cov = True
@@ -129,19 +123,23 @@ class GaussianProcess(eqx.Module):
 
         elif isinstance(function, PowerSpectralDensity):
             self.analytical_cov = False
-
-            if use_tinygp:
-                method = 'SHO'
             self.estimate_variance = estimate_variance
             self.model = PSDToACV(function, S_low=S_low, S_high=S_high,
                                   T = observation_indexes[-1]-observation_indexes[0],
-                                  dt =jnp.min(jnp.diff(observation_indexes)),
+                                  dt = jnp.min(jnp.diff(observation_indexes)),
                                   method=method,
                                   n_components=n_components,
                                   estimate_variance=self.estimate_variance)
             # self.model.print_info()
         else:
-            raise TypeError("The input model must be a CovarianceFunction or a PowerSpectralDensity.")
+            raise TypeError(f"The input model must be a CovarianceFunction or a PowerSpectralDensity, not {type(function)}")
+        
+                # Check if the training arrays have the same shape
+        if observation_errors is None:
+            sanity_checks(observation_indexes, observation_values)
+        else:
+            sanity_checks(observation_indexes, observation_values)
+            sanity_checks(observation_values, observation_errors)            
         
         # add a factor to scale the errors
         self.scale_errors = scale_errors
@@ -439,3 +437,6 @@ class GaussianProcess(eqx.Module):
         # s += f"Marginal log likelihood: {self.compute_log_marginal_likelihood():.5f}\n"
         s += self.model.__str__()
         return s
+
+    def __repr__(self) -> str:
+        return self.__str__()

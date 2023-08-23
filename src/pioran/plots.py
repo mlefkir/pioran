@@ -355,3 +355,159 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     fig.tight_layout()
     fig.savefig(f'{filename}_posterior_predictive_PSD.pdf',bbox_inches='tight')
     return fig,ax
+
+def diagnostics_psd_approx(f,res,ratio,f_min,f_max):
+    """Plot the mean residuals and the ratios of the PSD approximation as a function of frequency
+    
+    
+    Parameters
+    ----------
+    f : :obj:`jax.Array`
+        Frequency array.
+    res : :obj:`jax.Array`
+        Residuals of the PSD approximation.
+    ratio : :obj:`jax.Array`
+        Ratio of the PSD approximation.
+    f_min : :obj:`float`
+        Minimum observed frequency.
+    f_max : :obj:`float`
+        Maximum observed frequency.
+        
+    Returns
+    -------
+    fig : :obj:`matplotlib.figure.Figure`
+        Figure object.
+    ax : :obj:`matplotlib.axes.Axes`
+        Axes object.
+    
+    """
+    fig,ax = plt.subplots(2,1,figsize=(8,6))
+    ax[0].plot(f,jnp.mean(res,axis=0),label='mean')
+    ax[0].update({'xscale':'log','ylabel':'Residuals'})#,'yscale':'log'})
+    ax[1].plot(f,jnp.mean(ratio,axis=0),label='mean')
+    ax[1].update({'xlabel':'Frequency','xscale':'log','ylabel':'Ratio'})
+    ax[1].sharex(ax[0])
+    ax[0].axvline(f_min,color='k',ls='-.',label=r'$f_\mathrm{min}$')
+    ax[1].axvline(f_min,color='k',ls='-.',label=r'$f_\mathrm{min}$')
+    ax[0].axvline(f_max,color='k',ls=':',label=r'$f_\mathrm{max}$')
+    ax[1].axvline(f_max,color='k',ls=':',label=r'$f_\mathrm{max}$')
+
+    ax[1].legend(bbox_to_anchor=(.75, -.01), loc='lower right',ncol=3, borderaxespad=0.,bbox_transform=fig.transFigure)
+    fig.align_ylabels()
+    fig.tight_layout()
+    return fig,ax
+
+def violin_plots_psd_approx(res,ratio):
+    """Plot the violin plots of the residuals and the ratios of the PSD approximation.
+    
+    Parameters
+    ----------
+    res : :obj:`jax.Array`
+        Residuals of the PSD approximation.
+    ratio : :obj:`jax.Array`
+        Ratios of the PSD approximation.
+    
+    Returns
+    -------
+    fig : :obj:`matplotlib.figure.Figure`
+        Figure object.
+    ax : :obj:`matplotlib.axes.Axes`
+        Axes object.
+    
+    """
+    
+    mean_res = jnp.mean(res,axis=1)
+    median_res = jnp.median(res,axis=1)
+
+    mean_ratio = jnp.mean(ratio,axis=1)
+    median_ratio = jnp.median(ratio,axis=1)
+
+    max_ratio = jnp.max(jnp.abs(ratio),axis=1)
+    min_ratio = jnp.min(jnp.abs(ratio),axis=1)
+    max_res = jnp.max(jnp.abs(res),axis=1)
+
+    fig,ax = plt.subplots(2,1,figsize=(8,6))
+
+    ax[0].violinplot([mean_res,median_res,max_res],vert=True,showmeans=True)
+    ax[0].update({'xlabel':'','ylabel':'Residual value'})
+    ax[0].set_xticks([1,2,3])
+    ax[0].set_xticklabels(['Meta-mean','Meta-median','Meta-max'])
+    ax[0].axhline(0,c='g',ls=':')
+
+    axins = ax[0].inset_axes([0.2, 0.3, 0.5, 0.6])
+    axins.violinplot([mean_res,median_res],vert=True,showmeans=True)
+    # subregion of the original image
+    axins.set_xticks([1,2])
+    axins.set_xticklabels(['Mean','Median'])
+    axins.axhline(0,c='g',ls=':')
+
+
+    ax[1].violinplot([mean_ratio,median_ratio,min_ratio,max_ratio],vert=True,showmeans=True)
+    ax[1].axhline(1,c='g',ls=':')
+    ax[1].update({'xlabel':'','ylabel':'Ratio value'})
+    ax[1].set_xticks([1,2,3,4])
+    ax[1].set_xticklabels(['Meta-mean','Meta-median','Meta-min','Meta-max'])
+
+    axins = ax[1].inset_axes([0.2, 0.3, 0.5, 0.6])
+    axins.set_xticks([1,2])
+    axins.set_xticklabels(['Mean','Median'])
+    axins.axhline(1,c='g',ls=':')
+
+    axins.violinplot([mean_ratio,median_ratio],vert=True,showmeans=True)
+    fig.align_ylabels()
+    fig.tight_layout()
+    return fig,ax
+
+def residuals_quantiles(residuals,ratio,f,f_min,f_max):
+    """Plot the quantiles of the residuals and the ratios of the PSD approximation as a function of frequency.
+    
+    Parameters
+    ----------
+    res : :obj:`jax.Array`
+        Residuals of the PSD approximation.
+    ratio : :obj:`jax.Array`
+        Ratios of the PSD approximation.
+    f : :obj:`jax.Array`
+        Frequency array.
+    f_min : :obj:`float`
+        Minimum observed frequency.
+    f_max : :obj:`float`
+        Maximum observed frequency.
+        
+    
+    Returns
+    -------
+    fig : :obj:`matplotlib.figure.Figure`
+        Figure object.
+    ax : :obj:`matplotlib.axes.Axes`
+        Axes object.
+    
+    """
+    low_1,low_5,low_16,med,high_84,high_95,high_99 = jnp.percentile(residuals,jnp.array([1,5,16,50,84,95,99]),axis=0)
+
+    fig, ax = plt.subplots(2,1,figsize=(9,8))
+    ax[0].fill_between(f,low_5,high_95,alpha=.2,label='5% and 95% percentiles')
+    ax[0].fill_between(f,low_16,high_84,alpha=.4,label='16% and 84% percentiles')
+    ax[0].plot(f,med,label='Median')
+    ax[0].update({'xlabel':'Frequency',
+                'ylabel':'Residuals',
+                'xscale':'log'})
+
+    low_1,low_5,low_16,med,high_84,high_95,high_99 = jnp.percentile(ratio,jnp.array([1,5,16,50,84,95,99]),axis=0)
+    ax[1].fill_between(f,low_5,high_95,alpha=.2,label=r'$2\sigma$')
+    ax[1].fill_between(f,low_16,high_84,alpha=.4,label=r'1$\sigma$')
+    ax[1].plot(f,med,label='Median')
+
+    ax[1].update({'xlabel':'Frequency',
+                    'ylabel':'Ratios',
+                    'xscale':'log'})
+
+    ax[0].axvline(f_min,color='k',ls='-.',label=r'$f_\mathrm{min}$')
+    ax[1].axvline(f_min,color='k',ls='-.',label=r'$f_\mathrm{min}$')
+    ax[0].axvline(f_max,color='k',ls=':',label=r'$f_\mathrm{max}$')
+    ax[1].axvline(f_max,color='k',ls=':',label=r'$f_\mathrm{max}$')
+
+    ax[1].legend(bbox_to_anchor=(.95, -.03), loc='lower right',ncol=5, borderaxespad=0.,bbox_transform=fig.transFigure)
+    fig.align_ylabels()
+    fig.tight_layout()
+    return fig,ax

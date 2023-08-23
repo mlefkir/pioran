@@ -3,37 +3,37 @@
 """
 from typing import Union
 
-from mpi4py import MPI
-
+import jax
+import jax.numpy as jnp
+import numpy as np
 import ultranest
 import ultranest.stepsampler
+from mpi4py import MPI
 
-from .core import GaussianProcess
 from .carma_core import CARMAProcess
-
+from .core import GaussianProcess
+from .psdtoacv import PSDToACV
+from .utils.psd_decomp import get_samples_psd
+from .plots import violin_plots_psd_approx,diagnostics_psd_approx,residuals_quantiles
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 
 class Inference:
-    r"""Class to estimate the (hyper)parameters of the Gaussian Process.
+    r"""Class to infer the value of the (hyper)parameters of the Gaussian Process.
     
-    Optimize the (hyper)parameters of the Gaussian Process using scipy.optimize.minimize or nested sampling via ultranest.
     
     Attributes
     ----------
     
-    GP : :class:`~pioran.core.GaussianProcess`
+    process : :class:`~pioran.core.GaussianProcess`
         Gaussian Process object.
-    initial_guess : list of float
-        Initial guess for the (hyper)parameters.
-    bounds : list of tuple
-        Bounds for the (hyper)parameters.
+    priors: :obj:`function`
+        Function to define the priors for the (hyper)parameters.
     method : :obj:`str`
-        - "NS": using nested sampling via ultranest
-    
-    results : dict
-        Results of the optimization.
+        - "ultranest": nested sampling via ultranest.
+    results : :obj:`dict`
+        Results of the inference.
     
     Methods
     -------
@@ -45,7 +45,7 @@ class Inference:
     
     """
     
-    def __init__(self, Process: Union[GaussianProcess,CARMAProcess],priors, method="NS"):
+    def __init__(self, Process: Union[GaussianProcess,CARMAProcess],priors, method :str="ultranest",n_samples=10000,seed_check=0):
         r"""Constructor method for the Optimizer class.
 
         Instantiate the Inference class.
@@ -53,10 +53,16 @@ class Inference:
         Parameters
         ----------
         Process : :class:`~pioran.core.GaussianProcess`
-            Gaussian Process object.
+            Process object.
+        priors : :obj:`function`
+            Function to define the priors for the (hyper)parameters.
         method : str, optional
             "NS": using nested sampling via ultranest
-    
+        n_samples : int, optional
+            Number of samples to take from the prior distribution, by default 1000
+        seed_check : int, optional
+            Seed for the random number generator, by default 0    
+            
         Raises
         ------
         TypeError
@@ -71,7 +77,61 @@ class Inference:
             self.method = method
         else:
             raise TypeError("method must be a string.")  
-         
+        
+        if isinstance(Process, GaussianProcess) and isinstance(self.process.model,PSDToACV):
+            if self.process.model.method == 'SHO':
+                print("The PSD model is a SHO decomposition, checking the approximation.")
+                self.check_approximation(n_samples,seed_check)
+        
+    def check_approximation(self,n_samples,seed_check,n_frequencies=1000):
+        """Check the approximation of the PSD with the SHO decomposition.
+        
+        This method will take random samples from the prior distribution and compare the PSD obtained 
+        with the SHO decomposition with the true PSD.
+
+        Parameters
+        ----------
+        n_samples : int, optional
+            Number of samples to take from the prior distribution, by default 1000
+        seed : int, optional
+            , by default 0
+        """
+        freqs = jnp.geomspace(self.process.model.f0, self.process.model.fN, n_frequencies)
+        n_pars = len(self.process.model.parameters)
+
+        if self.method == 'ultranest':
+            # draw samples from the prior distribution
+            rng = np.random.default_rng(seed=seed_check)  
+            uniform_samples = rng.uniform(size=(n_pars,n_samples))  
+            params_samples = self.priors(uniform_samples)#[indexes]
+
+        else:
+            raise NotImplementedError("Only ultranest is implemented for now.")   
+        
+        
+        # get the true PSD and the SHO PSD samples        
+        psd_true,psd_SHO = get_samples_psd(self.process.model,freqs,params_samples.T)
+        # compute the residuals and the ratios
+        residuals = psd_true-psd_SHO
+        ratio = psd_SHO/psd_true
+        fig,_ = diagnostics_psd_approx(f=freqs,
+                                        res=residuals,
+                                        ratio=ratio,
+                                        f_min=self.process.model.f_min_obs,
+                                        f_max=self.process.model.f_max_obs)
+        fig.savefig("diagnostics_psd_approx.pdf")
+        
+        fig2,_ = violin_plots_psd_approx(res=residuals,
+                                        ratio=ratio)
+        fig2.savefig("violin_plots_psd_approx.pdf")
+        
+        fig3,_ = residuals_quantiles(residuals=residuals,
+                                     ratio=ratio,
+                                     f=freqs,
+                                     f_min=self.process.model.f_min_obs,
+                                     f_max=self.process.model.f_max_obs)
+        return fig,fig2,fig3,residuals,ratio
+                    
          
     def run(self, verbose=True, **kwargs):
         """ Optimize the (hyper)parameters of the Gaussian Process.

@@ -52,6 +52,10 @@ class PSDToACV(eqx.Module):
         Frequency grid.
     n_freq_grid : :obj:`int`
         Number of points in the frequency grid.
+    f_max_obs : :obj:`float`
+        Maximum observed frequency, i.e. the Nyquist frequency.
+    f_min_obs : :obj:`float`
+        Minimum observed frequency.
     f0 : :obj:`float`
         Lower bound of the frequency grid.
     fN : :obj:`float`
@@ -89,6 +93,8 @@ class PSDToACV(eqx.Module):
     tau: jax.Array = None
     dtau: float = None
     method: str
+    f_max_obs: float
+    f_min_obs: float
     f0: float 
     S_low: float
     S_high: float
@@ -166,12 +172,12 @@ class PSDToACV(eqx.Module):
             self.parameters.append('var', 1, True, hyperparameter=False)
 
         # parameters of the **observed** frequency grid
-        f_max_obs = 0.5/dt # Nyquist frequency
-        f_min_obs = 1/T # minimum observed frequency
+        self.f_max_obs = 0.5/dt # Nyquist frequency
+        self.f_min_obs = 1/T # minimum observed frequency
 
         # parameters of the **total** frequency grid
-        self.f0 = f_min_obs/self.S_low # minimum frequency
-        self.fN = f_max_obs*self.S_high # maximum frequency
+        self.f0 = self.f_min_obs/self.S_low # minimum frequency
+        self.fN = self.f_max_obs*self.S_high # maximum frequency
 
         self.n_freq_grid = jnp.rint(jnp.ceil(self.fN/self.f0)) + 1
         self.frequencies = jnp.arange(0, self.fN+self.f0, self.f0)
@@ -457,11 +463,12 @@ class PSDToACV(eqx.Module):
         s = f"PSDToACV\n"
         if self.method != 'NuFFT' and self.method != 'FFT':
             s += f"method: {self.method} decomposition\n"
-
             s += f"N_components: {self.n_components}\n"
         else:
             s += f"method: {self.method}\n"
             s += f"N_freq_grid: {self.n_freq_grid}\n"
+        s += f"S_low: {self.S_low}\n"
+        s += f"S_high: {self.S_high}\n"
         s += self.PSD.__str__()
         return s
 
