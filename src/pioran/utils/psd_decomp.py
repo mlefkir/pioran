@@ -78,11 +78,13 @@ def get_psd_approx_samples(psd_acvf,f,params):
     """
     
     psd_acvf.parameters.set_free_values(params)
-    a,f_c = psd_acvf.get_SHO_coefs()
-    psd_SHO = SHO_power_spectrum(f,a[...,None],f_c[...,None]).sum(axis=0)
-    psd_model = psd_acvf.PSD.calculate(f)
-    psd_model /= psd_model[...,0,None]
-    return psd_model,psd_SHO
-
+    if psd_acvf.method == 'SHO':
+        a,f_c = psd_acvf.get_SHO_coefs()
+        psd_SHO = SHO_power_spectrum(f,a[...,None],f_c[...,None]).sum(axis=0)
+        psd_model = psd_acvf.PSD.calculate(f)
+        psd_model /= psd_model[...,0,None]
+        return psd_model,psd_SHO
+    else:
+        raise NotImplementedError("Only SHO is implemented for now.")
 def get_samples_psd(psd_acvf,f,params_samples):
     return jax.vmap(get_psd_approx_samples,(None,None,0))(psd_acvf,f,params_samples)

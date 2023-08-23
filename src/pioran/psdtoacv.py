@@ -6,15 +6,15 @@ Class to convert a power spectral density to an autocovariance function via the 
 import equinox as eqx
 import jax
 import jax.numpy as jnp
+import tinygp
 from jax_finufft import nufft2
+from tinygp.kernels.quasisep import SHO as SHO_term
 
 from .parameters import ParametersModel
 from .psd_base import PowerSpectralDensity
-from .utils.gp_utils import (EuclideanDistance, decompose_triangular_matrix,
-                             reconstruct_triangular_matrix,allowed_methods)
-
-import tinygp
-from tinygp.kernels.quasisep import SHO as SHO_term
+from .utils.gp_utils import (EuclideanDistance, allowed_methods,
+                             decompose_triangular_matrix,
+                             reconstruct_triangular_matrix, tinygp_methods)
 
 
 class PSDToACV(eqx.Module):
@@ -40,7 +40,7 @@ class PSDToACV(eqx.Module):
     n_components : :obj:`int`
         Number of components used to approximate the power spectral density using the 'SHO' method.
     estimate_variance : :obj:`bool`, optional
-        If True, the variance of the autocovariance function is estimated. Default is True.
+        If True, the amplitude of the autocovariance function is estimated. Default is True.
             
     Attributes
     ----------
@@ -70,7 +70,7 @@ class PSDToACV(eqx.Module):
     n_components : :obj:`int`
             Number of components used to approximate the power spectral density using the 'SHO' method.
     estimate_variance : :obj:`bool`
-        If True, the variance of the autocovariance function is estimated.
+        If True, the amplitude of the autocovariance function is estimated.
     spectral_points : :obj:`jax.Array`
         Frequencies of the SHO kernels.
     spectral_matrix : :obj:`jax.Array`
@@ -187,14 +187,16 @@ class PSDToACV(eqx.Module):
         self.tau = jnp.arange(0, tau_max+self.dtau, self.dtau)
         if self.method == 'FFT' or self.method == 'NuFFT':
             pass
-        else:
+        elif self.method == 'SHO':
             self.n_components = n_components
             self.spectral_points = jnp.geomspace(
                 self.f0, self.fN, self.n_components)
             self.spectral_matrix = 1 / \
                 (1 + jnp.power(jnp.atleast_2d(self.spectral_points).T /
                  self.spectral_points, 4))
-
+        else:
+            raise NotImplementedError(f"Method {self.method} not implemented")
+        
     def decompose_model(self, psd_normalised: jax.Array):
         r"""Decompose the model into a sum of SHO kernels.
 
@@ -287,7 +289,10 @@ class PSDToACV(eqx.Module):
         psd /= psd[0]
 
         a, f = self.decompose_model(psd)
-        kernel = self.build_SHO_model(a*f, f)
+        if self.method == 'SHO':
+            kernel = self.build_SHO_model(a*f, f)
+        else:
+            raise NotImplementedError('Only SHO is implemented for now')
         if self.estimate_variance:
             return kernel*(self.parameters['var'].value/jnp.sum(a*f))
         return kernel

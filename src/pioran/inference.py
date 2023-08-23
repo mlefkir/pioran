@@ -15,6 +15,8 @@ from .core import GaussianProcess
 from .psdtoacv import PSDToACV
 from .utils.psd_decomp import get_samples_psd
 from .plots import violin_plots_psd_approx,diagnostics_psd_approx,residuals_quantiles
+from .utils.gp_utils import tinygp_methods
+
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -79,12 +81,12 @@ class Inference:
             raise TypeError("method must be a string.")  
         
         if isinstance(Process, GaussianProcess) and isinstance(self.process.model,PSDToACV):
-            if self.process.model.method == 'SHO':
-                print("The PSD model is a SHO decomposition, checking the approximation.")
+            if self.process.model.method in tinygp_methods:
+                print(f"The PSD model is a {self.process.model.method} decomposition, checking the approximation.")
                 self.check_approximation(n_samples,seed_check)
         
     def check_approximation(self,n_samples,seed_check,n_frequencies=1000):
-        """Check the approximation of the PSD with the SHO decomposition.
+        """Check the approximation of the PSD with the kernel decomposition.
         
         This method will take random samples from the prior distribution and compare the PSD obtained 
         with the SHO decomposition with the true PSD.
@@ -110,10 +112,10 @@ class Inference:
         
         
         # get the true PSD and the SHO PSD samples        
-        psd_true,psd_SHO = get_samples_psd(self.process.model,freqs,params_samples.T)
+        psd_true,psd_approx = get_samples_psd(self.process.model,freqs,params_samples.T)
         # compute the residuals and the ratios
-        residuals = psd_true-psd_SHO
-        ratio = psd_SHO/psd_true
+        residuals = psd_true-psd_approx
+        ratio = psd_approx/psd_true
         fig,_ = diagnostics_psd_approx(f=freqs,
                                         res=residuals,
                                         ratio=ratio,

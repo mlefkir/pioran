@@ -5,7 +5,7 @@ from jax.numpy import linalg as la
 from scipy.spatial.distance import cdist
 
 allowed_methods = ['FFT','NuFFT', 'SHO']
-
+tinygp_methods = ['SHO']
 
 @jit
 def EuclideanDistance(xq, xp):

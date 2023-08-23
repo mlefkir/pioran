@@ -13,7 +13,7 @@ from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
 from .tools import reshape_array, sanity_checks
-from .utils.gp_utils import nearest_positive_definite, allowed_methods
+from .utils.gp_utils import nearest_positive_definite, allowed_methods,tinygp_methods
 
 class GaussianProcess(eqx.Module):
     r""" Class for the Gaussian Process Regression of 1D data. 
@@ -30,7 +30,6 @@ class GaussianProcess(eqx.Module):
         Observables of the training data, in this it is flux, count-rate or intensity, etc.
     observation_errors : :obj:`jax.Array`, optional
         Errors on the observables, by default :obj:`None`
-    **kwargs : dict
         nb_prediction_points : :obj:`int`, optional
             Number of points to predict, by default 5 * length(training(indexes)).
         prediction_indexes : :obj:`jax.Array`, optional
@@ -77,6 +76,8 @@ class GaussianProcess(eqx.Module):
         True if the covariance function is analytical, False if it is estimated from a power spectral density.
     nb_prediction_points : :obj:`int`
         Number of points to predict, by default 5 * length(training(indexes)).
+    estimate_variance : :obj:`bool`
+        Estimate the amplitude of the autocovariance function, by default True.
 
     """
     model: Union[CovarianceFunction,PSDToACV] 
@@ -108,12 +109,12 @@ class GaussianProcess(eqx.Module):
 
         """
         if method not in allowed_methods:
-            raise ValueError(f"Method {method} not allowed. Choose between {allowed_methods}")
+            raise ValueError(f"Method {method} is not allowed. Choose between {allowed_methods}")
         self.use_tinygp = use_tinygp
-        if method == 'SHO' and not use_tinygp:
-            raise ValueError("Method 'SHO' can only be used with tinygp, please set `use_tinygp=True`")
-        if method != 'SHO' and use_tinygp:
-            raise ValueError("tinygp is only compatible with method 'SHO'")
+        if method in tinygp_methods and not use_tinygp:
+            raise ValueError(f"Method '{method}' can only be used with tinygp, please set `use_tinygp=True`")
+        if method not in tinygp_methods and use_tinygp:
+            raise ValueError(f"tinygp is only compatible with method {tinygp_methods}")
         if self.use_tinygp and (n_components is None):
             raise ValueError("The number of components must be specified when using tinygp, please set `n_components=...`")
         
@@ -362,7 +363,7 @@ class GaussianProcess(eqx.Module):
         r"""Compute the log marginal likelihood of the Gaussian Process using tinygp.
         
         This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
-        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep.SHO`. 
+        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep` objects.  
         
         
         Returns
