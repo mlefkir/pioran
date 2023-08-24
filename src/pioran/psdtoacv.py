@@ -12,9 +12,9 @@ from tinygp.kernels.quasisep import SHO as SHO_term
 
 from .parameters import ParametersModel
 from .psd_base import PowerSpectralDensity
-from .utils.gp_utils import (EuclideanDistance, allowed_methods,
+from .utils.gp_utils import (EuclideanDistance, valid_methods,
                              decompose_triangular_matrix,
-                             reconstruct_triangular_matrix, tinygp_methods)
+                             reconstruct_triangular_matrix)
 
 
 class PSDToACV(eqx.Module):
@@ -159,8 +159,8 @@ class PSDToACV(eqx.Module):
         if S_low < 2:
             raise ValueError(f"S_low must be greater than 2, {S_low} was given")
         
-        if method not in allowed_methods:
-            raise ValueError(f"Method {method} not allowed. Choose between {allowed_methods}")
+        if method not in valid_methods:
+            raise ValueError(f"Method {method} not allowed. Choose between {valid_methods}")
         
         if ('FFT' not in method ) and n_components < 1:
             raise ValueError("n_components must be greater than 1")
@@ -476,8 +476,7 @@ class PSDToACV(eqx.Module):
             # Compute the covariance matrix
             return self.calculate(dist)
         else:
-            raise NotImplementedError(f"Calculating the covariance matrix for method
-                                      '{self.method}' not implemented")
+            raise NotImplementedError(f"Calculating the covariance matrix for method '{self.method}' not implemented")
 
     def __str__(self) -> str:
         """String representation of the PSDToACV object.

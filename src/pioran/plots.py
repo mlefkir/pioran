@@ -5,10 +5,10 @@
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.signal import lombscargle
-from scipy.stats import norm
 from matplotlib.ticker import AutoMinorLocator
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from scipy.signal import lombscargle
+from scipy.stats import gaussian_kde, norm
 
 from .utils.ICCF import xcor
 
@@ -455,6 +455,7 @@ def violin_plots_psd_approx(res,ratio):
 
     axins.violinplot([mean_ratio,median_ratio],vert=True,showmeans=True)
     fig.align_ylabels()
+    fig.suptitle('Distribution of the meta-(mean,max,median,min) of\n residuals and ratios for the PSD approximation')
     fig.tight_layout()
     return fig,ax
 
@@ -494,8 +495,8 @@ def residuals_quantiles(residuals,ratio,f,f_min,f_max):
                 'xscale':'log'})
 
     low_1,low_5,low_16,med,high_84,high_95,high_99 = jnp.percentile(ratio,jnp.array([1,5,16,50,84,95,99]),axis=0)
-    ax[1].fill_between(f,low_5,high_95,alpha=.2,label=r'$2\sigma$')
-    ax[1].fill_between(f,low_16,high_84,alpha=.4,label=r'1$\sigma$')
+    ax[1].fill_between(f,low_5,high_95,alpha=.2,label=r'$95\%$')
+    ax[1].fill_between(f,low_16,high_84,alpha=.4,label=r'$68\%$')
     ax[1].plot(f,med,label='Median')
 
     ax[1].update({'xlabel':'Frequency',
@@ -509,5 +510,68 @@ def residuals_quantiles(residuals,ratio,f,f_min,f_max):
 
     ax[1].legend(bbox_to_anchor=(.95, -.03), loc='lower right',ncol=5, borderaxespad=0.,bbox_transform=fig.transFigure)
     fig.align_ylabels()
+    fig.suptitle('Quantiles of residuals and ratios for the PSD approximation')
+    fig.tight_layout()
+    return fig,ax
+
+def plot_priors_samples(params,names):
+    """Plot the samples from the prior distributions.
+    
+    Parameters
+    ----------
+    params : :obj:`numpy.ndarray`
+        Array of samples from the prior distributions.
+    names : :obj:`list` of :obj:`str`
+        Names of the parameters.
+
+    Returns
+    -------
+    :obj:`matplotlib.figure.Figure`
+        Figure object.
+    :obj:`matplotlib.axes.Axes`
+        Axes object.    
+    """
+    n_samples = params.shape[0]
+    n_rows = int(np.ceil(n_samples/2))
+    
+    fig, ax = plt.subplots(n_rows,2,figsize=(10,3.5*1.5**(n_rows-1)))
+    
+    ax = ax.flatten()
+    for i in range(n_samples):
+        ax[i].hist(params[i,:],bins='auto',density=True,alpha=.25)
+        x = jnp.linspace(params[i,:].min(),params[i,:].max(),1000)
+        kde = gaussian_kde(params[i,:])
+        ax[i].plot(x,kde(x))
+        ax[i].set_title(f'Prior samples {names[i]}')
+        ax[i].set_xlabel(names[i])
+
+    fig.suptitle('Samples from the prior distributions')
+    fig.tight_layout()
+    
+    return fig,ax
+
+def plot_prior_predictive_PSD(f,psd_samples,xlim=(None,None),ylim=(None,None),xunit=r'$d^{-1}$'):
+    """Plot the prior predictive Power Spectral Density of the process.
+
+    Parameters
+    ----------
+    f : :obj:`numpy.ndarray`
+        Frequencies.
+    psd_samples : :obj:`numpy.ndarray`
+        Array of PSDs posterior samples.
+    xlim : tuple, optional
+        Limits on the x-axis, by default (None,None)
+    ylim : tuple, optional
+        Limits on the y-axis, by default (None,None)
+    xunit : str, optional
+        Unit of the xaxis, by default r'$d^{-1}$'
+    """
+    fig, ax = plt.subplots(figsize=(10,5))
+    ax.loglog(f,psd_samples,c='k',alpha=.01)
+    ax.set_xlabel(f'Frequency {xunit}')
+    ax.set_ylabel(r'Power spectral density')
+    ax.set_title('Prior predictive power spectral density')
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
     fig.tight_layout()
     return fig,ax

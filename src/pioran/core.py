@@ -13,7 +13,7 @@ from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
 from .tools import reshape_array, sanity_checks
-from .utils.gp_utils import (allowed_methods, nearest_positive_definite,
+from .utils.gp_utils import (valid_methods, nearest_positive_definite,
                              tinygp_methods)
 
 
@@ -175,8 +175,8 @@ class GaussianProcess(eqx.Module):
             If the method is not valid, if the number of components is not specified when using tinygp, if the method is not compatible with tinygp.
 
         """
-        if method not in allowed_methods:
-            raise ValueError(f"Method {method} is not valid. Choose between {allowed_methods}")
+        if method not in valid_methods:
+            raise ValueError(f"Method {method} is not valid. Choose between {valid_methods}")
         self.use_tinygp = use_tinygp
         if method in tinygp_methods and not use_tinygp:
             raise ValueError(f"Method '{method}' can only be used with tinygp, please set `use_tinygp=True`")
