@@ -86,5 +86,17 @@ def get_psd_approx_samples(psd_acvf,f,params):
         return psd_model,psd_SHO
     else:
         raise NotImplementedError("Only SHO is implemented for now.")
+    
 def get_samples_psd(psd_acvf,f,params_samples):
+    """Just a wrapper for jax.vmap(get_psd_approx_samples,(None,None,0))(psd_acvf,f,params_samples)
+    
+    Parameters
+    ----------
+    psd_acvf : :class:`~pioran.psdtoacv.PSDToACV`
+        PSDToACV object.
+    f : :obj:`jax.Array`
+        Frequency array.
+    params : :obj:`jax.Array`
+        Parameters of the PSD model.
+    """
     return jax.vmap(get_psd_approx_samples,(None,None,0))(psd_acvf,f,params_samples)

@@ -1,6 +1,8 @@
 """Classes to store for the parameters of models.
 
 """
+import warnings
+
 import jax.numpy as jnp
 
 from .parameter_base import Parameter
@@ -155,6 +157,8 @@ class ParametersModel:
             ID = len(self.IDs)+1
         if component is None:
             component = 1
+        if name in self.names:
+            warnings.warn(f"Parameter {name} already exists, the parameter should be accessed with the index.")
         self._pars.append(Parameter(name,value,free,ID,hyperparameter,component,relation))
 
     @property

@@ -89,6 +89,10 @@ class Gaussian(PowerSpectralDensity):
     ----------
     parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the power spectral density function.
+    expression : :obj:`str`
+        Expression of the power spectral density function.
+    analytical : :obj:`bool`
+        If True, the power spectral density function is analytical, otherwise it is not.
         
     Methods
     -------
@@ -156,8 +160,17 @@ class OneBendingPowerLawNorm(PowerSpectralDensity):
         P = jnp.power( f/f_1 , index_1 ) * jnp.power( 1 + jnp.power ( f / f_1 , index_1-index_2 ),-1 )
         return P*norm
         
-class OneBendingPowerLaw(PowerSpectralDensity):
-    expression = 'onebendingpowerlaw'
+class OneBendPowerLaw(PowerSpectralDensity):
+    """Class for the bending power-law power spectral density with one bend.
+    
+    
+    .. math:: :label: onebendpowerlawpsd
+
+         \mathcal{P}(f) = \dfrac{A}{\left(1+\left(\dfrac{f}{f_1}\right)^{\alpha_1-\alpha_2}\right)} \left(\dfrac{f}{f_1}\right)^{\alpha_1}.
+             
+    
+    """
+    expression = 'onebendpowerlaw'
     parameters: ParametersModel    
     
     def __init__(self, parameters_values, free_parameters = [True, True,True]):     

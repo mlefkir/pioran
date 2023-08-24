@@ -112,8 +112,8 @@ class PSDToACV(eqx.Module):
                  T: float, 
                  dt: float, 
                  method: str, 
-                 n_components: int = 0, 
-                 estimate_variance=True):
+                 n_components: int = None, 
+                 estimate_variance = True):
         """Constructor of the PSDToACV class.
     
         Initialize the PSDToACV class with the power spectral density, the frequency grid and the method used to compute the autocovariance function.
@@ -151,13 +151,18 @@ class PSDToACV(eqx.Module):
              
         # sanity checks:   
         if not isinstance(PSD, PowerSpectralDensity):
-            raise TypeError("PSD must be a PowerSpectralDensity object")
+            raise TypeError(f"PSD must be a PowerSpectralDensity object, not a {type(PSD)}")
+        
+        if dt > T:
+            raise ValueError(f"dt ({dt}) must be smaller than T ({T})")
         
         if S_low < 2:
-            raise ValueError("S_low must be greater than 2")
+            raise ValueError(f"S_low must be greater than 2, {S_low} was given")
+        
         if method not in allowed_methods:
             raise ValueError(f"Method {method} not allowed. Choose between {allowed_methods}")
-        if (method !='FFT' or method !='NuFFT') and n_components < 1:
+        
+        if ('FFT' not in method ) and n_components < 1:
             raise ValueError("n_components must be greater than 1")
         
         
@@ -185,8 +190,10 @@ class PSDToACV(eqx.Module):
         tau_max = 0.5/self.f0 
         self.dtau = tau_max/(self.n_freq_grid-1)
         self.tau = jnp.arange(0, tau_max+self.dtau, self.dtau)
+        
         if self.method == 'FFT' or self.method == 'NuFFT':
             pass
+        
         elif self.method == 'SHO':
             self.n_components = n_components
             self.spectral_points = jnp.geomspace(
@@ -347,6 +354,7 @@ class PSDToACV(eqx.Module):
             # add a zero at the beginning to account for the zero frequency
             psd = jnp.insert(psd, 0, 0)
             acvf = self.get_acvf_byFFT(psd)
+            
             if self.estimate_variance:
                 # normalize by the variance instead of integrating the PSD with the trapezium rule
                 R = acvf / acvf[0]
@@ -357,6 +365,10 @@ class PSDToACV(eqx.Module):
             return self.interpolation(t, acvf)
 
         elif self.method == 'NuFFT':
+            
+            if self.estimate_variance:
+                raise NotImplementedError('estimate_variance not implemented for NuFFT')
+
             N = 2*(self.n_freq_grid-1)
             k = jnp.arange(-N/2, N/2)*self.f0
             psd = self.PSD.calculate(k)+0j
@@ -367,6 +379,8 @@ class PSDToACV(eqx.Module):
 
     def get_acvf_byNuFFT(self, psd: jax.Array, t: jax.Array) -> jax.Array:
         """Compute the autocovariance function from the power spectral density using the non uniform Fourier transform.
+
+        This function uses the jax_finufft package to compute the non uniform Fourier transform with the nufft2 function.
 
         Parameters
         ----------
@@ -462,9 +476,17 @@ class PSDToACV(eqx.Module):
             # Compute the covariance matrix
             return self.calculate(dist)
         else:
-            raise NotImplementedError(f"Method {self.method} not implemented")
+            raise NotImplementedError(f"Calculating the covariance matrix for method
+                                      '{self.method}' not implemented")
 
     def __str__(self) -> str:
+        """String representation of the PSDToACV object.
+        
+        Returns
+        -------
+        :obj:`str`
+            String representation of the PSDToACV object.
+        """
         s = f"PSDToACV\n"
         if self.method != 'NuFFT' and self.method != 'FFT':
             s += f"method: {self.method} decomposition\n"

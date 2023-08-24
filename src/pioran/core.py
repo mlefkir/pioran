@@ -13,7 +13,9 @@ from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
 from .tools import reshape_array, sanity_checks
-from .utils.gp_utils import nearest_positive_definite, allowed_methods,tinygp_methods
+from .utils.gp_utils import (allowed_methods, nearest_positive_definite,
+                             tinygp_methods)
+
 
 class GaussianProcess(eqx.Module):
     r""" Class for the Gaussian Process Regression of 1D data. 
@@ -22,34 +24,48 @@ class GaussianProcess(eqx.Module):
 
     Parameters
     ----------
-    fun : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity` 
+    function : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity` 
         Model function associated to the Gaussian Process. Can be a covariance function or a power spectral density.
     observation_indexes : :obj:`jax.Array`
         Indexes of the training data, in this case it is the time.
     observation_values : :obj:`jax.Array`
-        Observables of the training data, in this it is flux, count-rate or intensity, etc.
+        Observables of the training data.
     observation_errors : :obj:`jax.Array`, optional
         Errors on the observables, by default :obj:`None`
-        nb_prediction_points : :obj:`int`, optional
-            Number of points to predict, by default 5 * length(training(indexes)).
-        prediction_indexes : :obj:`jax.Array`, optional
-            Indexes of the prediction data, by default jnp.linspace(jnp.min(observation_indexes),jnp.max(observation_indexes),nb_prediction_points)
-        scale_errors : :obj:`bool`, optional
-            Scale the errors on the training data by adding a constant, by default True.
-        estimate_mean : :obj:`bool`, optional
-            Estimate the mean of the training data, by default True.
-        estimate_variance : :obj:`bool`, optional
-            Estimate the variance of the training data, by default True.
-        S_low : :obj:`float`, optional
-            Scaling factor for the lower bound of the PSD, by default 2. See :obj:`PSDToACV` for more details.
-        S_high : :obj:`float`, optional
-            Scaling factor for the upper bound of the PSD, by default 2. See :obj:`PSDToACV` for more details.
-
+    S_low : :obj:`float`, optional
+            Scaling factor to extend the frequency grid to lower values, by default 10. See :obj:`PSDToACV` for more details.
+    S_high : :obj:`float`, optional
+            Scaling factor to extend the frequency grid to higher values, by default 10. See :obj:`PSDToACV` for more details.
+    method : :obj:`str`, optional
+        Method to compute the covariance function from the power spectral density, by default 'FFT'.
+        Possible values are:
+            - 'FFT': use the FFT to compute the autocovariance function.
+            - 'NuFFT': use the non-uniform FFT to compute the autocovariance function.
+            - 'SHO': approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function.
+    use_tinygp : :obj:`bool`, optional
+        Use tinygp to compute the log marginal likelihood, by default False. Should only be used when the power spectrum model 
+        is expressed as a sum of quasi-separable kernels, i.e. method is not 'FFT' or 'NuFFT'.
+    n_components : :obj:`int`, optional
+        Number of components to use when using tinygp and the power spectrum model is expressed as a sum of quasi-separable kernels.
+    estimate_mean : :obj:`bool`, optional
+        Estimate the mean of the training data, by default True.
+    estimate_variance : :obj:`bool`, optional
+        Estimate the amplitude of the autocovariance function, by default True.
+    scale_errors : :obj:`bool`, optional
+        Scale the errors on the training data by adding a multiplicative factor, by default True.
+    log_warping : :obj:`bool`, optional
+        Use a log transformation of the data, by default False. This is useful when the data is log-normal distributed.
+        Only compatible with the method 'FFT' or 'NuFFT'.
+    nb_prediction_points : :obj:`int`, optional
+        Number of points to predict, by default 5 * length(training(indexes)).
+    prediction_indexes : :obj:`jax.Array`, optional
+        indexes of the prediction data, by default linspace(min(observation_indexes),max(observation_indexes),nb_prediction_points)
+        
     Methods
     -------
     get_cov(xt, xp, errors=None)
         Compute the covariance matrix between two arrays.
-    compute_predictive_distribution(**kwargs)
+    compute_predictive_distribution()
         Compute the predictive mean and predictive covariance given prediction indexes.
     compute_log_marginal_likelihood()
         Compute the log marginal likelihood.
@@ -60,25 +76,29 @@ class GaussianProcess(eqx.Module):
         
     Attributes
     ----------
-    model : :class:`~pioran.acvf_base.CovarianceFunction`  or :class:`~pioran.psd_base.PowerSpectralDensity`
-        Model associated to the Gaussian Process, can be a covariance function or a power spectral density.
+    model : :class:`~pioran.acvf_base.CovarianceFunction`  or :class:`~pioran.psdtoacvf.PSDToACV`
+        Model associated to the Gaussian Process, can be a covariance function or a 
+        power spectral density to autocovariance function converter.
     observation_indexes : :obj:`jax.Array` (n,1)
-        Indexes of the training data.
+        Indexes of the training data, in this case it is the time.
     observation_values : :obj:`jax.Array` of shape (n,1)
         Observabled training data.
     observation_errors : :obj:`jax.Array` of shape (n,1)
         Errors on the training observed data.
-    scale_errors : :obj:`bool`
-        Scale the errors on the training data by adding a constant, by default True.
-    estimate_mean : :obj:`bool`
-        Estimate the mean of the training data, by default True.
-    analytical_cov : :obj:`bool`
-        True if the covariance function is analytical, False if it is estimated from a power spectral density.
+    prediction_indexes : :obj:`jax.Array` of shape (m,1)
+        Indexes of the prediction data.
     nb_prediction_points : :obj:`int`
         Number of points to predict, by default 5 * length(training(indexes)).
+    scale_errors : :obj:`bool`
+        Scale the errors on the training data by adding a multiplicative factor.
+    estimate_mean : :obj:`bool`
+        Estimate the mean of the training data.
     estimate_variance : :obj:`bool`
-        Estimate the amplitude of the autocovariance function, by default True.
-
+        Estimate the amplitude of the autocovariance function.
+    log_warping : :obj:`bool`
+        Use a log transformation of the data.
+    use_tinygp : :obj:`bool`
+        Use tinygp to compute the log marginal likelihood.
     """
     model: Union[CovarianceFunction,PSDToACV] 
     observation_indexes: jax.Array
@@ -88,13 +108,13 @@ class GaussianProcess(eqx.Module):
     nb_prediction_points: int
     scale_errors: bool
     estimate_mean: bool
-    analytical_cov: bool    
     estimate_variance: bool = False
     log_warping: bool = False
     use_tinygp: bool = False
     
     def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity],
-                 observation_indexes, observation_values, 
+                 observation_indexes, 
+                 observation_values, 
                  observation_errors = None,
                  S_low = 10,
                  S_high = 10,
@@ -104,12 +124,59 @@ class GaussianProcess(eqx.Module):
                  estimate_variance = True,
                  estimate_mean = True,
                  scale_errors = True,
-                 log_warping = False,**kwargs) -> None:
+                 log_warping = False,
+                 nb_prediction_points = None,
+                 prediction_indexes = None) -> None:
         """Constructor method for the GaussianProcess class.
+
+
+        Parameters
+        ----------
+        function : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity` 
+            Model function associated to the Gaussian Process. Can be a covariance function or a power spectral density.
+        observation_indexes : :obj:`jax.Array`
+            Indexes of the training data, in this case it is the time.
+        observation_values : :obj:`jax.Array`
+            Observables of the training data.
+        observation_errors : :obj:`jax.Array`, optional
+            Errors on the observables, by default :obj:`None`
+        S_low : :obj:`float`, optional
+                Scaling factor to extend the frequency grid to lower values, by default 10. See :obj:`PSDToACV` for more details.
+        S_high : :obj:`float`, optional
+                Scaling factor to extend the frequency grid to higher values, by default 10. See :obj:`PSDToACV` for more details.
+        method : :obj:`str`, optional
+            Method to compute the covariance function from the power spectral density, by default 'FFT'.
+            Possible values are:
+                - 'FFT': use the FFT to compute the autocovariance function.
+                - 'NuFFT': use the non-uniform FFT to compute the autocovariance function.
+                - 'SHO': approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function.
+        use_tinygp : :obj:`bool`, optional
+            Use tinygp to compute the log marginal likelihood, by default False. Should only be used when the power spectrum model 
+            is expressed as a sum of quasi-separable kernels, i.e. method is not 'FFT' or 'NuFFT'.
+        n_components : :obj:`int`, optional
+            Number of components to use when using tinygp and the power spectrum model is expressed as a sum of quasi-separable kernels.
+        estimate_mean : :obj:`bool`, optional
+            Estimate the mean of the training data, by default True.
+        estimate_variance : :obj:`bool`, optional
+            Estimate the amplitude of the autocovariance function, by default True.
+        scale_errors : :obj:`bool`, optional
+            Scale the errors on the training data by adding a multiplicative factor, by default True.
+        log_warping : :obj:`bool`, optional
+            Use a log transformation of the data, by default False. This is useful when the data is log-normal distributed.
+            Only compatible with the method 'FFT' or 'NuFFT'.
+        nb_prediction_points : :obj:`int`, optional
+            Number of points to predict, by default 5 * length(training(indexes)).
+        prediction_indexes : :obj:`jax.Array`, optional
+            indexes of the prediction data, by default linspace(min(observation_indexes),max(observation_indexes),nb_prediction_points)
+            
+        Raises
+        ------
+        ValueError
+            If the method is not valid, if the number of components is not specified when using tinygp, if the method is not compatible with tinygp.
 
         """
         if method not in allowed_methods:
-            raise ValueError(f"Method {method} is not allowed. Choose between {allowed_methods}")
+            raise ValueError(f"Method {method} is not valid. Choose between {allowed_methods}")
         self.use_tinygp = use_tinygp
         if method in tinygp_methods and not use_tinygp:
             raise ValueError(f"Method '{method}' can only be used with tinygp, please set `use_tinygp=True`")
@@ -119,11 +186,9 @@ class GaussianProcess(eqx.Module):
             raise ValueError("The number of components must be specified when using tinygp, please set `n_components=...`")
         
         if isinstance(function, CovarianceFunction):
-            self.analytical_cov = True
             self.model = function
 
         elif isinstance(function, PowerSpectralDensity):
-            self.analytical_cov = False
             self.estimate_variance = estimate_variance
             self.model = PSDToACV(function, S_low=S_low, S_high=S_high,
                                   T = observation_indexes[-1]-observation_indexes[0],
@@ -172,8 +237,8 @@ class GaussianProcess(eqx.Module):
             self.model.parameters.append("const",jnp.min(self.observation_values),True,hyperparameter=False)
 
         # Prediction of data
-        self.nb_prediction_points = kwargs.get("nb_prediction_points", 5*len(self.observation_indexes))
-        self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.observation_indexes), jnp.max(self.observation_indexes), self.nb_prediction_points)))
+        self.nb_prediction_points = 5*len(self.observation_indexes) if nb_prediction_points is None else nb_prediction_points
+        self.prediction_indexes = reshape_array(jnp.linspace(jnp.min(self.observation_indexes), jnp.max(self.observation_indexes), self.nb_prediction_points)) if prediction_indexes is None else reshape_array(prediction_indexes)
 
     def get_cov(self, xt, xp, errors=None):
         """ Compute the covariance matrix between two arrays. 
@@ -265,9 +330,8 @@ class GaussianProcess(eqx.Module):
 
         Parameters
         ----------
-        **kwargs: dict
-            prediction_indexes: array of length m, optional
-                Indexes of the prediction data, by default jnp.linspace(jnp.min(observation_indexes),jnp.max(observation_indexes),nb_prediction_points)
+        prediction_indexes: array of length m, optional
+            Indexes of the prediction data, by default jnp.linspace(jnp.min(observation_indexes),jnp.max(observation_indexes),nb_prediction_points)
 
         Returns
         -------
@@ -321,7 +385,7 @@ class GaussianProcess(eqx.Module):
 
         Returns
         -------
-        log_marginal_likelihood: float
+        :obj:`float`
             Log marginal likelihood of the GP.
 
         """
@@ -340,6 +404,8 @@ class GaussianProcess(eqx.Module):
                 z = solve_triangular(L, self.observation_values, lower=True)
 
             return -jnp.take(jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.observation_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z),0)
+        
+        # if we use a log transformation of the data
         else:
             latent_errors = self.observation_errors.flatten() / (self.observation_values.flatten() - self.model.parameters["const"].value)
             latent_values = jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value))-self.model.parameters['mu'].value
@@ -368,7 +434,7 @@ class GaussianProcess(eqx.Module):
         
         Returns
         -------
-        log_marginal_likelihood: float
+        :obj:`float`
             Log marginal likelihood of the GP.
         
         """
@@ -403,19 +469,19 @@ class GaussianProcess(eqx.Module):
             
         Returns
         -------
-        float 
+        :obj:`float` 
             Log marginal likelihood of the GP.
         """
         self.model.parameters.set_free_values(parameters)
         return self.compute_log_marginal_likelihood()
     
-    # @eqx.filter_jit
+    @eqx.filter_jit
     def wrapper_neg_log_marginal_likelihood(self, parameters) -> float:
         """ Wrapper to compute the negative log marginal likelihood in function of the (hyper)parameters. 
 
         Parameters
         ----------
-        parameters: array of shape (n)
+        parameters: :obj:`jax.Array` of shape (n)
             (Hyper)parameters of the covariance function.
             
         Returns
@@ -431,7 +497,7 @@ class GaussianProcess(eqx.Module):
         
         Returns
         -------
-        str
+        :obj:`str`
             String representation of the GP object.        
         """
         s = 31*"=" +" Gaussian Process "+31*"="+"\n\n"
