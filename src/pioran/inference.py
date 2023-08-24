@@ -236,14 +236,14 @@ class Inference:
         results: dict
             Results of the optimization. Different keys depending on the method.
         """
-        if self.method == "NS":
+        if self.method == "ultranest":
             use_stepsampler = kwargs.pop('use_stepsampler',False)
             if 'user_likelihood' in kwargs:
                 print("user_likelihood is used please check the documentation.")
             user_likelihood = kwargs.pop('user_likelihood',self.process.wrapper_log_marginal_likelihood)
             results, sampler = self.nested_sampling(priors=self.priors,user_likelihood=user_likelihood,verbose=verbose,use_stepsampler=use_stepsampler,**kwargs)
         else:
-            raise ValueError("The method must be 'NS'.")
+            raise NotImplementedError("Only ultranest is implemented for now.")
         comm.Barrier()
         self.process.model.parameters.set_free_values(results['maximum_likelihood']['point'])#results['posterior']['median'])
         print(self.process.model.parameters.free_values)
