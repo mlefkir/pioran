@@ -247,8 +247,6 @@ class GaussianProcess(eqx.Module):
         If the errors are not None, then the covariance matrix is computed for the training dataset, 
         i.e. with observed data as input (xt=xp=training data) and the errors is the "standard deviation".
         The total covariance matrix is computed as:
-        
-        
 
         Parameters
         ----------
@@ -326,7 +324,6 @@ class GaussianProcess(eqx.Module):
         alpha = inv( k(x,x) + sig^2 * I ) * observation_values
         mean = k(x*,x) * alpha
         cov = k(x*,x*) - k(x*,x) * inv( k(x,x) + sig^2 * I ) * k(x,x*)
-
 
         Parameters
         ----------
@@ -429,8 +426,7 @@ class GaussianProcess(eqx.Module):
         r"""Compute the log marginal likelihood of the Gaussian Process using tinygp.
         
         This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
-        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep` objects.  
-        
+        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep` objects. 
         
         Returns
         -------

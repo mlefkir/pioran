@@ -4,7 +4,6 @@
 import warnings
 
 import jax.numpy as jnp
-
 from .parameter_base import Parameter
 from .tools import HEADER_PARAMETERS, TABLE_LENGTH
 
@@ -19,43 +18,43 @@ class ParametersModel:
     
     Parameters
     ----------
-    param_names : :obj:`list of str`
+    param_names : :obj:`list` of :obj:`str`
         Names of the parameters.
-    param_values : :obj:`list of float`
+    param_values : :obj:`list` of :obj:`float`
         Values of the parameters.
-    free_parameters : :obj:`list of bool`
+    free_parameters : :obj:`list` of :obj:`bool`, optional
         List of bool to indicate if the parameters are free or not.
-    IDs : :obj:`list of int`
+    IDs : :obj:`list` of :obj:`int`, optional
         IDs of the parameters.
-    hyperparameters : :obj:`list of bool`
+    hyperparameters : :obj:`list` of :obj:`bool`, optional
         List of bool to indicate if the parameters are hyperparameters or not.
-    components : :obj:`list of int`
+    components : :obj:`list` of :obj:`int`, optional
         List of int to indicate the component number of the parameters.
-    relations : :obj:`list of str`
+    relations : :obj:`list` of :obj:`str`, optional
         List of str to indicate the relation between the parameters.
-    kwargs : dict
-        _pars : :obj:`list of Parameter`
+    kwargs : :obj:`dict`, optional
+        _pars : :obj:`list` of :class:`~pioran.parameter_base.Parameter`
             List of Parameter objects.
             
     Attributes
     ----------
-    names : :obj:`list of str`
+    names : :obj:`list` of :obj:`str`
         Names of the parameters.
-    values : :obj:`list of float`
+    values : :obj:`list` of :obj:`float`
         Values of the parameters.
-    free_parameters : :obj:`list of bool`
+    free_parameters : :obj:`list` of :obj:`bool`
         True if the parameter is free, False otherwise.
-    IDs : :obj:`list of int`
+    IDs : :obj:`list` of :obj:`int`
         IDs of the parameters.
-    hyperparameters : :obj:`list of bool`
+    hyperparameters : :obj:`list` of :obj:`bool`
         True if the parameter is a hyperparameter, False otherwise.
-    components : :obj:`list of int`
+    components : :obj:`list` of :obj:`int`
         Component number of the parameters.
-    relations : :obj:`list of str`
+    relations : :obj:`list` of :obj:`str`
         Relation between the parameters.
-    _pars : :obj:`list of Parameter`
+    _pars : :obj:`list` of :class:`~pioran.parameter_base.Parameter`
         List of Parameter objects.
-    free_values : :obj:`list of float`
+    free_values : :obj:`list` of :obj:`float`
         Values of the free parameters.
         
     Methods
@@ -91,7 +90,8 @@ class ParametersModel:
     _pars:list = None
 
 
-    def __init__(self,param_names,param_values,free_parameters,IDs=None,hyperparameters=None,components=None,relations=None,**kwargs):
+    def __init__(self,param_names:list[str],param_values:list[float],free_parameters:list[bool],IDs:list[int]=None,hyperparameters:list[bool]=None,components:list[int]=None,relations:list[str]=None,**kwargs):
+                #  ,param_values,free_parameters,IDs=None,hyperparameters=None,components=None,relations=None,**kwargs):
         """Constructor method for the ParametersModel class.
         """
         if '_pars' in kwargs.keys():
@@ -178,7 +178,7 @@ class ParametersModel:
 
         Returns
         -------
-        :obj:`list of float`
+        :obj:`list` of :obj:`float``
             Values of the free parameters.
         """
         return [P.free for P in self._pars]
@@ -189,7 +189,7 @@ class ParametersModel:
 
         Returns
         -------
-        :obj:`list of float`
+        :obj:`list` of :obj:`float``
             IDs of the parameters.
         """
         return [P.ID for P in self._pars]
@@ -253,7 +253,7 @@ class ParametersModel:
 
         Returns
         -------
-        :obj:`list of float`
+        :obj:`list` of :obj:`float``
             Values of the parameters.
         """
         return [P.value for P in self._pars]
@@ -264,7 +264,7 @@ class ParametersModel:
 
         Returns
         -------
-        :obj:`list of float`
+        :obj:`list` of :obj:`float``
             Values of the free parameters.
         """
         return [p.value for p in self._pars if p.free]
@@ -286,7 +286,7 @@ class ParametersModel:
 
         Parameters
         ----------
-        new_free_values : :obj:`list of float`
+        new_free_values : :obj:`list` of :obj:`float``
             Values of the free parameters.
 
         Raises

@@ -29,7 +29,7 @@ class TestPowerSpectrum(unittest.TestCase):
     def setUp(self):
         self.lorentz = Lorentzian([1.2,4,5],free_parameters=[True,False,True])
         self.gauss = Gaussian([1.233,3.2432,4.5])
-        self.obpl = OneBendPowerLaw([3.2432,4.5,6.7])
+        self.obpl = OneBendPowerLaw([1,3.2432,4.5,6.7])
         self.manualpsd = build_object()
         
     def test_setup_custom_init(self):

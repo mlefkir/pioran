@@ -24,6 +24,7 @@
 
    .. autosummary::
    
+      ~Gaussian.analytical
       ~Gaussian.expression
       ~Gaussian.parameters
    

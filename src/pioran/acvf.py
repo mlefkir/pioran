@@ -25,11 +25,10 @@ class Exponential(CovarianceFunction):
     
     Parameters
     ----------
-    param_values : :obj:`list of float`
+    param_values : :obj:`list` of :obj:`float`
         Values of the parameters of the covariance function.
-    **kwargs : :obj:`dict`        
-        free_parameters: :obj:`list of bool`
-            List of bool to indicate if the parameters are free or not.
+    free_parameters: :obj:`list` of :obj:`bool`
+        List of bool to indicate if the parameters are free or not.
             
     Attributes
     ----------
@@ -45,11 +44,11 @@ class Exponential(CovarianceFunction):
     parameters: ParametersModel
     expression = 'exponential'
 
-    def __init__(self, param_values, **kwargs):
+    def __init__(self, param_values, free_parameters=[True, True]):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
         """
         assert len(param_values) == 2, 'The number of parameters for this covariance function must be 2'
-        free_parameters = kwargs.get('free_parameters', [True, True])
+        assert len(free_parameters) == 2, 'The number of free parameters for this covariance function must be 2'
         CovarianceFunction.__init__(self, param_values=param_values,param_names=['variance', 'length'], free_parameters=free_parameters)
     
     def calculate(self,t) -> jax.Array:
@@ -67,8 +66,6 @@ class Exponential(CovarianceFunction):
         -------
         Covariance function evaluated on the array of lags.
         """
-        
-        # return  self.parameters['variance'].value * jnp.exp(- jnp.abs(t) / self.parameters['length'].value)
         return  0.5 * self.parameters['variance'].value / self.parameters['length'].value *  jnp.exp(- jnp.abs(t) * self.parameters['length'].value)
 
 class SquaredExponential(CovarianceFunction):
@@ -88,11 +85,10 @@ class SquaredExponential(CovarianceFunction):
     
     Parameters
     ----------
-    param_values : :obj:`list of float`
+    param_values : :obj:`list` of :obj:`float`
         Values of the parameters of the covariance function.
-    **kwargs : :obj:`dict`        
-        free_parameters: :obj:`list of bool`
-            List of bool to indicate if the parameters are free or not.
+    free_parameters: :obj:`list` of :obj:`bool`
+        List of bool to indicate if the parameters are free or not.
             
     Attributes
     ----------
@@ -107,11 +103,10 @@ class SquaredExponential(CovarianceFunction):
     parameters: ParametersModel
     expression = 'squared_exponential'
 
-    def __init__(self, param_values, **kwargs):
+    def __init__(self, param_values, free_parameters=[True, True]):
         """Constructor of the covariance function inherited from the CovarianceFunction class. """
         assert len(param_values) == 2, 'The number of parameters for this covariance function must be 2'
-
-        free_parameters = kwargs.get('free_parameters', [True, True])
+        assert len(free_parameters) == 2, 'The number of free parameters for this covariance function must be 2'
         # initialise the parameters and check
         CovarianceFunction.__init__(self, param_values, param_names=['variance', 'length'], free_parameters=free_parameters)
 
@@ -150,11 +145,10 @@ class Matern32(CovarianceFunction):
     
     Parameters
     ----------
-    param_values : :obj:`list of float`
+    param_values : :obj:`list` of :obj:`float`
         Values of the parameters of the covariance function.
-    **kwargs : :obj:`dict`        
-        free_parameters: :obj:`list of bool`
-            List of bool to indicate if the parameters are free or not.
+    free_parameters: :obj:`list` of :obj:`bool`
+        List of bool to indicate if the parameters are free or not.
             
     Attributes
     ----------
@@ -169,11 +163,11 @@ class Matern32(CovarianceFunction):
     parameters: ParametersModel
     expression = 'matern32'
     
-    def __init__(self, param_values, **kwargs):
+    def __init__(self, param_values, free_parameters=[True, True]):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
         """
         assert len(param_values) == 2, 'The number of parameters for this covariance function must be 2'
-        free_parameters = kwargs.get('free_parameters', [True, True])
+        assert len(free_parameters) == 2, 'The number of free parameters for this covariance function must be 2'
         # initialise the parameters and check
         CovarianceFunction.__init__(self, param_values, param_names=['variance', 'length'], free_parameters=free_parameters)
 
@@ -212,11 +206,10 @@ class Matern52(CovarianceFunction):
     
     Parameters
     ----------
-    param_values : :obj:`list of float`
+    param_values : :obj:`list` of :obj:`float`
         Values of the parameters of the covariance function.
-    **kwargs : :obj:`dict`        
-        free_parameters: :obj:`list of bool`
-            List of bool to indicate if the parameters are free or not.
+    free_parameters: :obj:`list` of :obj:`bool`
+        List of bool to indicate if the parameters are free or not.
             
     Attributes
     ----------
@@ -233,11 +226,11 @@ class Matern52(CovarianceFunction):
     
     
 
-    def __init__(self, param_values, **kwargs):
+    def __init__(self, param_values, free_parameters=[True, True]):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
         """
         assert len(param_values) == 2, 'The number of parameters for this covariance function must be 2'
-        free_parameters = kwargs.get('free_parameters', [True, True])
+        assert len(free_parameters) == 2, 'The number of free parameters for this covariance function must be 2'
         # initialise the parameters and check
         CovarianceFunction.__init__(self, param_values, param_names=['variance', 'length'], free_parameters=free_parameters)
 
@@ -277,11 +270,10 @@ class RationalQuadratic(CovarianceFunction):
     
     Parameters
     ----------
-    param_values : :obj:`list of float`
+    param_values : :obj:`list` of :obj:`float`
         Values of the parameters of the covariance function.
-    **kwargs : :obj:`dict`        
-        free_parameters: :obj:`list of bool`
-            List of bool to indicate if the parameters are free or not.
+    free_parameters: :obj:`list` of :obj:`bool`
+        List of bool to indicate if the parameters are free or not.
             
     Attributes
     ----------
@@ -297,12 +289,11 @@ class RationalQuadratic(CovarianceFunction):
     expression = 'rationalquadratic'
     
     
-    def __init__(self, param_values, **kwargs):
+    def __init__(self, param_values, free_parameters=[True, True, True]):
         """Constructor of the covariance function inherited from the CovarianceFunction class.
-        """
-        free_parameters = kwargs.get('free_parameters', [True, True, True])
-        # initialise the parameters
+        """        # initialise the parameters
         assert len(param_values) == 3, 'The number of parameters for the rational quadratic covariance function is 3.'
+        assert len(free_parameters) == 3, 'The number of free parameters for the rational quadratic covariance function is 3.'
         CovarianceFunction.__init__(self, param_values, param_names=[ 'variance', 'alpha', 'length'], free_parameters=free_parameters)
 
     def calculate(self,x) -> jax.Array:

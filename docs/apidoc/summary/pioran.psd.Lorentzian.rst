@@ -24,6 +24,7 @@
 
    .. autosummary::
    
+      ~Lorentzian.analytical
       ~Lorentzian.expression
       ~Lorentzian.parameters
    

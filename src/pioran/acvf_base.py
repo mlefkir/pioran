@@ -3,6 +3,7 @@
 from copy import deepcopy
 from typing import List, Optional, Tuple, Union
 
+import jax
 import equinox as eqx
 import jax.numpy as jnp
 
@@ -18,17 +19,17 @@ class CovarianceFunction(eqx.Module):
     
     Parameters
     ----------
-    param_values : :class:`~pioran.parameters.ParametersModel` or  :obj:`list of float`
+    param_values : :class:`~pioran.parameters.ParametersModel` or  :obj:`list` of :obj:`float`
         Values of the parameters of the covariance function.
-    param_names :  :obj:`list of str`
+    param_names :  :obj:`list` of :obj:`str`
         param_names of the parameters of the covariance function.
-    free_parameters :  :obj:`list of bool`
-        List of bool to indicate if the parameters are free or not.
+    free_parameters :  :obj:`list` of :obj:`bool`
+        list` of :obj:`bool` to indicate if the parameters are free or not.
 
     Raises
     ------
     `TypeError`
-        If param_values is not a `list of float` or a :class:`~pioran.parameters.ParametersModel`.
+        If param_values is not a :obj:`list` of :obj:`float` or a :class:`~pioran.parameters.ParametersModel`.
 
     Attributes
     ----------
@@ -59,12 +60,12 @@ class CovarianceFunction(eqx.Module):
         
         Parameters
         ----------
-        param_values : :class:`~pioran.parameters.ParametersModel` or  :obj:`list of float`
+        param_values : :class:`~pioran.parameters.ParametersModel` or  :obj:`list` of :obj:`float`
             Values of the parameters of the covariance function.
-        param_names :  :obj:`list of str`
+        param_names :  :obj:`list` of :obj:`str`
             param_names of the parameters of the covariance function.
-        free_parameters :  :obj:`list of bool`
-            List of bool to indicate if the parameters are free or not.       
+        free_parameters :  :obj:`list` of :obj:`bool`
+            list` of :obj:`bool` to indicate if the parameters are free or not.       
         
         """ 
         if isinstance(param_values, ParametersModel):
@@ -73,7 +74,7 @@ class CovarianceFunction(eqx.Module):
             self.parameters = ParametersModel( param_names=param_names, param_values=param_values, free_parameters=free_parameters)
         else:
             raise TypeError(
-                "The parameters of the covariance function must be a list of floats or jnp.ndarray or a ParametersModel object.")
+                "The parameters of the covariance function must be a list` of :obj:`float`s or jnp.ndarray or a ParametersModel object.")
 
     def __str__(self) -> str:  # pragma: no cover
         """String representation of the covariance function.
@@ -191,7 +192,7 @@ class ProductCovarianceFunction(CovarianceFunction):
     expression: str
     
     def __init__(self, cov1, cov2):
-        """Constructor of the SumCovarianceFunction class.
+        """Constructor of the ProductCovarianceFunction class.
               
         Parameters
         ----------
@@ -253,7 +254,7 @@ class SumCovarianceFunction(CovarianceFunction):
         Second covariance function.
     parameters : :class:`~pioran.parameters.ParametersModel`
         Parameters of the covariance function.
-    expression : `str`
+    expression : :obj:`str`
         Expression of the total covariance function.
 
     Methods
@@ -266,7 +267,7 @@ class SumCovarianceFunction(CovarianceFunction):
     parameters: ParametersModel
     expression: str
     
-    def __init__(self, cov1, cov2):
+    def __init__(self, cov1: CovarianceFunction, cov2):
         """Constructor of the SumCovarianceFunction class.
                 
         Parameters
@@ -286,7 +287,7 @@ class SumCovarianceFunction(CovarianceFunction):
                                           _pars=cov1.parameters._pars + cov2.parameters._pars)
     
     @eqx.filter_jit
-    def calculate(self, x:jnp.array) -> jnp.ndarray:
+    def calculate(self, x:jax.Array) -> jax.Array:
         """Compute the covariance function at the points x.
         
         It is the sum of the two covariance functions.

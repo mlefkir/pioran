@@ -113,7 +113,7 @@ class PSDToACV(eqx.Module):
                  dt: float, 
                  method: str, 
                  n_components: int = None, 
-                 estimate_variance = True):
+                 estimate_variance: bool = True):
         """Constructor of the PSDToACV class.
     
         Initialize the PSDToACV class with the power spectral density, the frequency grid and the method used to compute the autocovariance function.
