@@ -53,7 +53,7 @@ class GaussianProcess(eqx.Module):
         Estimate the amplitude of the autocovariance function, by default True.
     scale_errors : :obj:`bool`, optional
         Scale the errors on the training data by adding a multiplicative factor, by default True.
-    log_warping : :obj:`bool`, optional
+    log_transform : :obj:`bool`, optional
         Use a log transformation of the data, by default False. This is useful when the data is log-normal distributed.
         Only compatible with the method 'FFT' or 'NuFFT'.
     nb_prediction_points : :obj:`int`, optional
@@ -95,7 +95,7 @@ class GaussianProcess(eqx.Module):
         Estimate the mean of the training data.
     estimate_variance : :obj:`bool`
         Estimate the amplitude of the autocovariance function.
-    log_warping : :obj:`bool`
+    log_transform : :obj:`bool`
         Use a log transformation of the data.
     use_tinygp : :obj:`bool`
         Use tinygp to compute the log marginal likelihood.
@@ -109,7 +109,7 @@ class GaussianProcess(eqx.Module):
     scale_errors: bool
     estimate_mean: bool
     estimate_variance: bool = False
-    log_warping: bool = False
+    log_transform: bool = False
     use_tinygp: bool = False
     
     def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity],
@@ -124,7 +124,7 @@ class GaussianProcess(eqx.Module):
                  estimate_variance = True,
                  estimate_mean = True,
                  scale_errors = True,
-                 log_warping = False,
+                 log_transform = False,
                  nb_prediction_points = None,
                  prediction_indexes = None) -> None:
         """Constructor method for the GaussianProcess class.
@@ -161,7 +161,7 @@ class GaussianProcess(eqx.Module):
             Estimate the amplitude of the autocovariance function, by default True.
         scale_errors : :obj:`bool`, optional
             Scale the errors on the training data by adding a multiplicative factor, by default True.
-        log_warping : :obj:`bool`, optional
+        log_transform : :obj:`bool`, optional
             Use a log transformation of the data, by default False. This is useful when the data is log-normal distributed.
             Only compatible with the method 'FFT' or 'NuFFT'.
         nb_prediction_points : :obj:`int`, optional
@@ -231,8 +231,8 @@ class GaussianProcess(eqx.Module):
         else:
             print("The mean of the training data is not estimated. Be careful of the data included in the training set.")
         
-        self.log_warping = log_warping
-        if self.log_warping:
+        self.log_transform = log_transform
+        if self.log_transform:
             assert self.estimate_mean, "The mean of the training data must be estimated to use a log transformation."
             self.model.parameters.append("const",jnp.min(self.observation_values),True,hyperparameter=False)
 
@@ -291,7 +291,7 @@ class GaussianProcess(eqx.Module):
         alpha: array of shape (n,1)
             alpha = Cov_inv * observation_values (- mu if mu is estimated)
         """
-        if not self.log_warping:
+        if not self.log_transform:
             Cov_xx = self.get_cov(
                 self.observation_indexes, self.observation_indexes, errors=self.observation_errors)
             Cov_inv = solve(Cov_xx, jnp.eye(len(self.observation_indexes)))
@@ -351,7 +351,7 @@ class GaussianProcess(eqx.Module):
 
         # Compute the predictive mean
         if self.estimate_mean:
-            if not self.log_warping:
+            if not self.log_transform:
                 predictive_mean = Cov_xxp.T@alpha + \
                     self.model.parameters["mu"].value
             else:
@@ -386,7 +386,7 @@ class GaussianProcess(eqx.Module):
             Log marginal likelihood of the GP.
 
         """
-        if not self.log_warping:
+        if not self.log_transform:
             Cov_xx = self.get_cov(self.observation_indexes, self.observation_indexes,
                                 errors=self.observation_errors)
             # Compute the covariance matrix between the training indexes
@@ -422,7 +422,7 @@ class GaussianProcess(eqx.Module):
             
             return -l + correction
             
-    def compute_log_marginal_likelihood_tinygp(self) -> float:
+    def compute_log_marginal_likelihood_tinygp(self) -> jax.Array:
         r"""Compute the log marginal likelihood of the Gaussian Process using tinygp.
         
         This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
@@ -434,18 +434,27 @@ class GaussianProcess(eqx.Module):
             Log marginal likelihood of the GP.
         
         """
+        if self.log_transform:
+            y = jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value))
+            yerr = self.observation_errors.flatten() / (self.observation_values.flatten() - self.model.parameters["const"].value)
+        else:
+            y = self.observation_indexes
+            yerr = self.observation_errors
+            
         if self.estimate_mean and self.scale_errors:
             gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
-                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*self.observation_errors**2),
+                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*yerr**2),
                                     mean=self.model.parameters['mu'].value)
         elif self.estimate_mean:
             gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
                                     mean=self.model.parameters['mu'].value)
         elif self.scale_errors:
             gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
-                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*self.observation_errors**2))
+                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*yerr**2))
         
-        return gp.log_probability(self.observation_values)
+        return gp.log_probability(y)
+        
+
     
     
     
