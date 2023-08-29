@@ -47,7 +47,7 @@ class Inference:
     
     """
     
-    def __init__(self, Process: Union[GaussianProcess,CARMAProcess],priors, method :str="ultranest",n_samples=1000,seed_check=0):
+    def __init__(self, Process: Union[GaussianProcess,CARMAProcess],priors, method :str="ultranest",n_samples=1000,seed_check=0,run_checks=True):
         r"""Constructor method for the Optimizer class.
 
         Instantiate the Inference class.
@@ -64,7 +64,8 @@ class Inference:
             Number of samples to take from the prior distribution, by default 1000
         seed_check : :obj:`int`, optional
             Seed for the random number generator, by default 0    
-            
+        run_checks : :obj:`bool`, optional
+            Run the prior predictive checks, by default True
         Raises
         ------
         TypeError
@@ -81,13 +82,14 @@ class Inference:
             raise TypeError("method must be a string.")  
         
         #run prior predictive checks
-        self.prior_predictive_checks(n_samples,seed_check)
-        
-        if isinstance(Process, GaussianProcess) and isinstance(self.process.model,PSDToACV):
-            if self.process.model.method in tinygp_methods:
-                print(f"The PSD model is a {self.process.model.method} decomposition, checking the approximation.")
-                self.check_approximation(n_samples,seed_check)
-        
+        if run_checks: 
+            self.prior_predictive_checks(n_samples,seed_check)
+            
+            if isinstance(Process, GaussianProcess) and isinstance(self.process.model,PSDToACV):
+                if self.process.model.method in tinygp_methods:
+                    print(f"The PSD model is a {self.process.model.method} decomposition, checking the approximation.")
+                    self.check_approximation(n_samples,seed_check)
+            
     
     def prior_predictive_checks(self,
                                 n_samples,
