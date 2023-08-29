@@ -113,7 +113,7 @@ class Inference:
             
         """
         key = jax.random.PRNGKey(seed_check)
-        n_pars = len(self.process.model.parameters)
+        n_pars = len(self.process.model.parameters.free_names)
         freqs = jnp.geomspace(self.process.model.f0, self.process.model.fN, n_frequencies)
 
 
