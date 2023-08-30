@@ -342,26 +342,35 @@ class GaussianProcess(eqx.Module):
             prediction_indexes = reshape_array(prediction_indexes)
         else:
             prediction_indexes = self.prediction_indexes
-        # Compute the covariance matrix between the training indexes
-        _, Cov_inv, alpha = self.get_cov_training()
-        # Compute the covariance matrix between the training indexes and the prediction indexes
-        Cov_xxp = self.get_cov(self.observation_indexes, prediction_indexes)
-        Cov_xpxp = self.get_cov(prediction_indexes,
-                                prediction_indexes)
+        
+        if not self.use_tinygp:
+            # Compute the covariance matrix between the training indexes
+            _, Cov_inv, alpha = self.get_cov_training()
+            # Compute the covariance matrix between the training indexes and the prediction indexes
+            Cov_xxp = self.get_cov(self.observation_indexes, prediction_indexes)
+            Cov_xpxp = self.get_cov(prediction_indexes,
+                                    prediction_indexes)
 
-        # Compute the predictive mean
-        if self.estimate_mean:
-            if not self.log_transform:
-                predictive_mean = Cov_xxp.T@alpha + \
-                    self.model.parameters["mu"].value
+            # Compute the predictive mean
+            if self.estimate_mean:
+                if not self.log_transform:
+                    predictive_mean = Cov_xxp.T@alpha + \
+                        self.model.parameters["mu"].value
+                else:
+                    predictive_mean = jnp.exp(Cov_xxp.T@alpha + \
+                        self.model.parameters["mu"].value) 
             else:
-                predictive_mean = jnp.exp(Cov_xxp.T@alpha + \
-                    self.model.parameters["mu"].value) 
+                predictive_mean = Cov_xxp.T@alpha
+            # Compute the predictive covariance and ensure that the covariance matrix is positive definite
+            predictive_covariance = nearest_positive_definite(
+                Cov_xpxp - Cov_xxp.T@Cov_inv@Cov_xxp)
         else:
-            predictive_mean = Cov_xxp.T@alpha
-        # Compute the predictive covariance and ensure that the covariance matrix is positive definite
-        predictive_covariance = nearest_positive_definite(
-            Cov_xpxp - Cov_xxp.T@Cov_inv@Cov_xxp)
+            gp = self.build_gp_tinygp()
+            if self.log_transform:
+                y = jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value))
+            else:
+                y = self.observation_values            
+            predictive_mean, predictive_covariance = gp.predict(y,prediction_indexes,include_mean=True,return_cov=True)
 
         return predictive_mean, predictive_covariance
     
@@ -422,6 +431,41 @@ class GaussianProcess(eqx.Module):
             
             return -l + correction
             
+    def build_gp_tinygp(self) -> tinygp.GaussianProcess:
+        r"""Build the Gaussian Process using tinygp.
+        
+        This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
+        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep` objects. 
+        
+        Returns
+        -------
+        :obj:`tinygp.GaussianProcess`
+            Gaussian Process object.
+        
+        """
+        x = self.observation_indexes # time
+        
+        # apply log transformation
+        if self.log_transform:
+            yerr = self.observation_errors.flatten() / (self.observation_values.flatten() - self.model.parameters["const"].value)
+        else:
+            yerr = self.observation_errors
+            
+        if self.estimate_mean and self.scale_errors:
+            gp = tinygp.GaussianProcess(self.model.ACVF,x,
+                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*yerr**2),
+                                    mean=self.model.parameters['mu'].value)
+        elif self.estimate_mean:
+            gp = tinygp.GaussianProcess(self.model.ACVF,x,
+                                    mean=self.model.parameters['mu'].value)
+        elif self.scale_errors:
+            gp = tinygp.GaussianProcess(self.model.ACVF,x,
+                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*yerr**2))
+        else:
+            gp = tinygp.GaussianProcess(self.model.ACVF,x)
+
+        return gp
+        
     def compute_log_marginal_likelihood_tinygp(self) -> jax.Array:
         r"""Compute the log marginal likelihood of the Gaussian Process using tinygp.
         
@@ -434,24 +478,13 @@ class GaussianProcess(eqx.Module):
             Log marginal likelihood of the GP.
         
         """
+        gp = self.build_gp_tinygp()
+        
         if self.log_transform:
             y = jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value))
-            yerr = self.observation_errors.flatten() / (self.observation_values.flatten() - self.model.parameters["const"].value)
         else:
-            y = self.observation_indexes
-            yerr = self.observation_errors
-            
-        if self.estimate_mean and self.scale_errors:
-            gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
-                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*yerr**2),
-                                    mean=self.model.parameters['mu'].value)
-        elif self.estimate_mean:
-            gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
-                                    mean=self.model.parameters['mu'].value)
-        elif self.scale_errors:
-            gp = tinygp.GaussianProcess(self.model.ACVF,self.observation_indexes,
-                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*yerr**2))
-        
+            y = self.observation_values
+
         return gp.log_probability(y)
         
 

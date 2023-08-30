@@ -3,6 +3,7 @@
 """
 from typing import Union
 
+import os
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -36,6 +37,8 @@ class Inference:
         - "ultranest": nested sampling via ultranest.
     results : :obj:`dict`
         Results of the inference.
+    log_dir : :obj:`str`
+        Directory to save the results of the inference.
     
     Methods
     -------
@@ -47,7 +50,7 @@ class Inference:
     
     """
     
-    def __init__(self, Process: Union[GaussianProcess,CARMAProcess],priors, method :str="ultranest",n_samples=1000,seed_check=0,run_checks=True):
+    def __init__(self, Process: Union[GaussianProcess,CARMAProcess],priors, method :str="ultranest",n_samples=1000,seed_check=0,run_checks=True,log_dir='log_dir'):
         r"""Constructor method for the Optimizer class.
 
         Instantiate the Inference class.
@@ -74,7 +77,9 @@ class Inference:
         
         self.process = Process
         self.priors = priors
-        
+        self.log_dir = log_dir
+        if not os.path.exists(self.log_dir):
+            os.makedirs(self.log_dir)
         
         if isinstance(method, str):
             self.method = method
@@ -129,7 +134,7 @@ class Inference:
         
         if plot_prior_samples:
             fig,_ = plot_priors_samples(self.params_samples,self.process.model.parameters.free_names)
-            fig.savefig("prior_samples.pdf")
+            fig.savefig(f"{self.log_dir}/prior_samples.pdf")
             
         if plot_prior_predictive_distribution:
             
@@ -193,13 +198,13 @@ class Inference:
                                             ratio=ratio,
                                             f_min=self.process.model.f_min_obs,
                                             f_max=self.process.model.f_max_obs)
-            fig.savefig("diagnostics_psd_approx.pdf")
+            fig.savefig(f"{self.log_dir}/diagnostics_psd_approx.pdf")
             figs.append(fig)
         
         if plot_violins:     
             fig,_ = violin_plots_psd_approx(res=residuals,
                                             ratio=ratio)
-            fig.savefig("violin_plots_psd_approx.pdf")
+            fig.savefig(f"{self.log_dir}/violin_plots_psd_approx.pdf")
             figs.append(fig)
         
         if plot_quantiles:
@@ -208,7 +213,7 @@ class Inference:
                                         f=freqs,
                                         f_min=self.process.model.f_min_obs,
                                         f_max=self.process.model.f_max_obs)
-            fig.savefig("quantiles_psd_approx.pdf")
+            fig.savefig(f"{self.log_dir}/quantiles_psd_approx.pdf")
             figs.append(fig)
             
         return figs,residuals,ratio
@@ -281,7 +286,7 @@ class Inference:
         """
         
         resume = kwargs.get('resume',True)
-        log_dir = kwargs.get('log_dir','GP_ultranest')
+        log_dir = kwargs.get('log_dir',self.log_dir)
         run_kwargs = kwargs.get('run_kwargs',{})
         viz = {} if verbose else  {'show_status': False , 'viz_callback': void}
         free_names = self.process.model.parameters.free_names
