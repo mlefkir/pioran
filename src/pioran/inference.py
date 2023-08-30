@@ -85,17 +85,19 @@ class Inference:
             self.method = method
         else:
             raise TypeError("method must be a string.")  
-        
+
         #run prior predictive checks
-        if run_checks: 
+        if run_checks and rank == 0: 
+            # MPI.COMM_WORLD.Barrier()
             self.prior_predictive_checks(n_samples,seed_check)
             
             if isinstance(Process, GaussianProcess) and isinstance(self.process.model,PSDToACV):
                 if self.process.model.method in tinygp_methods:
                     print(f"The PSD model is a {self.process.model.method} decomposition, checking the approximation.")
                     self.check_approximation(n_samples,seed_check)
-            
-    
+        MPI.COMM_WORLD.Barrier()
+
+ 
     def prior_predictive_checks(self,
                                 n_samples,
                                 seed_check,

@@ -370,7 +370,7 @@ class GaussianProcess(eqx.Module):
                 y = jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value))
             else:
                 y = self.observation_values            
-            predictive_mean, predictive_covariance = gp.predict(y,prediction_indexes,include_mean=True,return_cov=True)
+            predictive_mean, predictive_covariance = gp.predict(y,prediction_indexes.flatten(),include_mean=True,return_cov=True)
 
         return predictive_mean, predictive_covariance
     

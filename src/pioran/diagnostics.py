@@ -3,17 +3,14 @@ import sys
 from typing import Union
 
 import jax.numpy as jnp
-import matplotlib.pyplot as plt
 import numpy as np
 
-from .acvf import CARMA_covariance
-from .acvf_base import CovarianceFunction
+
 from .carma_core import CARMAProcess
 from .core import GaussianProcess
 from .plots import (plot_posterior_predictive_ACF,
                     plot_posterior_predictive_PSD, plot_prediction,
                     plot_residuals)
-from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
 from .utils.carma_utils import (CARMA_autocovariance, CARMA_powerspectrum,
                                 MA_quad_to_coeff, quad_to_coeff)
@@ -56,11 +53,6 @@ class Visualisations:
         self.x = process.observation_indexes.flatten()
         self.y = process.observation_values.flatten()
         self.yerr = process.observation_errors.flatten()
-        
-        
-        self.predictive_mean, self.predictive_cov = process.compute_predictive_distribution()
-        self.x_pred = process.prediction_indexes.flatten()
-
 
         self.f_min = 1/(self.x[-1]-self.x[0])
         self.f_max = .5/jnp.min(jnp.diff(self.x))
@@ -68,9 +60,6 @@ class Visualisations:
         self.frequencies = jnp.logspace(jnp.log10(self.f_min),jnp.log10(self.f_max),n_frequencies)
         self.tau = jnp.linspace(0,self.x[-1],1000)
         self.filename_prefix = filename
-        if not os.path.isdir(f'{self.filename_prefix}/data/'):
-            os.makedirs(f'{self.filename_prefix}/data/')
-        
         
     def plot_timeseries_diagnostics(self,**kwargs) -> None:
         """Plot the timeseries diagnostics.
@@ -79,15 +68,29 @@ class Visualisations:
         plot the predicted timeseries and the residuals.
 
         """
-   
-        fig,ax = plot_prediction(x=self.x.flatten(),y=self.y.flatten(),yerr=self.yerr.flatten(),x_pred = self.x_pred.flatten(),
-                        y_pred=self.predictive_mean.flatten(),cov_pred=self.predictive_cov,filename=self.filename_prefix,**kwargs)
+        print("Plotting timeseries diagnostics...")
+
+        self.predictive_mean, self.predictive_cov = self.process.compute_predictive_distribution()
+        self.x_pred = self.process.prediction_indexes.flatten()           
+        fig,ax = plot_prediction(x=self.x.flatten(),
+                                 y=self.y.flatten(),
+                                 yerr=self.yerr.flatten(),
+                                 x_pred = self.x_pred.flatten(),
+                                 y_pred=self.predictive_mean.flatten(),
+                                 cov_pred=self.predictive_cov,
+                                 filename=self.filename_prefix,
+                                 log_transform=self.process.log_transform,
+                                 **kwargs)
         
         prediction_at_observation_times, _ = self.process.compute_predictive_distribution(prediction_indexes=self.x)
         
-        fig2,ax2 = plot_residuals(x=self.x.flatten(),y=self.y.flatten(),yerr=self.yerr.flatten(),
+        fig2,ax2 = plot_residuals(x=self.x.flatten(),
+                                  y=self.y.flatten(),
+                                  yerr=self.yerr.flatten(),
                                   y_pred=prediction_at_observation_times.flatten(),
-                                  filename=self.filename_prefix,**kwargs)
+                                  filename=self.filename_prefix,
+                                  log_transform=self.process.log_transform,
+                                  **kwargs)
         
     def posterior_predictive_checks(self,samples,plot_PSD=True,plot_ACVF=True,**kwargs):
         """Plot the posterior predictive checks.
@@ -154,16 +157,17 @@ class Visualisations:
                             y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,**kwargs)
         
             else:
-                if isinstance(self.process.model,PSDToACV):
+                f_min = self.process.model.frequencies[1] # 0 is the first frequency
+                f_max = self.process.model.frequencies[-1]
+                f = jnp.logspace(jnp.log10(f_min),jnp.log10(f_max),1000)
+                                        
+                posterior_PSD = []
+                posterior_ACVF = []
+
+                if isinstance(self.process.model,PSDToACV) and not self.process.use_tinygp:
                     # posterior_PSD = jnp.array([self.process.model.PSD(self.frequencies,params[i]) for i in range(samples.shape[0])])
                     # f = self.process.model.frequencies[::int(self.process.model.S_low*self.process.model.S_high)]
-                    f_min = self.process.model.frequencies[1] # 0 is the first frequency
-                    f_max = self.process.model.frequencies[-1]
-                    f = jnp.logspace(jnp.log10(f_min),jnp.log10(f_max),1000)
                     
-                    posterior_PSD = []
-                    posterior_ACVF = []
-
                     if self.process.estimate_variance:
                         sumP = np.array([])
                         posterior_ACVF = []
@@ -196,13 +200,41 @@ class Visualisations:
                     plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
                                  y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,
                                  f_LS=f_LS,f_min_obs=self.f_min,f_max_obs=self.f_max,**kwargs)
-        
+                
+                # when the PSD model is approximated with tinygp, it is normalised to the variance
+                elif isinstance(self.process.model,PSDToACV) and self.process.use_tinygp:
+                    print("Plotting posterior predictive PSDs with tinygp...")
+                    for it in range(samples.shape[0]):
+    
+                        self.process.model.parameters.set_free_values(samples[it])
+                        fc = self.process.model.spectral_points
+                        psdc = self.process.model.PSD.calculate(fc) # calculate the PSD
+                        psdc /= psdc[0] # normalise the PSD to the first value
+                        amps, fc = self.process.model.decompose_model(psdc)
+                        
+                        psd = self.process.model.PSD.calculate(f) # calculate the PSD
+                        psd /= psd[0] # normalise the PSD to the first value
+                        psd /= jnp.sum(amps) # normalise the PSD to the sum of the amplitudes
+                        psd*=variance[it] # scale the PSD to the variance
+                        posterior_PSD.append(psd)
+                        
+                        
+                        print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
+                        sys.stdout.flush()
+                    
+                    posterior_PSD = np.array(posterior_PSD)
+                    f_LS = self.frequencies
+                    
+                    plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
+                                 y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,
+                                 f_LS=f_LS,f_min_obs=self.f_min,f_max_obs=self.f_max,**kwargs)
+                    
                     # raise NotImplementedError("Posterior predictive PSDs are not implemented for Gaussian processes.")
 
             # plot the posterior predictive PSDs
 
         # plot the posterior predictive ACFs
-        if plot_ACVF or posterior_ACVF is not None:
+        if plot_ACVF :
             print("Computing posterior predictive ACFs...")
             if isinstance(self.process,CARMAProcess):
                 if self.process.p == 1:

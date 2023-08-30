@@ -13,7 +13,7 @@ from scipy.stats import gaussian_kde, norm
 from .utils.ICCF import xcor
 
 
-def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),confidence_bands=True,title=None,xlabel=r'Time',ylabel=None,xlim=None,ylim=None,**kwargs):
+def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,log_transform=False,figsize=(16,6),confidence_bands=True,title=None,xlabel=r'Time',ylabel=None,xlim=None,ylim=None,**kwargs):
     """Plot the predicted time series and the confidence bands.
 
     Parameters
@@ -32,6 +32,8 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
         Covariance matrix of the prediction.    
     filename : :obj:`str`
         Name of the file to save the figure.
+    log_transform : :obj:`bool`, optional
+        Log transform the prediction, by default False
     figsize : :obj:`tuple`, optional
         Size of the figure.
     confidence_bands : :obj:`bool`, optional
@@ -57,13 +59,18 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
     show = kwargs.get('show',False)
 
     fig,ax = plt.subplots(1,1,figsize=figsize)
-     
+
     if confidence_bands:
         std = np.sqrt(np.diag(cov_pred))
         hi = (y_pred-std)
         lo = (y_pred+std)
         hi2 = (y_pred-2*std)
         lo2 = (y_pred+2*std)
+        
+        if log_transform:
+            y_pred = np.exp(y_pred)
+            hi,lo,hi2,lo2 = np.exp(hi),np.exp(lo),np.exp(hi2),np.exp(lo2)
+        
         ax.fill_between(x_pred,hi2,lo2,alpha=0.25,label=r"$2\sigma$")
         ax.fill_between(x_pred,hi,lo,alpha=0.5,label=r"$1\sigma$")
     
@@ -76,7 +83,6 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
     ax.set_xlim(xlim) if xlim is not None else None
     ax.set_ylim(ylim) if ylim is not None else None
     
-
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.set_minor_locator(AutoMinorLocator())
 
@@ -88,7 +94,7 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
         fig.show()
     return fig,ax
     
-def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize=(10,10),maxlag=None,title=None,**kwargs):
+def plot_residuals(x,y,yerr,y_pred,filename,log_transform=False,confidence_intervals=[95,99],figsize=(10,10),maxlag=None,title=None,**kwargs):
     """Plot the residuals of a predicted time series.
 
 
@@ -104,6 +110,8 @@ def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize
         Values of the prediction at the time of the observations.
     filename : :obj:`str`
         Name of the file to save the figure.
+    log_transform : :obj:`bool`, optional
+        Log transform the prediction, by default False
     confidence_intervals : :obj:`list` of :obj:`float`, optional
         Confidence intervals to plot, by default [95,99]
     figsize : :obj:`tuple`, optional
@@ -129,6 +137,7 @@ def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize
         maxlag = np.rint(maxlag)
 
     n = len(x)
+    if log_transform: y_pred = np.exp(y_pred)
     residuals = y - y_pred
     scaled_residuals = (residuals/yerr).flatten()
     max_scale_res = np.rint(np.max(scaled_residuals))
