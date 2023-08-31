@@ -313,7 +313,7 @@ class GaussianProcess(eqx.Module):
                 alpha = Cov_inv@latent_values
         return Cov_xx, Cov_inv, alpha
 
-    def compute_predictive_distribution(self, prediction_indexes=None):
+    def compute_predictive_distribution(self, log_transform=None,prediction_indexes=None):
         """ Compute the predictive mean and the predictive covariance of the GP. 
 
         The predictive distribution are computed using equations (2.25)  and (2.26) in Rasmussen and Williams (2006)
@@ -327,6 +327,8 @@ class GaussianProcess(eqx.Module):
 
         Parameters
         ----------
+        log_transform: bool, optional
+            Predict using a with exponentation of the posterior mean, by default None. 
         prediction_indexes: array of length m, optional
             Indexes of the prediction data, by default jnp.linspace(jnp.min(observation_indexes),jnp.max(observation_indexes),nb_prediction_points)
 
@@ -337,6 +339,7 @@ class GaussianProcess(eqx.Module):
         predictive_cov: array of shape (m,m)
             Predictive covariance of the GP.
         """
+        log_transform = self.log_transform if log_transform is None else log_transform
         # if we want to change the prediction indexes
         if prediction_indexes is not None:
             prediction_indexes = reshape_array(prediction_indexes)
@@ -353,12 +356,12 @@ class GaussianProcess(eqx.Module):
 
             # Compute the predictive mean
             if self.estimate_mean:
-                if not self.log_transform:
+                if not log_transform:
                     predictive_mean = Cov_xxp.T@alpha + \
                         self.model.parameters["mu"].value
                 else:
                     predictive_mean = jnp.exp(Cov_xxp.T@alpha + \
-                        self.model.parameters["mu"].value) 
+                    self.model.parameters["mu"].value) 
             else:
                 predictive_mean = Cov_xxp.T@alpha
             # Compute the predictive covariance and ensure that the covariance matrix is positive definite

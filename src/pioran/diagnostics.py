@@ -69,20 +69,21 @@ class Visualisations:
 
         """
         print("Plotting timeseries diagnostics...")
-
-        self.predictive_mean, self.predictive_cov = self.process.compute_predictive_distribution()
+        log_transform = False if (not self.process.use_tinygp and self.process.log_transform) else None
+        
+        self.predictive_mean, self.predictive_cov = self.process.compute_predictive_distribution(log_transform=log_transform)
         self.x_pred = self.process.prediction_indexes.flatten()           
-        fig,ax = plot_prediction(x=self.x.flatten(),
-                                 y=self.y.flatten(),
-                                 yerr=self.yerr.flatten(),
+        fig,ax = plot_prediction(x = self.x.flatten(),
+                                 y = self.y.flatten(),
+                                 yerr = self.yerr.flatten(),
                                  x_pred = self.x_pred.flatten(),
-                                 y_pred=self.predictive_mean.flatten(),
-                                 cov_pred=self.predictive_cov,
-                                 filename=self.filename_prefix,
-                                 log_transform=self.process.log_transform,
+                                 y_pred = self.predictive_mean.flatten(),
+                                 cov_pred = self.predictive_cov,
+                                 filename = self.filename_prefix,
+                                 log_transform = self.process.log_transform,
                                  **kwargs)
         
-        prediction_at_observation_times, _ = self.process.compute_predictive_distribution(prediction_indexes=self.x)
+        prediction_at_observation_times, _ = self.process.compute_predictive_distribution(log_transform=log_transform, prediction_indexes=self.x)
         
         fig2,ax2 = plot_residuals(x=self.x.flatten(),
                                   y=self.y.flatten(),
