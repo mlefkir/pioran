@@ -5,7 +5,6 @@ from typing import Union
 import jax.numpy as jnp
 import numpy as np
 
-
 from .carma_core import CARMAProcess
 from .core import GaussianProcess
 from .plots import (plot_posterior_predictive_ACF,
@@ -125,21 +124,12 @@ class Visualisations:
                 alpha = samples[:,1]
                 sigma = samples[:,0]
         else:
+            if self.process.estimate_variance:
+                index_variance = (self.process.model.parameters.free_names).index('var')                
+                variance = samples[:,index_variance]
+            params = samples
             
-            if self.process.scale_errors and self.process.estimate_mean:
-                params = samples[:,:-2]
-                if self.process.estimate_variance:
-                    variance = samples[:,-3]
         
-            elif self.process.scale_errors or self.process.estimate_mean:
-                params = samples[:,:-1]
-                if self.process.estimate_variance:
-                    variance = samples[:,-2]
-            else:
-                params = samples
-                if self.process.estimate_variance:
-                    variance = samples[:,-1]
-            
         posterior_ACVF = None
         # plot the posterior predictive PSDs
         if plot_PSD:
@@ -158,35 +148,40 @@ class Visualisations:
                             y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,**kwargs)
         
             else:
-                f_min = self.process.model.frequencies[1] # 0 is the first frequency
-                f_max = self.process.model.frequencies[-1]
+                f_min = self.process.model.f0 # 0 is the first frequency
+                f_max = self.process.model.fN
                 f = jnp.logspace(jnp.log10(f_min),jnp.log10(f_max),1000)
                                         
                 posterior_PSD = []
                 posterior_ACVF = []
 
                 if isinstance(self.process.model,PSDToACV) and not self.process.use_tinygp:
-                    # posterior_PSD = jnp.array([self.process.model.PSD(self.frequencies,params[i]) for i in range(samples.shape[0])])
-                    # f = self.process.model.frequencies[::int(self.process.model.S_low*self.process.model.S_high)]
-                    
+
                     if self.process.estimate_variance:
                         sumP = np.array([])
                         posterior_ACVF = []
-                        for it in range(samples.shape[0]):
-                            
-                            self.process.model.parameters.set_free_values(samples[it])
-                            R,factor = self.process.model.calculate(self.tau,with_ACVF_factor=True)
-                            sumP = np.append(sumP,factor)
-                            posterior_ACVF.append(R)
-                            
-                            P = self.process.model.PSD.calculate(f)#self.process.model.frequencies[1:])
-                            P /= sumP[-1]/variance[it]
-                            posterior_PSD.append(P) 
-                            print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
-                            sys.stdout.flush()
-                        np.savetxt(f'{self.filename_prefix}normalisation_factor.txt',np.array(sumP))
-                        posterior_ACVF = np.array(posterior_ACVF)
-                        # np.savetxt(f'{self.filename_prefix}posterior_predictive_ACFV.txt',posterior_ACVF)
+                        if not os.path.isfile(f'{self.filename_prefix}_normalisation_factor.txt'):
+                            for it in range(samples.shape[0]):
+                                self.process.model.parameters.set_free_values(samples[it])
+                                R, factor = self.process.model.calculate(self.tau,with_ACVF_factor=True)
+                                sumP = np.append(sumP,factor)
+                                posterior_ACVF.append(R)
+                                P = self.process.model.PSD.calculate(f)/factor*variance[it]#self.process.model.frequencies[1:])
+                                
+                                posterior_PSD.append(P) 
+                                print(f'Sample: {it+1}/{samples.shape[0]}', end='\r')
+                                sys.stdout.flush()
+                            np.savetxt(f'{self.filename_prefix}_normalisation_factor.txt',np.array(sumP))
+                            posterior_ACVF = np.array(posterior_ACVF)
+                        else:
+                            print('Normalisation factor already computed, loading it...')
+                            factors = np.loadtxt(f'{self.filename_prefix}_normalisation_factor.txt')
+                            for it in range(samples.shape[0]):
+                                self.process.model.parameters.set_free_values(samples[it])
+                                P = self.process.model.PSD.calculate(f)/factors[it]*variance[it]#self.process.model.frequencies[1:])
+                                posterior_PSD.append(P) 
+                                print(f'Sample: {it+1}/{samples.shape[0]}', end='\r')
+                                sys.stdout.flush()
                     else:
                         
                         for it in range(samples.shape[0]):
@@ -205,24 +200,26 @@ class Visualisations:
                 # when the PSD model is approximated with tinygp, it is normalised to the variance
                 elif isinstance(self.process.model,PSDToACV) and self.process.use_tinygp:
                     print("Plotting posterior predictive PSDs with tinygp...")
+                    fc = self.process.model.spectral_points
+                    factors = []
                     for it in range(samples.shape[0]):
     
                         self.process.model.parameters.set_free_values(samples[it])
-                        fc = self.process.model.spectral_points
-                        psdc = self.process.model.PSD.calculate(fc) # calculate the PSD
-                        psdc /= psdc[0] # normalise the PSD to the first value
-                        amps, fc = self.process.model.decompose_model(psdc)
+                        amps, _ = self.process.model.get_SHO_coefs()
+                        factors.append(jnp.sum(amps*fc))
                         
                         psd = self.process.model.PSD.calculate(f) # calculate the PSD
+                        
                         psd /= psd[0] # normalise the PSD to the first value
-                        psd /= jnp.sum(amps) # normalise the PSD to the sum of the amplitudes
-                        psd*=variance[it] # scale the PSD to the variance
+                        psd /= jnp.sum(amps*fc) # normalise the PSD to the sum of the amplitudes
+                        psd *= variance[it] # scale the PSD to the variance
+                        
                         posterior_PSD.append(psd)
-                        
-                        
                         print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
                         sys.stdout.flush()
-                    
+                        
+                    factors = np.array(factors)
+                    np.savetxt(f'{self.filename_prefix}_normalisation_factor.txt',factors)
                     posterior_PSD = np.array(posterior_PSD)
                     f_LS = self.frequencies
                     
@@ -230,8 +227,6 @@ class Visualisations:
                                  y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,
                                  f_LS=f_LS,f_min_obs=self.f_min,f_max_obs=self.f_max,**kwargs)
                     
-                    # raise NotImplementedError("Posterior predictive PSDs are not implemented for Gaussian processes.")
-
             # plot the posterior predictive PSDs
 
         # plot the posterior predictive ACFs
