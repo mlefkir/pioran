@@ -278,7 +278,6 @@ def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidenc
     fig.savefig(f'{filename}_posterior_predictive_ACF.pdf',bbox_inches='tight')
     return fig,ax
 
-
 def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$',f_min_obs=None,f_max_obs=None,**kwargs):
     """Plot the posterior predictive Power Spectral Density of the process.
 
@@ -342,10 +341,10 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
         psd_mean = jnp.mean(posterior_PSD,axis=0)
         ax.loglog(f,psd_mean,label='Mean',ls='--')
         
-    ax.loglog(f_LS,LS_periodogram,color='C2',label='Lomb-Scargle')
+    ax.loglog(f_LS,LS_periodogram,color='C2',label='Lomb-Scargle',alpha=.35)
 
     noise_level = np.median(np.diff(x))*np.mean(yerr**2)*2
-    noise_level_max = np.max(np.diff(x))*np.max(yerr**2)*2
+    noise_level_max = np.mean(np.diff(x))*np.mean(yerr**2)*2
     ax.axhspan(noise_level,noise_level_max,color='k',alpha=.1)
     ax.axhline(noise_level,color='k',ls='--',label='Noise level')
     

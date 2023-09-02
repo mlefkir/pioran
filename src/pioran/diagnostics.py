@@ -176,6 +176,7 @@ class Visualisations:
                         else:
                             print('Normalisation factor already computed, loading it...')
                             factors = np.loadtxt(f'{self.filename_prefix}_normalisation_factor.txt')
+                            
                             for it in range(samples.shape[0]):
                                 self.process.model.parameters.set_free_values(samples[it])
                                 P = self.process.model.PSD.calculate(f)/factors[it]*variance[it]#self.process.model.frequencies[1:])
@@ -191,10 +192,12 @@ class Visualisations:
                             sys.stdout.flush()
                         
                     posterior_PSD = np.array(posterior_PSD)
+                    np.savetxt(f'{self.filename_prefix}_posterior_PSD.txt',posterior_PSD)
                     f_LS = self.frequencies
                     
                     plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
-                                 y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,
+                                 y=np.log(self.y) if self.process.log_transform else self.y,
+                                 yerr=self.yerr,filename=self.filename_prefix,save_data=True,
                                  f_LS=f_LS,f_min_obs=self.f_min,f_max_obs=self.f_max,**kwargs)
                 
                 # when the PSD model is approximated with tinygp, it is normalised to the variance
@@ -224,7 +227,8 @@ class Visualisations:
                     f_LS = self.frequencies
                     
                     plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
-                                 y=self.y,yerr=self.yerr,filename=self.filename_prefix,save_data=True,
+                                 y=np.log(self.y) if self.process.log_transform else self.y,
+                                 yerr=self.yerr,filename=self.filename_prefix,save_data=True,
                                  f_LS=f_LS,f_min_obs=self.f_min,f_max_obs=self.f_max,**kwargs)
                     
             # plot the posterior predictive PSDs
