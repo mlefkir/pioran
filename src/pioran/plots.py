@@ -74,8 +74,10 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,log_transform=False
         ax.fill_between(x_pred,hi2,lo2,alpha=0.25,label=r"$2\sigma$")
         ax.fill_between(x_pred,hi,lo,alpha=0.5,label=r"$1\sigma$")
     
-    ax.errorbar(x ,y, yerr=yerr, fmt='.', label='Observation')
+    ax.errorbar(x ,y, yerr=yerr, fmt='.', label='Observation',markerfacecolor='w')
+
     ax.plot(x_pred,y_pred, label='Prediction',color='k')
+    np.savetxt(f'{filename}_prediction.txt',jnp.vstack([x_pred,y_pred,hi,lo,hi2,lo2]).T,header='x_pred,y_pred,hi,lo,hi2,lo2')
 
     ax.set_title(title) if title is not None else None
     ax.set_xlabel(xlabel) if xlabel is not None else None
@@ -334,7 +336,7 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
 
     ax.loglog(f,psd_median,c='C0',label='Median')
 
-    for i,ci in enumerate(confidence_bands):
+    for i,ci in enumerate(reversed(confidence_bands)):
         ax.fill_between(f,PSD_quantiles[i],PSD_quantiles[-(i+1)],color='C0',alpha=.15*(i+1),label=f'{ci}%')
     
     if with_mean:

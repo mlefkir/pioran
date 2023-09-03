@@ -185,14 +185,14 @@ class PSDToACV(eqx.Module):
         self.fN = self.f_max_obs*self.S_high # maximum frequency
 
         self.n_freq_grid = jnp.rint(jnp.ceil(self.fN/self.f0)) + 1
-        self.frequencies = jnp.arange(0, self.fN+self.f0, self.f0)
             
         tau_max = 0.5/self.f0 
         self.dtau = tau_max/(self.n_freq_grid-1)
-        self.tau = jnp.arange(0, tau_max+self.dtau, self.dtau)
         
         if self.method == 'FFT' or self.method == 'NuFFT':
-            pass
+            self.frequencies = jnp.arange(0, self.fN+self.f0, self.f0)
+            self.tau = jnp.arange(0, tau_max+self.dtau, self.dtau)
+
         
         elif self.method == 'SHO':
             self.n_components = n_components
