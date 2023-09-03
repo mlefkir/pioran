@@ -159,40 +159,41 @@ class Visualisations:
 
                     if self.process.estimate_variance:
                         sumP = np.array([])
-                        posterior_ACVF = []
                         if not os.path.isfile(f'{self.filename_prefix}_normalisation_factor.txt'):
                             for it in range(samples.shape[0]):
+                                
                                 self.process.model.parameters.set_free_values(samples[it])
                                 R, factor = self.process.model.calculate(self.tau,with_ACVF_factor=True)
                                 sumP = np.append(sumP,factor)
-                                posterior_ACVF.append(R)
-                                P = self.process.model.PSD.calculate(f)/factor*variance[it]#self.process.model.frequencies[1:])
-                                
+                                # posterior_ACVF.append(R)
+                                P = self.process.model.PSD.calculate(f)/factor*variance[it]
+
                                 posterior_PSD.append(P) 
                                 print(f'Sample: {it+1}/{samples.shape[0]}', end='\r')
                                 sys.stdout.flush()
-                            np.savetxt(f'{self.filename_prefix}_normalisation_factor.txt',np.array(sumP))
-                            posterior_ACVF = np.array(posterior_ACVF)
+                            np.savetxt(f'{self.filename_prefix}_normalisation_factor.txt',sumP)
+
                         else:
                             print('Normalisation factor already computed, loading it...')
                             factors = np.loadtxt(f'{self.filename_prefix}_normalisation_factor.txt')
                             
                             for it in range(samples.shape[0]):
+                                
                                 self.process.model.parameters.set_free_values(samples[it])
                                 P = self.process.model.PSD.calculate(f)/factors[it]*variance[it]#self.process.model.frequencies[1:])
                                 posterior_PSD.append(P) 
+
                                 print(f'Sample: {it+1}/{samples.shape[0]}', end='\r')
-                                sys.stdout.flush()
+                                sys.stdout.flush()                    
+
                     else:
-                        
                         for it in range(samples.shape[0]):
                             self.process.model.parameters.set_free_values(samples[it])
                             posterior_PSD.append(self.process.model.PSD.calculate(f))  
                             print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
                             sys.stdout.flush()
-                        
+                            
                     posterior_PSD = np.array(posterior_PSD)
-                    np.savetxt(f'{self.filename_prefix}_posterior_PSD.txt',posterior_PSD)
                     f_LS = self.frequencies
                     
                     plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,

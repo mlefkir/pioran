@@ -193,12 +193,12 @@ def plot_residuals(x,y,yerr,y_pred,filename,log_transform=False,confidence_inter
 
 
     ax[2].set_xlim(0,maxlag)
-    ax[2].set_xlabel('Time lag')
+    ax[2].set_xlabel('Lag (Index)')
     ax[2].margins(x=0,y=0)
     axins.margins(x=0,y=0)
     ax[2].set_ylabel('Autocorrelation\nResiduals / Error')
     ax[2].legend(loc='upper left')
-    axins.set_xlabel('Time lag')
+    axins.set_xlabel('Lag (Index)')
 
     if title is not None:
         fig.suptitle(title)
