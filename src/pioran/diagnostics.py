@@ -14,6 +14,8 @@ from .psdtoacv import PSDToACV
 from .utils.carma_utils import (CARMA_autocovariance, CARMA_powerspectrum,
                                 MA_quad_to_coeff, quad_to_coeff)
 
+from .utils.psd_utils import SHO_power_spectrum
+
 
 class Visualisations:
     """Class for visualising the results after an inference run.
@@ -60,7 +62,7 @@ class Visualisations:
         self.tau = jnp.linspace(0,self.x[-1],1000)
         self.filename_prefix = filename
         
-    def plot_timeseries_diagnostics(self,**kwargs) -> None:
+    def plot_timeseries_diagnostics(self,prediction_indexes=None,**kwargs) -> None:
         """Plot the timeseries diagnostics.
 
         This function will call the :func:`plot_prediction` and :func:`plot_residuals` functions to 
@@ -70,8 +72,8 @@ class Visualisations:
         print("Plotting timeseries diagnostics...")
         log_transform = False if (not self.process.use_tinygp and self.process.log_transform) else None
         
-        self.predictive_mean, self.predictive_cov = self.process.compute_predictive_distribution(log_transform=log_transform)
-        self.x_pred = self.process.prediction_indexes.flatten()           
+        self.predictive_mean, self.predictive_cov = self.process.compute_predictive_distribution(log_transform=log_transform,prediction_indexes=prediction_indexes)
+        self.x_pred = self.process.prediction_indexes.flatten() if prediction_indexes is None else prediction_indexes          
         fig,ax = plot_prediction(x = self.x.flatten(),
                                  y = self.y.flatten(),
                                  yerr = self.yerr.flatten(),
@@ -107,6 +109,8 @@ class Visualisations:
             Additional keyword arguments.
             frequencies : jnp.ndarray, optional
                 The frequencies at which to evaluate the PSDs of CARMA process, by default self.frequencies
+            plot_lombscargle : bool, optional
+                Plot the Lomb-Scargle periodogram, by default False
         """
         if isinstance(self.process,CARMAProcess):
             if self.process.p >1:
@@ -127,6 +131,12 @@ class Visualisations:
             if self.process.estimate_variance:
                 index_variance = (self.process.model.parameters.free_names).index('var')                
                 variance = samples[:,index_variance]
+            if self.process.scale_errors:
+                index_nu = (self.process.model.parameters.free_names).index('nu')                
+                nu = samples[:,index_nu]
+            if self.log_transform:
+                index_const = (self.process.model.parameters.free_names).index('const')
+                const = samples[:,index_const]
             params = samples
             
         
@@ -197,12 +207,16 @@ class Visualisations:
                     f_LS = self.frequencies
                     
                     plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
-                                 y=np.log(self.y) if self.process.log_transform else self.y,
+                                 y=np.log(self.y-np.mean(const)) if self.process.log_transform else self.y,
                                  yerr=self.yerr,filename=self.filename_prefix,save_data=True,
                                  f_LS=f_LS,f_min_obs=self.f_min,f_max_obs=self.f_max,**kwargs)
                 
                 # when the PSD model is approximated with tinygp, it is normalised to the variance
                 elif isinstance(self.process.model,PSDToACV) and self.process.use_tinygp:
+                    posterior_PSD_approx = []
+                    if self.process.model.method != 'SHO':
+                        raise NotImplementedError("Posterior predictive PSDs are not implemented for PSDToACV with tinygp.")
+                    
                     print("Plotting posterior predictive PSDs with tinygp...")
                     fc = self.process.model.spectral_points
                     factors = []
@@ -213,24 +227,40 @@ class Visualisations:
                         factors.append(jnp.sum(amps*fc))
                         
                         psd = self.process.model.PSD.calculate(f) # calculate the PSD
+                        psd_sho = SHO_power_spectrum(f,amps[...,None],fc[...,None]).sum(axis=0)
                         
                         psd /= psd[0] # normalise the PSD to the first value
+                        psd_sho /= psd_sho[0] # normalise the PSD to the first value
+                        
                         psd /= jnp.sum(amps*fc) # normalise the PSD to the sum of the amplitudes
+                        psd_sho /= jnp.sum(amps*fc) # normalise the PSD to the sum of the amplitudes
+                        
                         psd *= variance[it] # scale the PSD to the variance
+                        psd_sho *= variance[it] # scale the PSD to the variance
                         
                         posterior_PSD.append(psd)
+                        posterior_PSD_approx.append(psd_sho)
                         print(f'Samples: {it+1}/{samples.shape[0]}', end='\r')
                         sys.stdout.flush()
                         
                     factors = np.array(factors)
                     np.savetxt(f'{self.filename_prefix}_normalisation_factor.txt',factors)
                     posterior_PSD = np.array(posterior_PSD)
+                    posterior_PSD_approx = np.array(posterior_PSD_approx)
                     f_LS = self.frequencies
                     
-                    plot_posterior_predictive_PSD(f=f,posterior_PSD=posterior_PSD,x=self.x,
-                                 y=np.log(self.y) if self.process.log_transform else self.y,
-                                 yerr=self.yerr,filename=self.filename_prefix,save_data=True,
-                                 f_LS=f_LS,f_min_obs=self.f_min,f_max_obs=self.f_max,**kwargs)
+                    
+                    plot_posterior_predictive_PSD(f = f,posterior_PSD=posterior_PSD,
+                                 x = self.x,
+                                 y = np.log(self.y) if self.process.log_transform else self.y,
+                                 yerr = self.yerr,
+                                 filename = self.filename_prefix,
+                                 save_data = True,
+                                 posterior_PSD_approx = posterior_PSD_approx,
+                                 f_LS = f_LS,
+                                 f_min_obs = self.f_min,
+                                 f_max_obs = self.f_max,
+                                 **kwargs)
                     
             # plot the posterior predictive PSDs
 

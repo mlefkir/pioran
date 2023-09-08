@@ -280,7 +280,7 @@ def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidenc
     fig.savefig(f'{filename}_posterior_predictive_ACF.pdf',bbox_inches='tight')
     return fig,ax
 
-def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$',f_min_obs=None,f_max_obs=None,**kwargs):
+def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,posterior_PSD_approx=None,plot_lombscargle=False,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$',f_min_obs=None,f_max_obs=None,**kwargs):
     """Plot the posterior predictive Power Spectral Density of the process.
 
     This function will also compute the Lomb-Scargle periodogram on the data.
@@ -297,6 +297,8 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
         Time series values.
     yerr : :obj:`numpy.ndarray`
         Time series errors.  
+    posterior_PSD_approx : :obj:`numpy.ndarray`, optional
+        Array of PSDs posterior samples for the approximation, by default None
     filename : :obj:`str`
         Filename to save the figure.
     with_mean : bool, optional
@@ -323,6 +325,9 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     psd_median = jnp.median(posterior_PSD,axis=0)
     PSD_quantiles = jnp.percentile(posterior_PSD,q=percentiles,axis=0)
 
+    if posterior_PSD_approx is not None:
+        psd_median_approx = jnp.median(posterior_PSD_approx,axis=0)
+        PSD_quantiles_approx = jnp.percentile(posterior_PSD_approx,q=percentiles,axis=0)
     # compute the Lomb-Scargle periodogram
     LS_periodogram = lombscargle(x,y,2*np.pi*f_LS,precenter=True)    
     
@@ -330,6 +335,9 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
         np.savetxt(f'{filename}_LS_periodogram.txt',jnp.vstack((f_LS,LS_periodogram)).T,header='f_LS,LS_periodogram')
     np.savetxt(f'{filename}_posterior_predictive_PSD.txt',jnp.vstack((f,psd_median,PSD_quantiles)).T,
                header=f'f,psd_median,psd_quantiles({percentiles})')
+    if posterior_PSD_approx is not None:
+        np.savetxt(f'{filename}_posterior_predictive_PSD_approx.txt',jnp.vstack((f,psd_median_approx,PSD_quantiles_approx)).T,
+                   header=f'f,psd_median_approx,psd_quantiles_approx({percentiles})')
     
     # plots
     fig,ax = plt.subplots(figsize=(10,5))
@@ -339,16 +347,21 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     for i,ci in enumerate(reversed(confidence_bands)):
         ax.fill_between(f,PSD_quantiles[i],PSD_quantiles[-(i+1)],color='C0',alpha=.15*(i+1),label=f'{ci}%')
     
+    if posterior_PSD_approx is not None:
+        ax.loglog(f,psd_median_approx,c='C5',label='Median approx')
+        for i,ci in enumerate(reversed(confidence_bands)):
+            ax.fill_between(f,PSD_quantiles_approx[i],PSD_quantiles_approx[-(i+1)],color='C5',alpha=.15*(i+1),label=f'{ci}% approx')
     if with_mean:
         psd_mean = jnp.mean(posterior_PSD,axis=0)
         ax.loglog(f,psd_mean,label='Mean',ls='--')
         
-    ax.loglog(f_LS,LS_periodogram,color='C2',label='Lomb-Scargle',alpha=.35)
+    if plot_lombscargle:
+        ax.loglog(f_LS,LS_periodogram,color='C2',label='Lomb-Scargle',alpha=.35)
 
-    noise_level = np.median(np.diff(x))*np.mean(yerr**2)*2
-    noise_level_max = np.mean(np.diff(x))*np.mean(yerr**2)*2
-    ax.axhspan(noise_level,noise_level_max,color='k',alpha=.1)
-    ax.axhline(noise_level,color='k',ls='--',label='Noise level')
+    noise_level = np.median(np.diff(x))*np.median(yerr**2)*2
+    noise_level_mean = np.mean(np.diff(x))*np.mean(yerr**2)*2
+    ax.axhline(noise_level_mean,color='k',alpha=.1,label='mean noise level')
+    ax.axhline(noise_level,color='k',ls='--',label='median noise level')
     
     if f_min_obs is not None: ax.axvline(f_min_obs,ls='-.',label=r'$f_\mathrm{min}$')
     if f_max_obs is not None: ax.axvline(f_max_obs,ls='-.',label=r'$f_\mathrm{max}$')
