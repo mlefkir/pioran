@@ -134,7 +134,7 @@ class Visualisations:
             if self.process.scale_errors:
                 index_nu = (self.process.model.parameters.free_names).index('nu')                
                 nu = samples[:,index_nu]
-            if self.log_transform:
+            if self.process.log_transform:
                 index_const = (self.process.model.parameters.free_names).index('const')
                 const = samples[:,index_const]
             params = samples

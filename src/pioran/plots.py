@@ -354,7 +354,6 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,posterior_PS
     if with_mean:
         psd_mean = jnp.mean(posterior_PSD,axis=0)
         ax.loglog(f,psd_mean,label='Mean',ls='--')
-        
     if plot_lombscargle:
         ax.loglog(f_LS,LS_periodogram,color='C2',label='Lomb-Scargle',alpha=.35)
 
@@ -369,7 +368,7 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,posterior_PS
     if ylim is None:
         # ax.set_ylim(bottom=np.min(LS_periodogram)/1e3)
         ax.set_ylim(bottom=noise_level/10,top=np.max(psd_median)*2)
-        
+    
     ax.legend(bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
     ax.margins(x=0,y=0)
     ax.set_xlabel(xlabel)
