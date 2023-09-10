@@ -560,7 +560,7 @@ def plot_priors_samples(params,names):
     
     ax = ax.flatten()
     for i in range(n_samples):
-        ax[i].hist(params[i,:],bins='auto',density=True,alpha=.25)
+        ax[i].hist(params[i,:],bins=150,density=True,alpha=.25)
         x = jnp.linspace(params[i,:].min(),params[i,:].max(),1000)
         kde = gaussian_kde(params[i,:])
         ax[i].plot(x,kde(x))
