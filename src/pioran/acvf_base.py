@@ -70,11 +70,11 @@ class CovarianceFunction(eqx.Module):
         """ 
         if isinstance(param_values, ParametersModel):
             self.parameters = param_values
-        elif isinstance(param_values, list) or isinstance(param_values, jnp.ndarray):
+        elif isinstance(param_values, list) or isinstance(param_values, jax.Array):
             self.parameters = ParametersModel( param_names=param_names, param_values=param_values, free_parameters=free_parameters)
         else:
             raise TypeError(
-                "The parameters of the covariance function must be a list` of :obj:`float`s or jnp.ndarray or a ParametersModel object.")
+                "The parameters of the covariance function must be a list` of :obj:`float`s or jax.Array or a ParametersModel object.")
 
     def __str__(self) -> str:  # pragma: no cover
         """String representation of the covariance function.
@@ -101,7 +101,7 @@ class CovarianceFunction(eqx.Module):
         """    
         return self.__str__()
     
-    def get_cov_matrix(self, xq: jnp.ndarray, xp: jnp.ndarray) -> jnp.ndarray:
+    def get_cov_matrix(self, xq: jax.Array, xp: jax.Array) -> jax.Array:
         """Compute the covariance matrix between two arrays xq, xp.
 
         The term (xq-xp) is computed using the :func:`~pioran.utils.EuclideanDistance` function from the utils module.
@@ -219,7 +219,7 @@ class ProductCovarianceFunction(CovarianceFunction):
                                           _pars=cov1.parameters._pars + cov2.parameters._pars)
     
     @eqx.filter_jit
-    def calculate(self, x) -> jnp.ndarray:
+    def calculate(self, x) -> jax.Array:
         """Compute the covariance function at the points x.
         
         It is the product of the two covariance functions.
