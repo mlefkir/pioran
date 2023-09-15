@@ -4,18 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pioran"
+dynamic = ["dependencies"]
+
 authors = [
     {name = "Mehdy Lefkir", email = "mehdylefkir.work@gmail.com"},
-]
-description = "Timing package"
-readme = "README.md"
-requires-python = ">=3.8"
-dependencies = [
-    "numpy","h5py",
-    "scipy","matplotlib","astropy","jax","equinox","jaxlib","ultranest","jax_finufft",'tinygp'
     ]
-version = "0.1.0"
-
-
+description = "Timing package"
+requires-python = ">=3.8"
+version = "0.0.1"
+readme = "README.md"
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 [tool.setuptools.packages.find]
 where = ["src"]
