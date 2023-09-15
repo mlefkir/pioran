@@ -5,6 +5,7 @@ from typing import Union
 
 import os
 import jax
+import json
 import jax.numpy as jnp
 import numpy as np
 import ultranest
@@ -12,6 +13,8 @@ import ultranest.stepsampler
 from mpi4py import MPI
 
 from .carma_core import CARMAProcess
+from .acvf import CovarianceFunction
+from .psd import PowerSpectralDensity
 from .core import GaussianProcess
 from .psdtoacv import PSDToACV
 from .utils.psd_utils import get_samples_psd, wrapper_psd_true_samples
@@ -80,6 +83,18 @@ class Inference:
         self.log_dir = log_dir
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
+        if os.path.isfile(self.log_dir+'/config.json'):
+            print("The config file already exists. Loading the previous config.")
+            file = open(self.log_dir+'/config.json')
+            dict_config_old = json.load(file)
+            print('Check the config file:')
+            dict_config_new = self.save_config(save_file=False)
+            if dict_config_old == dict_config_new:
+                print("The config file is the identical.")
+            else:
+                raise ValueError("The config file is different.")
+        else:
+            self.save_config()
         
         if isinstance(method, str):
             self.method = method
@@ -97,6 +112,74 @@ class Inference:
                     self.check_approximation(n_samples,seed_check)
         MPI.COMM_WORLD.Barrier()
 
+    def save_config(self,save_file=True):
+        """Save the configuration of the inference.
+        
+        Save the configuration of the inference, process and model in a json file.        
+        
+        Parameters
+        ----------
+        save_file : :obj:`bool`, optional
+        
+        """
+        dict_config = {}
+        
+        # type of process
+        if isinstance(self.process,GaussianProcess):
+            dict_config['process'] = {'type':'GaussianProcess', 'options':{}}
+            dict_config['process']['options']['estimate_mean'] = self.process.estimate_mean
+        elif isinstance(self.process,CARMAProcess):
+            dict_config['process'] = {'type':'CARMAProcess', 'options':{}}
+            dict_config['process']['options']['use_beta'] = self.process.use_beta
+
+        else:
+            dict_config['process'] = {'type':'unknown', 'options':{}}
+        # 
+        # options of the process
+        dict_config['process']['options']['estimate_mean'] = self.process.estimate_mean
+        dict_config['process']['options']['scale_errors'] = self.process.scale_errors
+        dict_config['process']['options']['estimate_variance'] = self.process.estimate_variance
+        dict_config['process']['options']['log_transform'] = self.process.log_transform
+
+        # type of model
+        if isinstance(self.process.model,PSDToACV):
+            dict_config['model'] = {'type':'PowerSpectralDensity','info':{}}
+            dict_config['model']['info']['expression'] = self.process.model.PSD.expression
+            dict_config['model']['info']['method'] = self.process.model.method
+            dict_config['model']['info']['S_low'] = self.process.model.S_low
+            dict_config['model']['info']['S_high'] = self.process.model.S_high
+            if not ('FFT' in self.process.model.method):
+                dict_config['model']['info']['n_components'] = self.process.model.n_components
+        
+        elif isinstance(self.process.model,CovarianceFunction):
+            dict_config['model'] = {'type':'CovarianceFunction','info':{}}
+            dict_config['model']['info']['expression'] = self.process.model.expression
+        elif isinstance(self.process,CARMAProcess):
+            dict_config['model'] = {'type':'CARMA_model','info':{}}
+            dict_config['model']['info']['p'] = self.process.p
+            dict_config['model']['info']['q'] = self.process.q
+            
+        # parameters of the model
+        dict_config['model']['parameters'] = {}
+        dict_config['model']['parameters']['names'] = self.process.model.parameters.names
+        dict_config['model']['parameters']['free_parameters'] = self.process.model.parameters.free_names
+        
+        # data_related
+        dict_config['data'] = {}
+        dict_config['data']['nb_observation_points'] = len(self.process.observation_indexes)
+        dict_config['data']['duration'] = float(self.process.observation_indexes[-1]-self.process.observation_indexes[0])
+        dict_config['data']['min_sampling'] = np.diff(self.process.observation_indexes).min()
+        dict_config['data']['observation_indexes'] = self.process.observation_indexes.tolist()
+        dict_config['data']['observation_values'] = self.process.observation_values.tolist()
+        dict_config['data']['observation_errors'] = self.process.observation_errors.tolist()
+        
+        if save_file:
+            with open(self.log_dir+'/config.json', 'w', encoding='utf-8') as f:
+                json.dump(dict_config, f, ensure_ascii=False, indent=4)
+        
+        return dict_config
+        
+    
  
     def prior_predictive_checks(self,
                                 n_samples,
