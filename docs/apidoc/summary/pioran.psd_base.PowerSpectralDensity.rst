@@ -23,6 +23,7 @@
 
    .. autosummary::
    
+      ~PowerSpectralDensity.analytical
       ~PowerSpectralDensity.parameters
       ~PowerSpectralDensity.expression
    

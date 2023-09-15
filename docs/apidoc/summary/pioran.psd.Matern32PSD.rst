@@ -24,6 +24,7 @@
 
    .. autosummary::
    
+      ~Matern32PSD.analytical
       ~Matern32PSD.expression
       ~Matern32PSD.parameters
    

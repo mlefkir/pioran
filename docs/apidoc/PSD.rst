@@ -34,9 +34,8 @@ These are the PSD functions that are currently implemented. They all inherit fro
 
     Lorentzian
     Gaussian
+    OneBendPowerLaw
     Matern32PSD
-    MultipleBendingPowerLaw
-
 
 
 Power spectrum to autocovariance

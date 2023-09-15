@@ -5,15 +5,15 @@
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.signal import lombscargle
-from scipy.stats import norm
 from matplotlib.ticker import AutoMinorLocator
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from scipy.signal import lombscargle
+from scipy.stats import gaussian_kde, norm
 
 from .utils.ICCF import xcor
 
 
-def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),confidence_bands=True,title=None,xlabel=r'Time',ylabel=None,xlim=None,ylim=None,**kwargs):
+def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,log_transform=False,figsize=(16,6),confidence_bands=True,title=None,xlabel=r'Time',ylabel=None,xlim=None,ylim=None,**kwargs):
     """Plot the predicted time series and the confidence bands.
 
     Parameters
@@ -32,6 +32,8 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
         Covariance matrix of the prediction.    
     filename : :obj:`str`
         Name of the file to save the figure.
+    log_transform : :obj:`bool`, optional
+        Log transform the prediction, by default False
     figsize : :obj:`tuple`, optional
         Size of the figure.
     confidence_bands : :obj:`bool`, optional
@@ -57,18 +59,25 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
     show = kwargs.get('show',False)
 
     fig,ax = plt.subplots(1,1,figsize=figsize)
-     
+
     if confidence_bands:
         std = np.sqrt(np.diag(cov_pred))
         hi = (y_pred-std)
         lo = (y_pred+std)
         hi2 = (y_pred-2*std)
         lo2 = (y_pred+2*std)
+        
+        if log_transform:
+            y_pred = np.exp(y_pred)
+            hi,lo,hi2,lo2 = np.exp(hi),np.exp(lo),np.exp(hi2),np.exp(lo2)
+        
         ax.fill_between(x_pred,hi2,lo2,alpha=0.25,label=r"$2\sigma$")
         ax.fill_between(x_pred,hi,lo,alpha=0.5,label=r"$1\sigma$")
     
-    ax.errorbar(x ,y, yerr=yerr, fmt='.', label='Observation')
+    ax.errorbar(x ,y, yerr=yerr, fmt='.', label='Observation',markerfacecolor='w')
+
     ax.plot(x_pred,y_pred, label='Prediction',color='k')
+    np.savetxt(f'{filename}_prediction.txt',jnp.vstack([x_pred,y_pred,hi,lo,hi2,lo2]).T,header='x_pred,y_pred,hi,lo,hi2,lo2')
 
     ax.set_title(title) if title is not None else None
     ax.set_xlabel(xlabel) if xlabel is not None else None
@@ -76,7 +85,6 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
     ax.set_xlim(xlim) if xlim is not None else None
     ax.set_ylim(ylim) if ylim is not None else None
     
-
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.set_minor_locator(AutoMinorLocator())
 
@@ -88,7 +96,7 @@ def plot_prediction(x,y,yerr,x_pred,y_pred,cov_pred,filename,figsize=(16,6),conf
         fig.show()
     return fig,ax
     
-def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize=(10,10),maxlag=None,title=None,**kwargs):
+def plot_residuals(x,y,yerr,y_pred,filename,log_transform=False,confidence_intervals=[95,99],figsize=(10,10),maxlag=None,title=None,**kwargs):
     """Plot the residuals of a predicted time series.
 
 
@@ -104,6 +112,8 @@ def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize
         Values of the prediction at the time of the observations.
     filename : :obj:`str`
         Name of the file to save the figure.
+    log_transform : :obj:`bool`, optional
+        Log transform the prediction, by default False
     confidence_intervals : :obj:`list` of :obj:`float`, optional
         Confidence intervals to plot, by default [95,99]
     figsize : :obj:`tuple`, optional
@@ -129,6 +139,7 @@ def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize
         maxlag = np.rint(maxlag)
 
     n = len(x)
+    if log_transform: y_pred = np.exp(y_pred)
     residuals = y - y_pred
     scaled_residuals = (residuals/yerr).flatten()
     max_scale_res = np.rint(np.max(scaled_residuals))
@@ -182,12 +193,12 @@ def plot_residuals(x,y,yerr,y_pred,filename,confidence_intervals=[95,99],figsize
 
 
     ax[2].set_xlim(0,maxlag)
-    ax[2].set_xlabel('Time lag')
+    ax[2].set_xlabel('Lag (Index)')
     ax[2].margins(x=0,y=0)
     axins.margins(x=0,y=0)
     ax[2].set_ylabel('Autocorrelation\nResiduals / Error')
     ax[2].legend(loc='upper left')
-    axins.set_xlabel('Time lag')
+    axins.set_xlabel('Lag (Index)')
 
     if title is not None:
         fig.suptitle(title)
@@ -269,8 +280,7 @@ def plot_posterior_predictive_ACF(tau,acf,x,y,filename,with_mean=False,confidenc
     fig.savefig(f'{filename}_posterior_predictive_ACF.pdf',bbox_inches='tight')
     return fig,ax
 
-
-def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$',f_min_obs=None,f_max_obs=None,**kwargs):
+def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,posterior_PSD_approx=None,plot_lombscargle=False,save_data=False,with_mean=False,confidence_bands=[68,95],ylim=None,xlabel=r'Frequency $\mathrm{d}^{-1}$',f_min_obs=None,f_max_obs=None,**kwargs):
     """Plot the posterior predictive Power Spectral Density of the process.
 
     This function will also compute the Lomb-Scargle periodogram on the data.
@@ -287,6 +297,8 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
         Time series values.
     yerr : :obj:`numpy.ndarray`
         Time series errors.  
+    posterior_PSD_approx : :obj:`numpy.ndarray`, optional
+        Array of PSDs posterior samples for the approximation, by default None
     filename : :obj:`str`
         Filename to save the figure.
     with_mean : bool, optional
@@ -313,6 +325,9 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     psd_median = jnp.median(posterior_PSD,axis=0)
     PSD_quantiles = jnp.percentile(posterior_PSD,q=percentiles,axis=0)
 
+    if posterior_PSD_approx is not None:
+        psd_median_approx = jnp.median(posterior_PSD_approx,axis=0)
+        PSD_quantiles_approx = jnp.percentile(posterior_PSD_approx,q=percentiles,axis=0)
     # compute the Lomb-Scargle periodogram
     LS_periodogram = lombscargle(x,y,2*np.pi*f_LS,precenter=True)    
     
@@ -320,25 +335,32 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
         np.savetxt(f'{filename}_LS_periodogram.txt',jnp.vstack((f_LS,LS_periodogram)).T,header='f_LS,LS_periodogram')
     np.savetxt(f'{filename}_posterior_predictive_PSD.txt',jnp.vstack((f,psd_median,PSD_quantiles)).T,
                header=f'f,psd_median,psd_quantiles({percentiles})')
+    if posterior_PSD_approx is not None:
+        np.savetxt(f'{filename}_posterior_predictive_PSD_approx.txt',jnp.vstack((f,psd_median_approx,PSD_quantiles_approx)).T,
+                   header=f'f,psd_median_approx,psd_quantiles_approx({percentiles})')
     
     # plots
     fig,ax = plt.subplots(figsize=(10,5))
 
     ax.loglog(f,psd_median,c='C0',label='Median')
 
-    for i,ci in enumerate(confidence_bands):
+    for i,ci in enumerate(reversed(confidence_bands)):
         ax.fill_between(f,PSD_quantiles[i],PSD_quantiles[-(i+1)],color='C0',alpha=.15*(i+1),label=f'{ci}%')
     
+    if posterior_PSD_approx is not None:
+        ax.loglog(f,psd_median_approx,c='C5',label='Median approx')
+        for i,ci in enumerate(reversed(confidence_bands)):
+            ax.fill_between(f,PSD_quantiles_approx[i],PSD_quantiles_approx[-(i+1)],color='C5',alpha=.15*(i+1),label=f'{ci}% approx')
     if with_mean:
         psd_mean = jnp.mean(posterior_PSD,axis=0)
         ax.loglog(f,psd_mean,label='Mean',ls='--')
-        
-    ax.loglog(f_LS,LS_periodogram,color='C2',label='Lomb-Scargle')
+    if plot_lombscargle:
+        ax.loglog(f_LS,LS_periodogram,color='C2',label='Lomb-Scargle',alpha=.35)
 
-    noise_level = np.median(np.diff(x))*np.mean(yerr**2)*2
-    noise_level_max = np.max(np.diff(x))*np.max(yerr**2)*2
-    ax.axhspan(noise_level,noise_level_max,color='k',alpha=.1)
-    ax.axhline(noise_level,color='k',ls='--',label='Noise level')
+    noise_level = np.median(np.diff(x))*np.median(yerr**2)*2
+    noise_level_mean = np.mean(np.diff(x))*np.mean(yerr**2)*2
+    ax.axhline(noise_level_mean,color='k',alpha=.1,label='mean noise level')
+    ax.axhline(noise_level,color='k',ls='--',label='median noise level')
     
     if f_min_obs is not None: ax.axvline(f_min_obs,ls='-.',label=r'$f_\mathrm{min}$')
     if f_max_obs is not None: ax.axvline(f_max_obs,ls='-.',label=r'$f_\mathrm{max}$')
@@ -346,7 +368,7 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     if ylim is None:
         # ax.set_ylim(bottom=np.min(LS_periodogram)/1e3)
         ax.set_ylim(bottom=noise_level/10,top=np.max(psd_median)*2)
-        
+    
     ax.legend(bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
     ax.margins(x=0,y=0)
     ax.set_xlabel(xlabel)
@@ -354,4 +376,224 @@ def plot_posterior_predictive_PSD(f,posterior_PSD,x,y,yerr,filename,save_data=Fa
     ax.set_title('Posterior predictive power spectral density')
     fig.tight_layout()
     fig.savefig(f'{filename}_posterior_predictive_PSD.pdf',bbox_inches='tight')
+    return fig,ax
+
+def diagnostics_psd_approx(f,res,ratio,f_min,f_max):
+    """Plot the mean residuals and the ratios of the PSD approximation as a function of frequency
+    
+    
+    Parameters
+    ----------
+    f : :obj:`jax.Array`
+        Frequency array.
+    res : :obj:`jax.Array`
+        Residuals of the PSD approximation.
+    ratio : :obj:`jax.Array`
+        Ratio of the PSD approximation.
+    f_min : :obj:`float`
+        Minimum observed frequency.
+    f_max : :obj:`float`
+        Maximum observed frequency.
+        
+    Returns
+    -------
+    fig : :obj:`matplotlib.figure.Figure`
+        Figure object.
+    ax : :obj:`matplotlib.axes.Axes`
+        Axes object.
+    
+    """
+    fig,ax = plt.subplots(2,1,figsize=(8,6))
+    ax[0].plot(f,jnp.mean(res,axis=0),label='mean')
+    ax[0].update({'xscale':'log','ylabel':'Residuals'})#,'yscale':'log'})
+    ax[1].plot(f,jnp.mean(ratio,axis=0),label='mean')
+    ax[1].update({'xlabel':'Frequency','xscale':'log','ylabel':'Ratio'})
+    ax[1].sharex(ax[0])
+    ax[0].axvline(f_min,color='k',ls='-.',label=r'$f_\mathrm{min}$')
+    ax[1].axvline(f_min,color='k',ls='-.',label=r'$f_\mathrm{min}$')
+    ax[0].axvline(f_max,color='k',ls=':',label=r'$f_\mathrm{max}$')
+    ax[1].axvline(f_max,color='k',ls=':',label=r'$f_\mathrm{max}$')
+
+    ax[1].legend(bbox_to_anchor=(.75, -.01), loc='lower right',ncol=3, borderaxespad=0.,bbox_transform=fig.transFigure)
+    fig.align_ylabels()
+    fig.tight_layout()
+    return fig,ax
+
+def violin_plots_psd_approx(res,ratio):
+    """Plot the violin plots of the residuals and the ratios of the PSD approximation.
+    
+    Parameters
+    ----------
+    res : :obj:`jax.Array`
+        Residuals of the PSD approximation.
+    ratio : :obj:`jax.Array`
+        Ratios of the PSD approximation.
+    
+    Returns
+    -------
+    fig : :obj:`matplotlib.figure.Figure`
+        Figure object.
+    ax : :obj:`matplotlib.axes.Axes`
+        Axes object.
+    
+    """
+    
+    mean_res = jnp.mean(res,axis=1)
+    median_res = jnp.median(res,axis=1)
+
+    mean_ratio = jnp.mean(ratio,axis=1)
+    median_ratio = jnp.median(ratio,axis=1)
+
+    max_ratio = jnp.max(jnp.abs(ratio),axis=1)
+    min_ratio = jnp.min(jnp.abs(ratio),axis=1)
+    max_res = jnp.max(jnp.abs(res),axis=1)
+
+    fig,ax = plt.subplots(2,1,figsize=(8,6))
+
+    ax[0].violinplot([mean_res,median_res,max_res],vert=True,showmeans=True)
+    ax[0].update({'xlabel':'','ylabel':'Residual value'})
+    ax[0].set_xticks([1,2,3])
+    ax[0].set_xticklabels(['Meta-mean','Meta-median','Meta-max'])
+    ax[0].axhline(0,c='g',ls=':')
+
+    axins = ax[0].inset_axes([0.2, 0.3, 0.5, 0.6])
+    axins.violinplot([mean_res,median_res],vert=True,showmeans=True)
+    # subregion of the original image
+    axins.set_xticks([1,2])
+    axins.set_xticklabels(['Mean','Median'])
+    axins.axhline(0,c='g',ls=':')
+
+
+    ax[1].violinplot([mean_ratio,median_ratio,min_ratio,max_ratio],vert=True,showmeans=True)
+    ax[1].axhline(1,c='g',ls=':')
+    ax[1].update({'xlabel':'','ylabel':'Ratio value'})
+    ax[1].set_xticks([1,2,3,4])
+    ax[1].set_xticklabels(['Meta-mean','Meta-median','Meta-min','Meta-max'])
+
+    axins = ax[1].inset_axes([0.2, 0.3, 0.5, 0.6])
+    axins.set_xticks([1,2])
+    axins.set_xticklabels(['Mean','Median'])
+    axins.axhline(1,c='g',ls=':')
+
+    axins.violinplot([mean_ratio,median_ratio],vert=True,showmeans=True)
+    fig.align_ylabels()
+    fig.suptitle('Distribution of the meta-(mean,max,median,min) of\n residuals and ratios for the PSD approximation')
+    fig.tight_layout()
+    return fig,ax
+
+def residuals_quantiles(residuals,ratio,f,f_min,f_max):
+    """Plot the quantiles of the residuals and the ratios of the PSD approximation as a function of frequency.
+    
+    Parameters
+    ----------
+    res : :obj:`jax.Array`
+        Residuals of the PSD approximation.
+    ratio : :obj:`jax.Array`
+        Ratios of the PSD approximation.
+    f : :obj:`jax.Array`
+        Frequency array.
+    f_min : :obj:`float`
+        Minimum observed frequency.
+    f_max : :obj:`float`
+        Maximum observed frequency.
+        
+    
+    Returns
+    -------
+    fig : :obj:`matplotlib.figure.Figure`
+        Figure object.
+    ax : :obj:`matplotlib.axes.Axes`
+        Axes object.
+    
+    """
+    low_1,low_5,low_16,med,high_84,high_95,high_99 = jnp.percentile(residuals,jnp.array([1,5,16,50,84,95,99]),axis=0)
+
+    fig, ax = plt.subplots(2,1,figsize=(9,8))
+    ax[0].fill_between(f,low_5,high_95,alpha=.2,label='5% and 95% percentiles')
+    ax[0].fill_between(f,low_16,high_84,alpha=.4,label='16% and 84% percentiles')
+    ax[0].plot(f,med,label='Median')
+    ax[0].update({'xlabel':'Frequency',
+                'ylabel':'Residuals',
+                'xscale':'log'})
+
+    low_1,low_5,low_16,med,high_84,high_95,high_99 = jnp.percentile(ratio,jnp.array([1,5,16,50,84,95,99]),axis=0)
+    ax[1].fill_between(f,low_5,high_95,alpha=.2,label=r'$95\%$')
+    ax[1].fill_between(f,low_16,high_84,alpha=.4,label=r'$68\%$')
+    ax[1].plot(f,med,label='Median')
+
+    ax[1].update({'xlabel':'Frequency',
+                    'ylabel':'Ratios',
+                    'xscale':'log'})
+
+    ax[0].axvline(f_min,color='k',ls='-.',label=r'$f_\mathrm{min}$')
+    ax[1].axvline(f_min,color='k',ls='-.',label=r'$f_\mathrm{min}$')
+    ax[0].axvline(f_max,color='k',ls=':',label=r'$f_\mathrm{max}$')
+    ax[1].axvline(f_max,color='k',ls=':',label=r'$f_\mathrm{max}$')
+
+    ax[1].legend(bbox_to_anchor=(.95, -.03), loc='lower right',ncol=5, borderaxespad=0.,bbox_transform=fig.transFigure)
+    fig.align_ylabels()
+    fig.suptitle('Quantiles of residuals and ratios for the PSD approximation')
+    fig.tight_layout()
+    return fig,ax
+
+def plot_priors_samples(params,names):
+    """Plot the samples from the prior distributions.
+    
+    Parameters
+    ----------
+    params : :obj:`numpy.ndarray`
+        Array of samples from the prior distributions.
+    names : :obj:`list` of :obj:`str`
+        Names of the parameters.
+
+    Returns
+    -------
+    :obj:`matplotlib.figure.Figure`
+        Figure object.
+    :obj:`matplotlib.axes.Axes`
+        Axes object.    
+    """
+    n_samples = params.shape[0]
+    n_rows = int(np.ceil(n_samples/2))
+    
+    fig, ax = plt.subplots(n_rows,2,figsize=(10,3.5*1.5**(n_rows-1)))
+    
+    ax = ax.flatten()
+    for i in range(n_samples):
+        ax[i].hist(params[i,:],bins=150,density=True,alpha=.25)
+        x = jnp.linspace(params[i,:].min(),params[i,:].max(),1000)
+        kde = gaussian_kde(params[i,:])
+        ax[i].plot(x,kde(x))
+        ax[i].set_title(f'Prior samples {names[i]}')
+        ax[i].set_xlabel(names[i])
+
+    fig.suptitle('Samples from the prior distributions')
+    fig.tight_layout()
+    
+    return fig,ax
+
+def plot_prior_predictive_PSD(f,psd_samples,xlim=(None,None),ylim=(None,None),xunit=r'$d^{-1}$'):
+    """Plot the prior predictive Power Spectral Density of the process.
+
+    Parameters
+    ----------
+    f : :obj:`numpy.ndarray`
+        Frequencies.
+    psd_samples : :obj:`numpy.ndarray`
+        Array of PSDs posterior samples.
+    xlim : tuple, optional
+        Limits on the x-axis, by default (None,None)
+    ylim : tuple, optional
+        Limits on the y-axis, by default (None,None)
+    xunit : str, optional
+        Unit of the xaxis, by default r'$d^{-1}$'
+    """
+    fig, ax = plt.subplots(figsize=(10,5))
+    ax.loglog(f,psd_samples,c='k',alpha=.01)
+    ax.set_xlabel(f'Frequency {xunit}')
+    ax.set_ylabel(r'Power spectral density')
+    ax.set_title('Prior predictive power spectral density')
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+    fig.tight_layout()
     return fig,ax

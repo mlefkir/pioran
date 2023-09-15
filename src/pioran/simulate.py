@@ -1,4 +1,4 @@
-"""Generic class and functions for fake time series.
+"""Generic class and functions to generate fake time series.
 """
 import sys
 import warnings
@@ -181,9 +181,12 @@ class Simulations:
         ----------
         figsize  : :obj:`tuple`, optional
             Size of the figure, by default (15,3)
+        xunit  : :obj:`str`, optional
+            Unit of the x-axis, by default 'd'
         filename  : :obj:`str`, optional
             Name of the file to save the figure, by default None
-        
+        title  : :obj:`str`, optional
+            Title of the plot, by default None
                 
         Returns
         -------
@@ -218,14 +221,14 @@ class Simulations:
         ----------
         figsize  : :obj:`tuple`, optional
             Size of the figure, by default (15,3)
+        filename  : :obj:`str`, optional
+            Name of the file to save the figure, by default None
         title  : :obj:`str`, optional
             Title of the plot, by default None
         xunit  : :obj:`str`, optional
             Unit of the x-axis, by default 'd'
         loglog  : :obj:`bool`, optional
             If True, the plot is in loglog, by default True
-        filename  : :obj:`str`, optional
-            Name of the file to save the figure, by default None
         
         Returns
         -------
@@ -254,7 +257,7 @@ class Simulations:
             fig.savefig(f'{filename}',format='pdf')
         return fig,ax
              
-    def GP_method(self,t_test,interpolation='cubic'):
+    def GP_method(self, t_test, interpolation='cubic'):
         """Generate a time series using the GP method.
         
         If the ACVF is not already calculated, it is calculated from the PSD 
@@ -262,8 +265,15 @@ class Simulations:
         
         Parameters
         ----------
+        t_test: :obj:`jax.Array`
+            Time array of the time series.
         interpolation  : :obj:`str`, optional
-            Interpolation method to use for the GP function, by default 'cubic'
+            Interpolation method to use for the GP function, by default 'cubic'.
+        
+        Raises
+        ------
+        ValueError
+            If the interpolation method is not 'linear' or 'cubic'.
         
         Returns
         -------
@@ -271,16 +281,12 @@ class Simulations:
             Time array of the time series.
         :obj:`jax.Array`
             Time series.
-        
         """
-        
         # if no acvf is given, we calculate it from the psd
         if self.acvf is None:
             acv = jnp.fft.irfft(self.psd)
             self.acvf = acv[:len(acv)//2+1]/self.dtau
         
-        
-
         # if the cholesky decomposition of the autocovariance function is not already calculated, we calculate it
         if self.triang is None:
             
@@ -293,6 +299,8 @@ class Simulations:
                     interpo = interp1d(self.tau,self.acvf,'linear')
                 elif interpolation == 'cubic':
                     interpo = interp1d(self.tau,self.acvf,'cubic')
+                else:
+                    raise ValueError(f"Interpolation method {interpolation} is not accepted, use either 'linear' or 'cubic'")
                 K = interpo(dist)
                 
             self.triang = cholesky(K).T
@@ -426,7 +434,7 @@ class Simulations:
             if irregular_sampling:
                 t_test = jnp.sort(random.uniform(key=self.keys['sampling'],shape=(self.n_time,),minval=0,maxval=self.duration))
                 while not t_test.shape == jnp.unique(t_test).shape:
-                    warnings.warn("The time series is not sampled at unique time intervals, resampling")
+                    warnings.warn("The time series is not sampled at unique time intervals, resampling with new seed")
                     self.keys['sampling']+=1
                     t_test = jnp.sort(random.uniform(key=self.keys['sampling'],shape=(self.n_time,),minval=0,maxval=self.duration))
             else:

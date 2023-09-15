@@ -32,26 +32,27 @@ class PowerSpectralDensity(eqx.Module):
     Attributes
     ----------
     parameters : :class:`~pioran.parameters.ParametersModel`
-        Parameters of the covariance function.
+        Parameters of the power spectral density function.
     expression : :obj:`str`
-        Expression of the covariance function.
+        Expression of the power spectral density function.
+    analytical : :obj:`bool`
+        If True, the covariance function is analytical, otherwise it is not.
 
     Methods
     -------
     __init__(param_values, param_names, free_parameters)
         Constructor of the power spectral density function class.
     __str__()
-        String representation of the covariance function.
+        String representation of the power spectral density function.
     __add__(other)
-        Overload the + operator to add two covariance functions.
+        Overload the + operator to add two power spectral density functions.
     __mul__(other)
-        Overload the * operator to multiply two covariance functions.
-    get_cov_matrix(xp,xq)
-        Returns the covariance matrix.
+        Overload the * operator to multiply two power spectral density functions.
 
     """    
     parameters: ParametersModel
     expression: str
+    analytical: bool = False
     
     def __init__(self, param_values,param_names, free_parameters):
 
@@ -77,7 +78,8 @@ class PowerSpectralDensity(eqx.Module):
         s += self.parameters.__str__()
         return s
     
-    
+    def __repr__(self) -> str:
+        return self.__str__()
     
     def __add__(self, other)->"SumPowerSpectralDensity":
         """Overload of the + operator for the power spectral densities.

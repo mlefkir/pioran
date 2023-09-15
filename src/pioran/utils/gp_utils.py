@@ -4,6 +4,8 @@ from jax import jit
 from jax.numpy import linalg as la
 from scipy.spatial.distance import cdist
 
+valid_methods = ['FFT','NuFFT', 'SHO']
+tinygp_methods = ['SHO']
 
 @jit
 def EuclideanDistance(xq, xp):

@@ -3,16 +3,18 @@
 """
 from typing import Union
 
-import jax
 import equinox as eqx
+import jax
 import jax.numpy as jnp
+import tinygp
 from jax.scipy.linalg import cholesky, solve, solve_triangular
 
 from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
 from .tools import reshape_array, sanity_checks
-from .utils.gp_utils import nearest_positive_definite
+from .utils.gp_utils import (valid_methods, nearest_positive_definite,
+                             tinygp_methods)
 
 
 class GaussianProcess(eqx.Module):
@@ -22,35 +24,48 @@ class GaussianProcess(eqx.Module):
 
     Parameters
     ----------
-    fun : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity` 
+    function : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity` 
         Model function associated to the Gaussian Process. Can be a covariance function or a power spectral density.
     observation_indexes : :obj:`jax.Array`
         Indexes of the training data, in this case it is the time.
     observation_values : :obj:`jax.Array`
-        Observables of the training data, in this it is flux, count-rate or intensity, etc.
+        Observables of the training data.
     observation_errors : :obj:`jax.Array`, optional
         Errors on the observables, by default :obj:`None`
-    **kwargs : dict
-        nb_prediction_points : :obj:`int`, optional
-            Number of points to predict, by default 5 * length(training(indexes)).
-        prediction_indexes : :obj:`jax.Array`, optional
-            Indexes of the prediction data, by default jnp.linspace(jnp.min(observation_indexes),jnp.max(observation_indexes),nb_prediction_points)
-        scale_errors : :obj:`bool`, optional
-            Scale the errors on the training data by adding a constant, by default True.
-        estimate_mean : :obj:`bool`, optional
-            Estimate the mean of the training data, by default True.
-        estimate_variance : :obj:`bool`, optional
-            Estimate the variance of the training data, by default True.
-        S_low : :obj:`float`, optional
-            Scaling factor for the lower bound of the PSD, by default 2. See :obj:`PSDToACV` for more details.
-        S_high : :obj:`float`, optional
-            Scaling factor for the upper bound of the PSD, by default 2. See :obj:`PSDToACV` for more details.
-
+    S_low : :obj:`float`, optional
+            Scaling factor to extend the frequency grid to lower values, by default 10. See :obj:`PSDToACV` for more details.
+    S_high : :obj:`float`, optional
+            Scaling factor to extend the frequency grid to higher values, by default 10. See :obj:`PSDToACV` for more details.
+    method : :obj:`str`, optional
+        Method to compute the covariance function from the power spectral density, by default 'FFT'.
+        Possible values are:
+            - 'FFT': use the FFT to compute the autocovariance function.
+            - 'NuFFT': use the non-uniform FFT to compute the autocovariance function.
+            - 'SHO': approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function.
+    use_tinygp : :obj:`bool`, optional
+        Use tinygp to compute the log marginal likelihood, by default False. Should only be used when the power spectrum model 
+        is expressed as a sum of quasi-separable kernels, i.e. method is not 'FFT' or 'NuFFT'.
+    n_components : :obj:`int`, optional
+        Number of components to use when using tinygp and the power spectrum model is expressed as a sum of quasi-separable kernels.
+    estimate_mean : :obj:`bool`, optional
+        Estimate the mean of the training data, by default True.
+    estimate_variance : :obj:`bool`, optional
+        Estimate the amplitude of the autocovariance function, by default True.
+    scale_errors : :obj:`bool`, optional
+        Scale the errors on the training data by adding a multiplicative factor, by default True.
+    log_transform : :obj:`bool`, optional
+        Use a log transformation of the data, by default False. This is useful when the data is log-normal distributed.
+        Only compatible with the method 'FFT' or 'NuFFT'.
+    nb_prediction_points : :obj:`int`, optional
+        Number of points to predict, by default 5 * length(training(indexes)).
+    prediction_indexes : :obj:`jax.Array`, optional
+        indexes of the prediction data, by default linspace(min(observation_indexes),max(observation_indexes),nb_prediction_points)
+        
     Methods
     -------
     get_cov(xt, xp, errors=None)
         Compute the covariance matrix between two arrays.
-    compute_predictive_distribution(**kwargs)
+    compute_predictive_distribution()
         Compute the predictive mean and predictive covariance given prediction indexes.
     compute_log_marginal_likelihood()
         Compute the log marginal likelihood.
@@ -61,23 +76,29 @@ class GaussianProcess(eqx.Module):
         
     Attributes
     ----------
-    model : :class:`~pioran.acvf_base.CovarianceFunction`  or :class:`~pioran.psd_base.PowerSpectralDensity`
-        Model associated to the Gaussian Process, can be a covariance function or a power spectral density.
+    model : :class:`~pioran.acvf_base.CovarianceFunction`  or :class:`~pioran.psdtoacvf.PSDToACV`
+        Model associated to the Gaussian Process, can be a covariance function or a 
+        power spectral density to autocovariance function converter.
     observation_indexes : :obj:`jax.Array` (n,1)
-        Indexes of the training data.
+        Indexes of the training data, in this case it is the time.
     observation_values : :obj:`jax.Array` of shape (n,1)
         Observabled training data.
     observation_errors : :obj:`jax.Array` of shape (n,1)
         Errors on the training observed data.
-    scale_errors : :obj:`bool`
-        Scale the errors on the training data by adding a constant, by default True.
-    estimate_mean : :obj:`bool`
-        Estimate the mean of the training data, by default True.
-    analytical_cov : :obj:`bool`
-        True if the covariance function is analytical, False if it is estimated from a power spectral density.
+    prediction_indexes : :obj:`jax.Array` of shape (m,1)
+        Indexes of the prediction data.
     nb_prediction_points : :obj:`int`
         Number of points to predict, by default 5 * length(training(indexes)).
-
+    scale_errors : :obj:`bool`
+        Scale the errors on the training data by adding a multiplicative factor.
+    estimate_mean : :obj:`bool`
+        Estimate the mean of the training data.
+    estimate_variance : :obj:`bool`
+        Estimate the amplitude of the autocovariance function.
+    log_transform : :obj:`bool`
+        Use a log transformation of the data.
+    use_tinygp : :obj:`bool`
+        Use tinygp to compute the log marginal likelihood.
     """
     model: Union[CovarianceFunction,PSDToACV] 
     observation_indexes: jax.Array
@@ -87,63 +108,137 @@ class GaussianProcess(eqx.Module):
     nb_prediction_points: int
     scale_errors: bool
     estimate_mean: bool
-    analytical_cov: bool    
     estimate_variance: bool = False
-    log_warping: bool = False
+    log_transform: bool = False
+    use_tinygp: bool = False
     
-    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity], observation_indexes, observation_values, observation_errors=None, **kwargs) -> None:
+    def __init__(self, function: Union[CovarianceFunction,PowerSpectralDensity],
+                 observation_indexes, 
+                 observation_values, 
+                 observation_errors = None,
+                 S_low = 10,
+                 S_high = 10,
+                 method = 'FFT',
+                 use_tinygp = False,
+                 n_components = None,
+                 estimate_variance = True,
+                 estimate_mean = True,
+                 scale_errors = True,
+                 log_transform = False,
+                 nb_prediction_points = None,
+                 prediction_indexes = None) -> None:
         """Constructor method for the GaussianProcess class.
 
+
+        Parameters
+        ----------
+        function : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity` 
+            Model function associated to the Gaussian Process. Can be a covariance function or a power spectral density.
+        observation_indexes : :obj:`jax.Array`
+            Indexes of the training data, in this case it is the time.
+        observation_values : :obj:`jax.Array`
+            Observables of the training data.
+        observation_errors : :obj:`jax.Array`, optional
+            Errors on the observables, by default :obj:`None`
+        S_low : :obj:`float`, optional
+                Scaling factor to extend the frequency grid to lower values, by default 10. See :obj:`PSDToACV` for more details.
+        S_high : :obj:`float`, optional
+                Scaling factor to extend the frequency grid to higher values, by default 10. See :obj:`PSDToACV` for more details.
+        method : :obj:`str`, optional
+            Method to compute the covariance function from the power spectral density, by default 'FFT'.
+            Possible values are:
+                - 'FFT': use the FFT to compute the autocovariance function.
+                - 'NuFFT': use the non-uniform FFT to compute the autocovariance function.
+                - 'SHO': approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function.
+        use_tinygp : :obj:`bool`, optional
+            Use tinygp to compute the log marginal likelihood, by default False. Should only be used when the power spectrum model 
+            is expressed as a sum of quasi-separable kernels, i.e. method is not 'FFT' or 'NuFFT'.
+        n_components : :obj:`int`, optional
+            Number of components to use when using tinygp and the power spectrum model is expressed as a sum of quasi-separable kernels.
+        estimate_mean : :obj:`bool`, optional
+            Estimate the mean of the training data, by default True.
+        estimate_variance : :obj:`bool`, optional
+            Estimate the amplitude of the autocovariance function, by default True.
+        scale_errors : :obj:`bool`, optional
+            Scale the errors on the training data by adding a multiplicative factor, by default True.
+        log_transform : :obj:`bool`, optional
+            Use a log transformation of the data, by default False. This is useful when the data is log-normal distributed.
+            Only compatible with the method 'FFT' or 'NuFFT'.
+        nb_prediction_points : :obj:`int`, optional
+            Number of points to predict, by default 5 * length(training(indexes)).
+        prediction_indexes : :obj:`jax.Array`, optional
+            indexes of the prediction data, by default linspace(min(observation_indexes),max(observation_indexes),nb_prediction_points)
+            
+        Raises
+        ------
+        ValueError
+            If the method is not valid, if the number of components is not specified when using tinygp, if the method is not compatible with tinygp.
+
         """
-        # Check if the training arrays have the same shape
+        if method not in valid_methods:
+            raise ValueError(f"Method {method} is not valid. Choose between {valid_methods}")
+        self.use_tinygp = use_tinygp
+        if method in tinygp_methods and not use_tinygp:
+            raise ValueError(f"Method '{method}' can only be used with tinygp, please set `use_tinygp=True`")
+        if method not in tinygp_methods and use_tinygp:
+            raise ValueError(f"tinygp is only compatible with method {tinygp_methods}")
+        if self.use_tinygp and (n_components is None):
+            raise ValueError("The number of components must be specified when using tinygp, please set `n_components=...`")
+        
+        if isinstance(function, CovarianceFunction):
+            self.model = function
+
+        elif isinstance(function, PowerSpectralDensity):
+            self.estimate_variance = estimate_variance
+            self.model = PSDToACV(function, S_low=S_low, S_high=S_high,
+                                  T = observation_indexes[-1]-observation_indexes[0],
+                                  dt = jnp.min(jnp.diff(observation_indexes)),
+                                  method=method,
+                                  n_components=n_components,
+                                  estimate_variance=self.estimate_variance)
+            # self.model.print_info()
+        else:
+            raise TypeError(f"The input model must be a CovarianceFunction or a PowerSpectralDensity, not {type(function)}")
+        
+                # Check if the training arrays have the same shape
         if observation_errors is None:
             sanity_checks(observation_indexes, observation_values)
         else:
             sanity_checks(observation_indexes, observation_values)
             sanity_checks(observation_values, observation_errors)            
         
-        if isinstance(function, CovarianceFunction):
-            self.analytical_cov = True
-            self.model = function
-
-        elif isinstance(function, PowerSpectralDensity):
-            self.analytical_cov = False
-            S_low = kwargs.get("S_low", 10)
-            S_high = kwargs.get("S_high", 10)
-            method = kwargs.get("method", "FFT")
-            self.estimate_variance = kwargs.get("estimate_variance", True)
-            self.model = PSDToACV(function, S_low=S_low, S_high=S_high,T = observation_indexes[-1]-observation_indexes[0],dt =jnp.min(jnp.diff(observation_indexes)),method=method,estimate_variance=self.estimate_variance)
-            self.model.print_info()
-        else:
-            raise TypeError("The input model must be a CovarianceFunction or a PowerSpectralDensity.")
-        
         # add a factor to scale the errors
-        self.scale_errors = kwargs.get("scale_errors", True)
+        self.scale_errors = scale_errors
+        if observation_errors is None:
+            self.scale_errors = False
         if self.scale_errors and (observation_errors is not None):
             self.model.parameters.append("nu",1.0,True,hyperparameter=False)
 
-
-        # Reshape the arrays
-        self.observation_indexes = reshape_array(observation_indexes)
-        self.observation_values = reshape_array(observation_values)
-        # add a small number to the errors to avoid singular matrices in the cholesky decomposition
-        self.observation_errors = observation_errors.flatten() if observation_errors is not None else jnp.ones_like(self.observation_values)*jnp.sqrt(jnp.finfo(float).eps)
-
+        if not use_tinygp:
+          # Reshape the arrays
+            self.observation_indexes = reshape_array(observation_indexes)
+            self.observation_values = reshape_array(observation_values)
+            # add a small number to the errors to avoid singular matrices in the cholesky decomposition
+            self.observation_errors = observation_errors.flatten() if observation_errors is not None else jnp.ones_like(self.observation_values)*jnp.sqrt(jnp.finfo(float).eps)
+        else:
+            self.observation_indexes = observation_indexes.flatten()
+            self.observation_values = observation_values.flatten()
+            self.observation_errors = observation_errors.flatten() if observation_errors is not None else jnp.ones_like(self.observation_values)*jnp.sqrt(jnp.finfo(float).eps)
         # add the mean of the observed data as a parameter
-        self.estimate_mean = kwargs.get("estimate_mean", True)
+        self.estimate_mean = estimate_mean
         if self.estimate_mean:
             self.model.parameters.append("mu",jnp.mean(self.observation_values),True,hyperparameter=False)
         else:
             print("The mean of the training data is not estimated. Be careful of the data included in the training set.")
         
-        self.log_warping = kwargs.get("log_warping", False)
-        if self.log_warping:
+        self.log_transform = log_transform
+        if self.log_transform:
             assert self.estimate_mean, "The mean of the training data must be estimated to use a log transformation."
             self.model.parameters.append("const",jnp.min(self.observation_values),True,hyperparameter=False)
 
         # Prediction of data
-        self.nb_prediction_points = kwargs.get("nb_prediction_points", 5*len(self.observation_indexes))
-        self.prediction_indexes = kwargs.get('prediction_indexes', reshape_array(jnp.linspace(jnp.min(self.observation_indexes), jnp.max(self.observation_indexes), self.nb_prediction_points)))
+        self.nb_prediction_points = 5*len(self.observation_indexes) if nb_prediction_points is None else nb_prediction_points
+        self.prediction_indexes = reshape_array(jnp.linspace(jnp.min(self.observation_indexes), jnp.max(self.observation_indexes), self.nb_prediction_points)) if prediction_indexes is None else reshape_array(prediction_indexes)
 
     def get_cov(self, xt, xp, errors=None):
         """ Compute the covariance matrix between two arrays. 
@@ -152,8 +247,6 @@ class GaussianProcess(eqx.Module):
         If the errors are not None, then the covariance matrix is computed for the training dataset, 
         i.e. with observed data as input (xt=xp=training data) and the errors is the "standard deviation".
         The total covariance matrix is computed as:
-        
-        
 
         Parameters
         ----------
@@ -198,7 +291,7 @@ class GaussianProcess(eqx.Module):
         alpha: array of shape (n,1)
             alpha = Cov_inv * observation_values (- mu if mu is estimated)
         """
-        if not self.log_warping:
+        if not self.log_transform:
             Cov_xx = self.get_cov(
                 self.observation_indexes, self.observation_indexes, errors=self.observation_errors)
             Cov_inv = solve(Cov_xx, jnp.eye(len(self.observation_indexes)))
@@ -220,7 +313,7 @@ class GaussianProcess(eqx.Module):
                 alpha = Cov_inv@latent_values
         return Cov_xx, Cov_inv, alpha
 
-    def compute_predictive_distribution(self, **kwargs):
+    def compute_predictive_distribution(self, log_transform=None,prediction_indexes=None):
         """ Compute the predictive mean and the predictive covariance of the GP. 
 
         The predictive distribution are computed using equations (2.25)  and (2.26) in Rasmussen and Williams (2006)
@@ -232,12 +325,12 @@ class GaussianProcess(eqx.Module):
         mean = k(x*,x) * alpha
         cov = k(x*,x*) - k(x*,x) * inv( k(x,x) + sig^2 * I ) * k(x,x*)
 
-
         Parameters
         ----------
-        **kwargs: dict
-            prediction_indexes: array of length m, optional
-                Indexes of the prediction data, by default jnp.linspace(jnp.min(observation_indexes),jnp.max(observation_indexes),nb_prediction_points)
+        log_transform: bool, optional
+            Predict using a with exponentation of the posterior mean, by default None. 
+        prediction_indexes: array of length m, optional
+            Indexes of the prediction data, by default jnp.linspace(jnp.min(observation_indexes),jnp.max(observation_indexes),nb_prediction_points)
 
         Returns
         -------
@@ -246,35 +339,45 @@ class GaussianProcess(eqx.Module):
         predictive_cov: array of shape (m,m)
             Predictive covariance of the GP.
         """
+        log_transform = self.log_transform if log_transform is None else log_transform
         # if we want to change the prediction indexes
-        if "prediction_indexes" in kwargs:
-            prediction_indexes = reshape_array(kwargs["prediction_indexes"])
+        if prediction_indexes is not None:
+            prediction_indexes = reshape_array(prediction_indexes)
         else:
             prediction_indexes = self.prediction_indexes
-        # Compute the covariance matrix between the training indexes
-        _, Cov_inv, alpha = self.get_cov_training()
-        # Compute the covariance matrix between the training indexes and the prediction indexes
-        Cov_xxp = self.get_cov(self.observation_indexes, prediction_indexes)
-        Cov_xpxp = self.get_cov(prediction_indexes,
-                                prediction_indexes)
+        
+        if not self.use_tinygp:
+            # Compute the covariance matrix between the training indexes
+            _, Cov_inv, alpha = self.get_cov_training()
+            # Compute the covariance matrix between the training indexes and the prediction indexes
+            Cov_xxp = self.get_cov(self.observation_indexes, prediction_indexes)
+            Cov_xpxp = self.get_cov(prediction_indexes,
+                                    prediction_indexes)
 
-        # Compute the predictive mean
-        if self.estimate_mean:
-            if not self.log_warping:
-                predictive_mean = Cov_xxp.T@alpha + \
-                    self.model.parameters["mu"].value
-            else:
-                predictive_mean = jnp.exp(Cov_xxp.T@alpha + \
+            # Compute the predictive mean
+            if self.estimate_mean:
+                if not log_transform:
+                    predictive_mean = Cov_xxp.T@alpha + \
+                        self.model.parameters["mu"].value
+                else:
+                    predictive_mean = jnp.exp(Cov_xxp.T@alpha + \
                     self.model.parameters["mu"].value) 
+            else:
+                predictive_mean = Cov_xxp.T@alpha
+            # Compute the predictive covariance and ensure that the covariance matrix is positive definite
+            predictive_covariance = nearest_positive_definite(
+                Cov_xpxp - Cov_xxp.T@Cov_inv@Cov_xxp)
         else:
-            predictive_mean = Cov_xxp.T@alpha
-        # Compute the predictive covariance and ensure that the covariance matrix is positive definite
-        predictive_covariance = nearest_positive_definite(
-            Cov_xpxp - Cov_xxp.T@Cov_inv@Cov_xxp)
+            gp = self.build_gp_tinygp()
+            if self.log_transform:
+                y = jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value))
+            else:
+                y = self.observation_values            
+            predictive_mean, predictive_covariance = gp.predict(y,prediction_indexes.flatten(),include_mean=True,return_cov=True)
 
         return predictive_mean, predictive_covariance
     
-    def compute_log_marginal_likelihood(self) -> float:
+    def compute_log_marginal_likelihood_pioran(self) -> float:
         r""" Compute the log marginal likelihood of the Gaussian Process.
 
         The log marginal likelihood is computed using algorithm (2.1) in Rasmussen and Williams (2006)
@@ -291,11 +394,11 @@ class GaussianProcess(eqx.Module):
 
         Returns
         -------
-        log_marginal_likelihood: float
+        :obj:`float`
             Log marginal likelihood of the GP.
 
         """
-        if not self.log_warping:
+        if not self.log_transform:
             Cov_xx = self.get_cov(self.observation_indexes, self.observation_indexes,
                                 errors=self.observation_errors)
             # Compute the covariance matrix between the training indexes
@@ -310,6 +413,8 @@ class GaussianProcess(eqx.Module):
                 z = solve_triangular(L, self.observation_values, lower=True)
 
             return -jnp.take(jnp.sum(jnp.log(jnp.diagonal(L))) + 0.5 * len(self.observation_indexes) * jnp.log(2*jnp.pi) + 0.5 * (z.T@z),0)
+        
+        # if we use a log transformation of the data
         else:
             latent_errors = self.observation_errors.flatten() / (self.observation_values.flatten() - self.model.parameters["const"].value)
             latent_values = jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value))-self.model.parameters['mu'].value
@@ -329,6 +434,70 @@ class GaussianProcess(eqx.Module):
             
             return -l + correction
             
+    def build_gp_tinygp(self) -> tinygp.GaussianProcess:
+        r"""Build the Gaussian Process using tinygp.
+        
+        This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
+        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep` objects. 
+        
+        Returns
+        -------
+        :obj:`tinygp.GaussianProcess`
+            Gaussian Process object.
+        
+        """
+        x = self.observation_indexes # time
+        
+        # apply log transformation
+        if self.log_transform:
+            yerr = self.observation_errors.flatten() / (self.observation_values.flatten() - self.model.parameters["const"].value)
+        else:
+            yerr = self.observation_errors
+            
+        if self.estimate_mean and self.scale_errors:
+            gp = tinygp.GaussianProcess(self.model.ACVF,x,
+                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*yerr**2),
+                                    mean=self.model.parameters['mu'].value)
+        elif self.estimate_mean:
+            gp = tinygp.GaussianProcess(self.model.ACVF,x,
+                                    mean=self.model.parameters['mu'].value)
+        elif self.scale_errors:
+            gp = tinygp.GaussianProcess(self.model.ACVF,x,
+                                    noise=tinygp.noise.Diagonal(self.model.parameters['nu'].value*yerr**2))
+        else:
+            gp = tinygp.GaussianProcess(self.model.ACVF,x)
+
+        return gp
+        
+    def compute_log_marginal_likelihood_tinygp(self) -> jax.Array:
+        r"""Compute the log marginal likelihood of the Gaussian Process using tinygp.
+        
+        This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
+        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep` objects. 
+        
+        Returns
+        -------
+        :obj:`float`
+            Log marginal likelihood of the GP.
+        
+        """
+        gp = self.build_gp_tinygp()
+        
+        if self.log_transform:
+            y = jnp.log(jnp.abs(self.observation_values-self.model.parameters["const"].value))
+        else:
+            y = self.observation_values
+
+        return gp.log_probability(y)
+        
+
+    
+    
+    
+    def compute_log_marginal_likelihood(self) -> float:
+        if self.use_tinygp:
+            return self.compute_log_marginal_likelihood_tinygp()
+        return self.compute_log_marginal_likelihood_pioran()
     
     @eqx.filter_jit
     def wrapper_log_marginal_likelihood(self, parameters) -> float:
@@ -341,7 +510,7 @@ class GaussianProcess(eqx.Module):
             
         Returns
         -------
-        float 
+        :obj:`float` 
             Log marginal likelihood of the GP.
         """
         self.model.parameters.set_free_values(parameters)
@@ -353,7 +522,7 @@ class GaussianProcess(eqx.Module):
 
         Parameters
         ----------
-        parameters: array of shape (n)
+        parameters: :obj:`jax.Array` of shape (n)
             (Hyper)parameters of the covariance function.
             
         Returns
@@ -369,10 +538,13 @@ class GaussianProcess(eqx.Module):
         
         Returns
         -------
-        str
+        :obj:`str`
             String representation of the GP object.        
         """
         s = 31*"=" +" Gaussian Process "+31*"="+"\n\n"
-        s += f"Marginal log likelihood: {self.compute_log_marginal_likelihood():.5f}\n"
+        # s += f"Marginal log likelihood: {self.compute_log_marginal_likelihood():.5f}\n"
         s += self.model.__str__()
         return s
+
+    def __repr__(self) -> str:
+        return self.__str__()

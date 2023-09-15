@@ -46,6 +46,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
     'jax': ('https://jax.readthedocs.io/en/latest/', None), 
     'equinox': ('https://docs.kidger.site/equinox/', None),
+    'tinygp': ('https://tinygp.readthedocs.io/en/latest/', None)
 }
 
 autodoc_default_options = {
@@ -78,6 +79,12 @@ autosectionlabel_prefix_document = True
 numpydoc_class_members_toctree = False
 numpydoc_show_class_members = False
 numpydoc_show_inherited_class_members = False
+
+napoleon_include_init_with_doc = True
+napoleon_include_private_with_doc = True
+napoleon_include_special_with_doc  = True
+napoleon_use_ivar = True
+napoleon_attr_annotations = True
 
 
 autodoc_default_options = {

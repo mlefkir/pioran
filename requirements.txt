@@ -1,0 +1,10 @@
+jax
+equinox
+tinygp
+jax_finufft
+mpi4py
+numpy
+scipy
+astropy
+ultranest
+blackjax
