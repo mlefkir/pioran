@@ -25,6 +25,8 @@ from .utils.gp_utils import tinygp_methods
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 
+valid_methods = ["ultranest","blackjax"]
+
 class Inference:
     r"""Class to infer the value of the (hyper)parameters of the Gaussian Process.
     
@@ -97,6 +99,8 @@ class Inference:
             self.save_config()
         
         if isinstance(method, str):
+            if method not in valid_methods:
+                raise ValueError(f"method must be one of {valid_methods}, got {method}")
             self.method = method
         else:
             raise TypeError("method must be a string.")  
@@ -179,8 +183,6 @@ class Inference:
         
         return dict_config
         
-    
- 
     def prior_predictive_checks(self,
                                 n_samples,
                                 seed_check,

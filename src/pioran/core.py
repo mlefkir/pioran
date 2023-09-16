@@ -489,10 +489,7 @@ class GaussianProcess(eqx.Module):
             y = self.observation_values
 
         return gp.log_probability(y)
-        
-
-    
-    
+            
     
     def compute_log_marginal_likelihood(self) -> float:
         if self.use_tinygp:

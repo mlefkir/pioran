@@ -377,7 +377,7 @@ class Simulations:
         hdu = fits.HDUList(hdu_list)
         hdu.writeto(f'{filename}.fits',overwrite=True)       
     
-    def simulate(self, mean=None,method='GP',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs):
+    def simulate(self, mean=None,method='GP',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,exponentiate_ts=False,**kwargs):
         """Method to simulate time series using either the GP method or the TK method.
         
         When using the GP method, the time series is generated using an analytical autocovariance function or a power spectral density.
@@ -405,6 +405,8 @@ class Simulations:
             If True the time series will be sampled at irregular time intervals
         seed : :obj:`int`, optional
             Set the seed for the RNG
+        exponentiate_ts: :obj:`bool`, optional
+            Exponentiate the time series to produce a lognormal flux distribution.
         filename : :obj:`str`, optional
             Name of the file to save the time series, by default None
         **kwargs : :obj:`dict`
@@ -462,7 +464,7 @@ class Simulations:
         if randomise_fluxes:
             if errors == 'gauss':
                 # generate the variance of the errors
-                timeseries_error_size = jnp.abs(random.normal(key=self.keys['errors'],shape=(len(t),)))
+                timeseries_error_size = jnp.var(true_timeseries)/2*jnp.abs(random.normal(key=self.keys['errors'],shape=(len(t),)))
                 # generate the measured time series with the associated fluxes
                 observed_timeseries = true_timeseries + timeseries_error_size*random.normal(key=self.keys['fluxes'],shape=(len(t),))
             elif errors == 'poisson':
@@ -470,16 +472,18 @@ class Simulations:
                 #### IMPLEMENT POISSON ERRORS
             else:
                 raise ValueError(f"Error type {errors} is not accepted, use either 'gauss' or 'poisson'")
-          
+        
         else:
             timeseries_error_size = jnp.zeros_like(t)
             observed_timeseries = true_timeseries
 
+        if exponentiate_ts:
+            observed_timeseries = jnp.exp(observed_timeseries)
         # set the mean of the time series
         if mean is not None:
             observed_timeseries = observed_timeseries - jnp.mean(observed_timeseries) + mean
         else:
-            observed_timeseries = observed_timeseries - 2*jnp.min(observed_timeseries)
+            observed_timeseries = observed_timeseries #- 2*jnp.min(observed_timeseries)
          
         if filename is not None:
             savetxt(filename,jnp.vstack([t,observed_timeseries,timeseries_error_size]).T)
