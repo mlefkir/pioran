@@ -175,6 +175,7 @@ class GaussianProcess(eqx.Module):
             If the method is not valid, if the number of components is not specified when using tinygp, if the method is not compatible with tinygp.
 
         """
+        
         if method not in valid_methods:
             raise ValueError(f"Method {method} is not valid. Choose between {valid_methods}")
         self.use_tinygp = use_tinygp
@@ -184,6 +185,14 @@ class GaussianProcess(eqx.Module):
             raise ValueError(f"tinygp is only compatible with method {tinygp_methods}")
         if self.use_tinygp and (n_components is None):
             raise ValueError("The number of components must be specified when using tinygp, please set `n_components=...`")
+        
+        # Check if the training arrays have the same shape
+        if observation_errors is None:
+            sanity_checks(observation_indexes, observation_values)
+        else:
+            sanity_checks(observation_indexes, observation_values)
+            sanity_checks(observation_values, observation_errors)            
+        
         
         if isinstance(function, CovarianceFunction):
             self.model = function
@@ -195,18 +204,13 @@ class GaussianProcess(eqx.Module):
                                   dt = jnp.min(jnp.diff(observation_indexes)),
                                   method=method,
                                   n_components=n_components,
-                                  estimate_variance=self.estimate_variance)
+                                  estimate_variance=self.estimate_variance,
+                                  init_variance = jnp.var(observation_values,ddof=1) )
             # self.model.print_info()
         else:
             raise TypeError(f"The input model must be a CovarianceFunction or a PowerSpectralDensity, not {type(function)}")
         
-                # Check if the training arrays have the same shape
-        if observation_errors is None:
-            sanity_checks(observation_indexes, observation_values)
-        else:
-            sanity_checks(observation_indexes, observation_values)
-            sanity_checks(observation_values, observation_errors)            
-        
+
         # add a factor to scale the errors
         self.scale_errors = scale_errors
         if observation_errors is None:
@@ -226,15 +230,16 @@ class GaussianProcess(eqx.Module):
             self.observation_errors = observation_errors.flatten() if observation_errors is not None else jnp.ones_like(self.observation_values)*jnp.sqrt(jnp.finfo(float).eps)
         # add the mean of the observed data as a parameter
         self.estimate_mean = estimate_mean
+        self.log_transform = log_transform
+
         if self.estimate_mean:
-            self.model.parameters.append("mu",jnp.mean(self.observation_values),True,hyperparameter=False)
+            self.model.parameters.append("mu",jnp.mean(self.observation_values) if not self.log_transform else jnp.mean(jnp.log(self.observation_values)),True,hyperparameter=False)
         else:
             print("The mean of the training data is not estimated. Be careful of the data included in the training set.")
         
-        self.log_transform = log_transform
         if self.log_transform:
             assert self.estimate_mean, "The mean of the training data must be estimated to use a log transformation."
-            self.model.parameters.append("const",jnp.min(self.observation_values),True,hyperparameter=False)
+            self.model.parameters.append("const",.5*jnp.min(self.observation_values),True,hyperparameter=False)
 
         # Prediction of data
         self.nb_prediction_points = 5*len(self.observation_indexes) if nb_prediction_points is None else nb_prediction_points
@@ -496,7 +501,6 @@ class GaussianProcess(eqx.Module):
             return self.compute_log_marginal_likelihood_tinygp()
         return self.compute_log_marginal_likelihood_pioran()
     
-    @eqx.filter_jit
     def wrapper_log_marginal_likelihood(self, parameters) -> float:
         """ Wrapper to compute the log marginal likelihood in function of the (hyper)parameters. 
 
@@ -513,7 +517,6 @@ class GaussianProcess(eqx.Module):
         self.model.parameters.set_free_values(parameters)
         return self.compute_log_marginal_likelihood()
     
-    @eqx.filter_jit
     def wrapper_neg_log_marginal_likelihood(self, parameters) -> float:
         """ Wrapper to compute the negative log marginal likelihood in function of the (hyper)parameters. 
 

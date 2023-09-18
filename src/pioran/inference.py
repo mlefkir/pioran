@@ -1,26 +1,39 @@
 """Class and functions for inference with Gaussian Processes and other methods.
 
 """
+import json
+import multiprocessing
+import os
+from functools import partial
 from typing import Union
 
-import os
+import asdf
+import blackjax
 import jax
-import json
 import jax.numpy as jnp
 import numpy as np
 import ultranest
 import ultranest.stepsampler
+from blackjax.diagnostics import (effective_sample_size,
+                                  potential_scale_reduction)
+from equinox import filter_jit
 from mpi4py import MPI
 
-from .carma_core import CARMAProcess
 from .acvf import CovarianceFunction
-from .psd import PowerSpectralDensity
+from .carma_core import CARMAProcess
 from .core import GaussianProcess
+from .plots import (diagnostics_psd_approx, plot_prior_predictive_PSD,
+                    plot_priors_samples, residuals_quantiles,
+                    violin_plots_psd_approx)
+from .psd import PowerSpectralDensity
 from .psdtoacv import PSDToACV
-from .utils.psd_utils import get_samples_psd, wrapper_psd_true_samples
-from .plots import violin_plots_psd_approx,diagnostics_psd_approx,plot_prior_predictive_PSD,residuals_quantiles,plot_priors_samples
 from .utils.gp_utils import tinygp_methods
+from .utils.inference_utils import progress_bar_factory, save_sampling_results
+from .utils.psd_utils import get_samples_psd, wrapper_psd_true_samples
+from .utils.mcmc_visualisations import from_samples_to_inference_data, plot_diagnostics_sampling
 
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ["XLA_FLAGS"] = f"--xla_force_host_platform_device_count={multiprocessing.cpu_count()}"
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -44,6 +57,8 @@ class Inference:
         Results of the inference.
     log_dir : :obj:`str`
         Directory to save the results of the inference.
+    n_pars : :obj:`int`
+        Number of free (hyper)parameters in the model to sample.
     
     Methods
     -------
@@ -81,6 +96,7 @@ class Inference:
         """
         
         self.process = Process
+        self.n_pars = len(self.process.model.parameters.free_names)
         self.priors = priors
         self.log_dir = log_dir
         if not os.path.exists(self.log_dir):
@@ -207,15 +223,13 @@ class Inference:
             
         """
         key = jax.random.PRNGKey(seed_check)
-        n_pars = len(self.process.model.parameters.free_names)
         freqs = jnp.geomspace(self.process.model.f0, self.process.model.fN, n_frequencies)
 
 
         if self.method == 'ultranest':
             # draw samples from the prior distribution
-            uniform_samples = jax.random.uniform(key=key,shape=(n_pars,n_samples))
+            uniform_samples = jax.random.uniform(key=key,shape=(self.n_pars,n_samples))
             self.params_samples = self.priors(np.array(uniform_samples))#[indexes]
-            
         else:
             raise NotImplementedError("Only ultranest is implemented for now.")
         
@@ -240,12 +254,12 @@ class Inference:
             #     fig,_ = plot_prior_predictive_distribution(params_samples)
             #     fig.savefig("prior_predictive_distribution.pdf")
 
-    def check_approximation(self,n_samples,
-                            seed_check,
-                            n_frequencies=1000,
-                            plot_diagnostics=True,
-                            plot_violins=True,
-                            plot_quantiles=True):
+    def check_approximation(self,n_samples:int,
+                            seed_check:int,
+                            n_frequencies:int = 1000,
+                            plot_diagnostics:bool = True,
+                            plot_violins:bool = True,
+                            plot_quantiles:bool = True):
         
         """Check the approximation of the PSD with the kernel decomposition.
         
@@ -304,9 +318,16 @@ class Inference:
             figs.append(fig)
             
         return figs,residuals,ratio
-                       
-    def run(self, verbose=True, **kwargs):
-        """ Optimize the (hyper)parameters of the Gaussian Process.
+           
+    def run(self, verbose=True, 
+            user_log_likelihood=None,
+            seed:int = 0,
+            n_chains:int = 1,
+            n_samples:int = 1_000,
+            n_warmup_steps:int = 1_000,
+            use_stepsampler:bool = False,
+            options={}):
+        """ Estimate the (hyper)parameters of the Gaussian Process.
         
         Run the inference method.
         
@@ -316,9 +337,10 @@ class Inference:
             Function to define the priors for the (hyper)parameters.
         verbose : :obj:`bool`, optional
             Print the results of the optimization, by default False
-        **kwargs : :obj:`dict`, optional
-            Additional arguments for the optimization method.
-                For ML: see 'optimize_ML' docstring
+        user_log_likelihood : :obj:`function`, optional
+            User-defined function to compute the log-likelihood, by default None
+        seed : :obj:`int`, optional
+            Seed for the random number generator, by default 0
         
         Raises
         ------
@@ -330,25 +352,169 @@ class Inference:
         results: dict
             Results of the optimization. Different keys depending on the method.
         """
+        rng_key = jax.random.PRNGKey(seed)
+    
+    
+        log_likelihood = filter_jit(self.process.wrapper_log_marginal_likelihood) if user_log_likelihood is None else user_log_likelihood
+
         if self.method == "ultranest":
-            use_stepsampler = kwargs.pop('use_stepsampler',False)
-            if 'user_likelihood' in kwargs:
-                print("user_likelihood is used please check the documentation.")
-            user_likelihood = kwargs.pop('user_likelihood',self.process.wrapper_log_marginal_likelihood)
-            results, sampler = self.nested_sampling(priors=self.priors,user_likelihood=user_likelihood,verbose=verbose,use_stepsampler=use_stepsampler,**kwargs)
+
+            results, sampler = self.nested_sampling(priors=self.priors,log_likelihood=log_likelihood,verbose=verbose,use_stepsampler=use_stepsampler)
+            
+            # make sure all the processes are done
+            comm.Barrier()
+            self.process.model.parameters.set_free_values(results['maximum_likelihood']['point'])#results['posterior']['median'])
+            if rank == 0:
+                print("\n>>>>>> Plotting corner and trace.")
+                sampler.plot()
+        
+        elif self.method == "blackjax":   
+                     
+            if os.path.isfile(f'{self.log_dir}/sampling_results.asdf'):
+                print("The sampling results file already exists. Loading the previous results.")
+                af = asdf.open(f'{self.log_dir}/sampling_results.asdf')
+                samples = np.array([af['samples'][f'chain_{i}'] for i in range(af['info']['num_chains'])])
+                log_prob = np.array([af['log_prob'][f'chain_{i}'] for i in range(af['info']['num_chains'])])
+            
+            else:
+                print("\n>>>>>> Sampling the posterior distribution.")
+                samples, log_prob = self.blackjax(rng_key=rng_key,
+                                    initial_position=self.process.model.parameters.free_values,
+                                    log_likelihood=log_likelihood,
+                                    log_prior=self.priors,
+                                    num_warmup_steps=n_warmup_steps,
+                                    num_samples=n_samples,
+                                    num_chains=n_chains)
+            names = self.process.model.parameters.free_names
+            dataset = from_samples_to_inference_data(names,samples)
+            plot_diagnostics_sampling(dataset,plot_dir='log_dir')
+            
+            medians = jnp.median(samples,axis=(0,2))
+            self.process.model.parameters.set_free_values(medians)
+            results = {'samples':samples,'log_prob':log_prob}
         else:
             raise NotImplementedError("Only ultranest is implemented for now.")
-        comm.Barrier()
-        self.process.model.parameters.set_free_values(results['maximum_likelihood']['point'])#results['posterior']['median'])
-        print(self.process.model.parameters.free_values)
-        if rank == 0:
-            print("\n>>>>>> Plotting corner and trace.")
-            sampler.plot()
-            print("\n>>>>>> Optimization done.")
-            print(self.process)
+        
+        
+        print("\n>>>>>> Optimization done.")
+        print(self.process)
         return results
         
-    def nested_sampling(self,priors,user_likelihood,verbose=True,use_stepsampler=False,**kwargs):
+    def blackjax(self,
+                 rng_key: jax.random.PRNGKey,
+                 initial_position: jax.Array,
+                 log_likelihood:callable,
+                 log_prior:callable,
+                 num_warmup_steps: int = 1_00,
+                 num_samples: int= 1_00,
+                 num_chains: int = 1):
+        """Sample the posterior distribution using the NUTS sampler from blackjax.
+        
+        Wrapper around the NUTS sampler from blackjax to sample the posterior distribution.        
+        This function also performs the warmup via window adaptation.
+
+        Parameters
+        ----------
+        rng_key : :obj:`jax.random.PRNGKey`
+            Random key for the random number generator.
+        initial_position : :obj:`jax.Array`    
+            Initial position of the chains.
+        log_likelihood : :obj:`function`
+            Function to compute the log-likelihood.
+        log_prior : :obj:`function`
+            Function to compute the log-prior.
+        num_warmup_steps : :obj:`int`, optional
+            Number of warmup steps, by default 1_000
+        num_samples : :obj:`int`, optional
+            Number of samples to take from the posterior distribution, by default 1_000
+        num_chains : :obj:`int`, optional
+            Number of chains, by default 1
+            
+        Returns
+        -------
+        samples : :obj:`jax.Array`
+            Samples from the posterior distribution. It has shape (num_chains, num_params, num_samples).
+        log_prob : :obj:`jax.Array`
+            Log-probability of the samples.
+        """
+
+        log_posterior = jax.jit(lambda x : log_likelihood(x) + log_prior(x))
+        
+        # set the initial positions of the chains 
+        initial_positions = jnp.array(initial_position)*jnp.ones((num_chains,self.n_pars))
+        # warmup loop
+        keys_adapt = jax.random.split(rng_key, num_chains)
+
+        warmup = blackjax.window_adaptation(blackjax.nuts, log_posterior,progress_bar=True,num_chains=num_chains)
+        warmup_run = partial(warmup.run,num_steps=num_warmup_steps)
+        (state, parameters), _ = jax.pmap(warmup_run,in_axes=(0,0))(keys_adapt,initial_positions)
+        steps_size = parameters['step_size'].block_until_ready()
+        
+        
+        parameters['inverse_mass_matrix'] = np.array(parameters['inverse_mass_matrix'])
+        parameters['step_size'] = np.array(parameters['step_size'])
+        # save the warmup state
+        warmup = {'parameters': parameters,
+          'state.position': np.array(state.position),
+          'state.logdensity': np.array(state.logdensity),
+          'state.logdensity_grad': np.array(state.logdensity_grad)}
+        
+        print(f"\n>>>>>> Warmup done. Steps size: {steps_size}")
+        
+        # inference loop 
+        @partial(jax.jit,static_argnums=(3,4))
+        def inference_loop(rng_key, parameters, initial_state, num_samples, num_chains):
+            kernel = blackjax.nuts(log_posterior, **parameters).step
+            
+            @jax.jit
+            @progress_bar_factory(num_samples,num_chains)
+            def one_step(carry, iter_num):
+                state, rng_key = carry
+                key = rng_key[iter_num]
+
+                state, _ = kernel(key, state)
+                return (state, rng_key), state
+            
+            keys = jax.random.split(rng_key, num_samples)
+            
+            carry = (initial_state, keys)
+            _, states = jax.lax.scan(one_step, carry, jnp.arange(num_samples))
+            return states
+        
+        # split the random keys for the chains
+        keys = jax.random.split(rng_key, num_chains)
+        # pmap the inference loop
+        inference_loop_multiple_chains = jax.pmap(inference_loop, in_axes=(0, 0, 0, None, None), static_broadcasted_argnums=(3,4))
+        # run the inference loop
+        states = inference_loop_multiple_chains(keys, parameters, state, num_samples, num_chains)
+        # get the samples and the log-probability
+        samples = states.position.block_until_ready()
+        log_prob = states.logdensity.block_until_ready()
+        log_density_grad = states.logdensity_grad.block_until_ready()
+        
+        # save the sampling results
+        info = {'n_params': self.n_pars,
+                'num_samples': num_samples,
+                'num_warmup': num_warmup_steps,
+                'num_chains': num_chains,
+                'ESS': np.array(effective_sample_size(samples.T)),
+                'Rhat-split':np.array(potential_scale_reduction(samples.T))}
+        samples = jnp.transpose(samples,axes=(0,2,1))
+        
+        save_sampling_results(info=info,warmup=warmup,samples=samples,
+                              log_prob=log_prob,log_densitygrad=log_density_grad,
+                              filename=f'{self.log_dir}/sampling_results')
+        
+        return samples, log_prob
+        
+    def nested_sampling(self,
+                        priors:callable,
+                        log_likelihood:callable,
+                        verbose:bool=True,
+                        use_stepsampler:bool=False,
+                        resume:bool=True,
+                        run_kwargs={},
+                        slice_steps=100):
         r""" Optimize the (hyper)parameters of the Gaussian Process with nested sampling via ultranest.
 
         Perform nested sampling to optimize the (hyper)parameters of the Gaussian Process.    
@@ -359,11 +525,7 @@ class Inference:
             Function to define the priors for the parameters to be optimized.
         verbose : :obj:`bool`, optional
             Print the results of the optimization and the progress of the sampling, by default True
-        **kwargs : :obj:`dict`
-            Keyword arguments for ultranest
-                - resume: :obj:`bool`
-                - log_dir: :obj:`str`
-                - run_kwargs: :obj:`dict`
+
                 - Dictionary of arguments for ReactiveNestedSampler.run() see https://johannesbuchner.github.io/UltraNest/ultranest.html#module-ultranest.integrator
         
         Returns
@@ -372,13 +534,9 @@ class Inference:
             Dictionary of results from the nested sampling. 
         """
         
-        resume = kwargs.get('resume',True)
-        log_dir = kwargs.get('log_dir',self.log_dir)
-        run_kwargs = kwargs.get('run_kwargs',{})
         viz = {} if verbose else  {'show_status': False , 'viz_callback': void}
         free_names = self.process.model.parameters.free_names
-        slice_steps = kwargs.get('slice_steps',100)
-        sampler = ultranest.ReactiveNestedSampler(free_names,user_likelihood ,priors,resume=resume,log_dir=log_dir)
+        sampler = ultranest.ReactiveNestedSampler(free_names,log_likelihood ,priors,resume=resume,log_dir=self.log_dir)
         if use_stepsampler: sampler.stepsampler = ultranest.stepsampler.SliceSampler(nsteps=slice_steps,
                                                 generate_direction=ultranest.stepsampler.generate_mixture_random_direction)
         

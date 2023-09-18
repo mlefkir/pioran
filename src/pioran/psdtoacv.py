@@ -113,7 +113,8 @@ class PSDToACV(eqx.Module):
                  dt: float, 
                  method: str, 
                  n_components: int = None, 
-                 estimate_variance: bool = True):
+                 estimate_variance: bool = True,
+                 init_variance = 1.0):
         """Constructor of the PSDToACV class.
     
         Initialize the PSDToACV class with the power spectral density, the frequency grid and the method used to compute the autocovariance function.
@@ -138,6 +139,8 @@ class PSDToACV(eqx.Module):
             Number of components used to approximate the power spectral density using the 'SHO' method.
         estimate_variance : :obj:`bool`, optional
             If True, the variance of the autocovariance function is estimated. Default is True.
+        init_variance : :obj:`float`, optional
+            Initial value of the variance. Default is 1.0.
         
         Raises
         ------
@@ -174,7 +177,7 @@ class PSDToACV(eqx.Module):
         self.S_high = S_high
 
         if self.estimate_variance:
-            self.parameters.append('var', 1, True, hyperparameter=False)
+            self.parameters.append('var', init_variance, True, hyperparameter=False)
 
         # parameters of the **observed** frequency grid
         self.f_max_obs = 0.5/dt # Nyquist frequency
