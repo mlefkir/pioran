@@ -38,6 +38,7 @@ def from_samples_to_inference_data(names:List[str],
 
 def plot_diagnostics_sampling(dataset,
                               plot_dir,
+                              prefix='',
                               plot_trace=True,
                               plot_mcse=True,
                               plot_rank=True,
@@ -50,6 +51,8 @@ def plot_diagnostics_sampling(dataset,
         The InferenceData object
     plot_dir: :obj:`str`
         The directory to save the plots to
+    prefix: :obj:`str`, optional
+        The prefix to add to the plots. Default is ''
     plot_trace: :obj:`bool`, optional
         Whether to plot the trace plot. Default is True
     plot_mcse: :obj:`bool`, optional
@@ -67,31 +70,31 @@ def plot_diagnostics_sampling(dataset,
         fig = plt.gcf()
         fig.suptitle('Trace plot')
         fig.tight_layout()
-        fig.savefig(f'{plot_dir}/trace_plot.pdf',bbox_inches='tight')
+        fig.savefig(f'{plot_dir}/{prefix}trace_plot.pdf',bbox_inches='tight')
     
     if plot_rank:
         s = az.plot_rank(dataset)
         fig = plt.gcf()
         fig.suptitle('Rank plot (All chains)')
         fig.tight_layout()
-        fig.savefig(f'{plot_dir}/plot_rank.pdf',bbox_inches='tight')
+        fig.savefig(f'{plot_dir}/{prefix}plot_rank.pdf',bbox_inches='tight')
     
     if plot_mcse:
         s = az.plot_mcse(dataset,extra_methods=True)
         fig = plt.gcf()
         fig.suptitle('Plot of the Monte Carlo Standard Error (MCSE) for each parameter')
         fig.tight_layout()
-        fig.savefig(f'{plot_dir}/mcse.pdf',bbox_inches='tight')
+        fig.savefig(f'{plot_dir}/{prefix}mcse.pdf',bbox_inches='tight')
         
     if plot_ess:
         s = az.plot_ess(dataset,kind='quantile')
         fig = plt.gcf()
         fig.suptitle('Effective sample size for quantiles')
         fig.tight_layout()
-        fig.savefig(f'{plot_dir}/ess_quantiles.pdf')
+        fig.savefig(f'{plot_dir}/{prefix}ess_quantiles.pdf')
         
         s = az.plot_ess(dataset,kind='local')
         fig = plt.gcf()
         fig.suptitle('Effective sample size for small intervals')
         fig.tight_layout()
-        fig.savefig(f'{plot_dir}/ess_small.pdf')
+        fig.savefig(f'{plot_dir}/{prefix}ess_small.pdf')

@@ -7,6 +7,7 @@ import os
 from functools import partial
 from typing import Union
 
+import arviz as az
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -29,17 +30,19 @@ from .utils.psd_utils import get_samples_psd, wrapper_psd_true_samples
 os.environ['OMP_NUM_THREADS'] = '1'
 os.environ["XLA_FLAGS"] = f"--xla_force_host_platform_device_count={multiprocessing.cpu_count()}"
 
-inference_methods = ["ultranest","blackjax"]
+inference_methods = ["ultranest", "blackjax_nuts"]
+
+USE_BLACKJAX = True
+USE_ULTRANEST = True
+USE_MPI = True
 
 # check if the optional inference packages are installed
-
 try:
     import tqdm # for the progress bar
     import asdf # for saving the results
     import blackjax # for the HMC/MCMC sampling
     from blackjax.diagnostics import (effective_sample_size,
-                                potential_scale_reduction)
-    USE_BLACKJAX = True
+                              potential_scale_reduction)
 except ImportError:
     blackjax = None
     asdf = None
@@ -49,7 +52,6 @@ except ImportError:
 try:
     import ultranest # for the nested sampling
     import ultranest.stepsampler
-    USE_ULTRANEST = True
 except ImportError:
     ultranest = None
     USE_ULTRANEST = False
@@ -59,16 +61,16 @@ try:
     from mpi4py import MPI
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
-    USE_MPI = True
 except ImportError:
     rank = 0
     USE_MPI = False
-    
     
             
 class Inference:
     r"""Class to infer the value of the (hyper)parameters of the Gaussian Process.
     
+    Various methods to sample the posterior probability distribution of the (hyper)parameters of the Gaussian Process are implemented
+    as wrappers around the inference packages blackjax and ultranest.
     
     Attributes
     ----------
@@ -79,7 +81,7 @@ class Inference:
         Function to define the priors for the (hyper)parameters.
     method : :obj:`str`
         - "ultranest": nested sampling via ultranest.
-        - "blackjax": HMC/MCMC sampling via blackjax.
+        - "blackjax_nuts": NUTS sampling via blackjax.
     results : :obj:`dict`
         Results of the inference.
     log_dir : :obj:`str`
@@ -91,15 +93,28 @@ class Inference:
     
     Methods
     -------
-    
-    run 
-        Optimize the (hyper)parameters of the Gaussian Process.
-    nested_sampling 
-        Optimize the (hyper)parameters of the Gaussian Process using nested sampling via ultranest.
-    
+    save_config(save_file=True)
+        Save the configuration of the inference.
+    prior_predictive_checks(n_samples_checks,seed_check,n_frequencies=1000,plot_prior_samples=True,plot_prior_predictive_distribution=True)
+        Check the prior predictive distribution.
+    check_approximation(n_samples_checks,seed_check,n_frequencies=1000,plot_diagnostics=True,plot_violins=True,plot_quantiles=True)
+        Check the approximation of the PSD with the kernel decomposition.
+    run(verbose=True, user_log_likelihood=None, seed=0, n_chains=1, n_samples=1_000, n_warmup_steps=1_000, use_stepsampler=False)
+        Estimate the (hyper)parameters of the Gaussian Process.
+    blackjax_NUTS(rng_key, initial_position, log_likelihood, log_prior, num_warmup_steps=1_000, num_samples=1_000, num_chains=1)
+        Sample the posterior distribution using the NUTS sampler from blackjax.
+    nested_sampling(priors, log_likelihood, verbose=True, use_stepsampler=False, resume=True, run_kwargs={}, slice_steps=100)
+        Sample the posterior distribution using nested sampling via ultranest.
+        
     """
     
-    def __init__(self, Process: Union[GaussianProcess,CARMAProcess],priors, method :str,n_samples=1000,seed_check=0,run_checks=True,log_dir='log_dir'):
+    def __init__(self, Process: Union[GaussianProcess,CARMAProcess],
+                 priors, 
+                 method,
+                 n_samples_checks=1000,
+                 seed_check=0,
+                 run_checks=True,
+                 log_dir='log_dir'):
         r"""Constructor method for the Optimizer class.
 
         Instantiate the Inference class.
@@ -112,14 +127,21 @@ class Inference:
             Function to define the priors for the (hyper)parameters.
         method : :obj:`str`, optional
             "NS": using nested sampling via ultranest
-        n_samples : :obj:`int`, optional
+        n_samples_checks : :obj:`int`, optional
             Number of samples to take from the prior distribution, by default 1000
         seed_check : :obj:`int`, optional
             Seed for the random number generator, by default 0    
         run_checks : :obj:`bool`, optional
             Run the prior predictive checks, by default True
+        log_dir : :obj:`str`, optional
+            Directory to save the results of the inference, by default 'log_dir'    
+    
         Raises
         ------
+        ImportError
+            If the required packages are not installed.
+        ValueError
+            If the saved config file is different from the current config, or if the method is not valid.
         TypeError
             If the method is not a string.
         """
@@ -128,20 +150,27 @@ class Inference:
         self.n_pars = len(self.process.model.parameters.free_names)
         self.priors = priors
         self.log_dir = log_dir
-        if not os.path.exists(self.log_dir):
-            os.makedirs(self.log_dir)
-        if os.path.isfile(self.log_dir+'/config.json'):
-            print("The config file already exists. Loading the previous config.")
-            file = open(self.log_dir+'/config.json')
-            dict_config_old = json.load(file)
-            print('Check the config file:')
-            dict_config_new = self.save_config(save_file=False)
-            if dict_config_old == dict_config_new:
-                print("The config file is the identical.")
+        self.plot_dir = f"{self.log_dir}/plots"
+    
+        # create the log directory and save the config file
+        if rank == 0:
+            if not os.path.exists(self.log_dir):
+                os.makedirs(self.log_dir)
+            if not os.path.exists(self.plot_dir):
+                os.makedirs(self.plot_dir)
+            if os.path.isfile(self.log_dir+'/config.json'):
+                print(">>>>>> The config file already exists. Loading the previous config.")
+                file = open(self.log_dir+'/config.json')
+                dict_config_old = json.load(file)
+                print('>>>>>> Check the config file:')
+                dict_config_new = self.save_config(save_file=False)
+                if dict_config_old == dict_config_new:
+                    print(">>>>>> The config file is the identical.")
+                else:
+                    raise ValueError("The config file is different.")
             else:
-                raise ValueError("The config file is different.")
-        else:
-            self.save_config()
+                self.save_config()
+        
         
         if isinstance(method, str):
             if method not in inference_methods:
@@ -149,25 +178,23 @@ class Inference:
             self.method = method
             
             # check if the required packages are installed
-            if method == 'blackjax' and USE_BLACKJAX:
+            if method == 'blackjax_nuts' and not USE_BLACKJAX:
                 raise ImportError("blackjax and/or asdf not installed. Please install them to use blackjax.")
             
-            elif method == 'ultranest' and USE_ULTRANEST:
+            elif method == 'ultranest' and not USE_ULTRANEST:
                     raise ImportError("ultranest not installed. Please install it to use nested sampling.")
         else:
             raise TypeError("method must be a string.")  
 
-
-            
-            
         #run prior predictive checks
         if run_checks and rank == 0: 
-            self.prior_predictive_checks(n_samples,seed_check)
+            self.prior_predictive_checks(n_samples_checks,seed_check)
             
             if isinstance(Process, GaussianProcess) and isinstance(self.process.model,PSDToACV):
                 if self.process.model.method in tinygp_methods:
-                    print(f"The PSD model is a {self.process.model.method} decomposition, checking the approximation.")
-                    self.check_approximation(n_samples,seed_check)
+                    print(f"\n>>>>>> The PSD model is a {self.process.model.method} decomposition, checking the approximation.")
+                    self.check_approximation(n_samples_checks,seed_check)
+        
         if USE_MPI: comm.Barrier()
 
     def save_config(self,save_file=True):
@@ -179,6 +206,10 @@ class Inference:
         ----------
         save_file : :obj:`bool`, optional
         
+        Returns
+        -------
+        dict_config : :obj:`dict`
+            Dictionary with the configuration of the inference, process and model.
         """
         dict_config = {}
         
@@ -189,10 +220,9 @@ class Inference:
         elif isinstance(self.process,CARMAProcess):
             dict_config['process'] = {'type':'CARMAProcess', 'options':{}}
             dict_config['process']['options']['use_beta'] = self.process.use_beta
-
         else:
             dict_config['process'] = {'type':'unknown', 'options':{}}
-        # 
+            
         # options of the process
         dict_config['process']['options']['estimate_mean'] = self.process.estimate_mean
         dict_config['process']['options']['scale_errors'] = self.process.scale_errors
@@ -238,7 +268,7 @@ class Inference:
         return dict_config
         
     def prior_predictive_checks(self,
-                                n_samples,
+                                n_samples_checks,
                                 seed_check,
                                 n_frequencies=1000,
                                 plot_prior_samples=True,
@@ -250,7 +280,7 @@ class Inference:
         
         Parameters
         ----------
-        n_samples : :obj:`int`
+        n_samples_checks : :obj:`int`
             Number of samples to take from the prior distribution, by default 1000
         seed_check : :obj:`int`
             Seed for the random number generator
@@ -266,7 +296,7 @@ class Inference:
 
         if self.method == 'ultranest':
             # draw samples from the prior distribution
-            uniform_samples = jax.random.uniform(key=key,shape=(self.n_pars,n_samples))
+            uniform_samples = jax.random.uniform(key=key,shape=(self.n_pars,n_samples_checks))
             self.params_samples = self.priors(np.array(uniform_samples))#[indexes]
         else:
             raise NotImplementedError("Only ultranest is implemented for now.")
@@ -292,7 +322,7 @@ class Inference:
             #     fig,_ = plot_prior_predictive_distribution(params_samples)
             #     fig.savefig("prior_predictive_distribution.pdf")
 
-    def check_approximation(self,n_samples:int,
+    def check_approximation(self,n_samples_checks:int,
                             seed_check:int,
                             n_frequencies:int = 1000,
                             plot_diagnostics:bool = True,
@@ -306,7 +336,7 @@ class Inference:
 
         Parameters
         ----------
-        n_samples : :obj:`int`
+        n_samples_checks : :obj:`int`
             Number of samples to take from the prior distribution, by default 1000
         seed_check : :obj:`int`
             Seed for the random number generator
@@ -320,7 +350,15 @@ class Inference:
             Plot the quantiles of the residuals and the ratios, by default True
         plot_prior_samples : :obj:`bool`, optional
             Plot the prior samples, by default True
-            
+           
+        Returns
+        -------
+        figs : :obj:`list`
+            List of figures.
+        residuals : :obj:`jax.Array`
+            Residuals of the PSD approximation.
+        ratio : :obj:`jax.Array`
+            Ratio of the PSD approximation. 
         """
         freqs = jnp.geomspace(self.process.model.f0, self.process.model.fN, n_frequencies)
         
@@ -363,32 +401,32 @@ class Inference:
             n_chains:int = 1,
             n_samples:int = 1_000,
             n_warmup_steps:int = 1_000,
-            use_stepsampler:bool = False,
-            options={}):
+            use_stepsampler:bool = False):
         """ Estimate the (hyper)parameters of the Gaussian Process.
         
         Run the inference method.
         
         Parameters
         ----------
-        priors : :obj:`function`, optional
-            Function to define the priors for the (hyper)parameters.
         verbose : :obj:`bool`, optional
-            Print the results of the optimization, by default False
+            Be verbose, by default True
         user_log_likelihood : :obj:`function`, optional
             User-defined function to compute the log-likelihood, by default None
         seed : :obj:`int`, optional
             Seed for the random number generator, by default 0
-        
-        Raises
-        ------
-        ValueError
-            If the method is not "NS".
-        
+        n_chains : :obj:`int`, optional
+            Number of chains, by default 1
+        n_samples : :obj:`int`, optional
+            Number of samples to take from the posterior distribution, by default 1_000
+        n_warmup_steps : :obj:`int`, optional
+            Number of warmup steps, by default 1_000
+        use_stepsampler : :obj:`bool`, optional
+            Use the slice sampler as step sampler, by default False
+
         Returns
         -------
         results: dict
-            Results of the optimization. Different keys depending on the method.
+            Results of the sampling. The keys differ depending on the method/sampler used.
         """
         rng_key = jax.random.PRNGKey(seed)
     
@@ -406,17 +444,25 @@ class Inference:
                 print("\n>>>>>> Plotting corner and trace.")
                 sampler.plot()
         
-        elif self.method == "blackjax":   
+        elif self.method == "blackjax_nuts":   
                      
-            if os.path.isfile(f'{self.log_dir}/sampling_results.asdf'):
+            if os.path.isfile(f'{self.log_dir}/chains.asdf'):
                 print("The sampling results file already exists. Loading the previous results.")
-                af = asdf.open(f'{self.log_dir}/sampling_results.asdf')
+                af = asdf.open(f'{self.log_dir}/chains.asdf')
+                # check that warmup and sampling parameters are the same
+                loaded_info = af['info']
+                assert loaded_info['sampler'] == 'NUTS', f"The sampler saved ({loaded_info['sampler']}) is different from the one given ('NUTS')." 
+                assert loaded_info['package'] == 'blackjax', f"The package saved ({loaded_info['package']}) is different from the one given ('blackjax')."
+                assert loaded_info['num_warmup'] == n_warmup_steps, f"The number of warmup steps saved ({loaded_info['num_warmup']}) is different from the one given ({n_warmup_steps})."
+                assert loaded_info['num_samples'] == n_samples, f"The number of samples saved ({loaded_info['num_samples']}) is different from the one given ({n_samples})."
+                assert loaded_info['num_chains'] == n_chains, f"The number of chains saved ({loaded_info['num_chains']}) is different from the one given ({n_chains})."
+
                 samples = np.array([af['samples'][f'chain_{i}'] for i in range(af['info']['num_chains'])])
                 log_prob = np.array([af['log_prob'][f'chain_{i}'] for i in range(af['info']['num_chains'])])
             
             else:
                 print("\n>>>>>> Sampling the posterior distribution.")
-                samples, log_prob = self.blackjax(rng_key=rng_key,
+                samples, log_prob = self.blackjax_NUTS(rng_key=rng_key,
                                     initial_position=self.process.model.parameters.free_values,
                                     log_likelihood=log_likelihood,
                                     log_prior=self.priors,
@@ -426,26 +472,28 @@ class Inference:
             
             names = self.process.model.parameters.free_names
             dataset = from_samples_to_inference_data(names,samples)
-            plot_diagnostics_sampling(dataset,plot_dir='log_dir')
+            print("\n>>>>>> Summary of the sampling.")
+            print(az.summary(dataset))
+            print("\n>>>>>> Plotting corner, trace and diagnostics.")
+            plot_diagnostics_sampling(dataset,plot_dir=self.plot_dir,prefix='blackjax_nuts_')
             
             medians = jnp.median(samples,axis=(0,2))
             self.process.model.parameters.set_free_values(medians)
-            results = {'samples':samples,'log_prob':log_prob}
+            results = {'samples':samples,'log_prob':log_prob,'inferencedata':dataset}
         else:
             raise NotImplementedError("Only ultranest is implemented for now.")
         
         
-        print("\n>>>>>> Optimization done.")
         print(self.process)
         return results
         
-    def blackjax(self,
+    def blackjax_NUTS(self,
                  rng_key: jax.random.PRNGKey,
                  initial_position: jax.Array,
                  log_likelihood:callable,
                  log_prior:callable,
-                 num_warmup_steps: int = 1_00,
-                 num_samples: int= 1_00,
+                 num_warmup_steps: int = 1_000,
+                 num_samples: int= 1_000,
                  num_chains: int = 1):
         """Sample the posterior distribution using the NUTS sampler from blackjax.
         
@@ -492,6 +540,7 @@ class Inference:
         
         parameters['inverse_mass_matrix'] = np.array(parameters['inverse_mass_matrix'])
         parameters['step_size'] = np.array(parameters['step_size'])
+
         # save the warmup state
         warmup = {'parameters': parameters,
           'state.position': np.array(state.position),
@@ -532,7 +581,10 @@ class Inference:
         log_density_grad = states.logdensity_grad.block_until_ready()
         
         # save the sampling results
-        info = {'n_params': self.n_pars,
+        info = {'sampler': 'NUTS',
+                'package': 'blackjax',
+                'package_version': blackjax.__version__,
+                'n_params': self.n_pars,
                 'num_samples': num_samples,
                 'num_warmup': num_warmup_steps,
                 'num_chains': num_chains,
@@ -542,7 +594,7 @@ class Inference:
         
         save_sampling_results(info=info,warmup=warmup,samples=samples,
                               log_prob=log_prob,log_densitygrad=log_density_grad,
-                              filename=f'{self.log_dir}/sampling_results')
+                              filename=f'{self.log_dir}/chains')
         
         return samples, log_prob
         
@@ -554,18 +606,26 @@ class Inference:
                         resume:bool=True,
                         run_kwargs={},
                         slice_steps=100):
-        r""" Optimize the (hyper)parameters of the Gaussian Process with nested sampling via ultranest.
+        r""" Sample the posterior distribution of the (hyper)parameters of the Gaussian Process with nested sampling via ultranest.
 
-        Perform nested sampling to optimize the (hyper)parameters of the Gaussian Process.    
+        Perform nested sampling to sample the (hyper)parameters of the Gaussian Process.    
 
         Parameters
         ----------
         priors : :obj:`function`
-            Function to define the priors for the parameters to be optimized.
+            Function to define the priors for the parameters
+        log_likelihood : :obj:`function`
+            Function to compute the log-likelihood.
         verbose : :obj:`bool`, optional
-            Print the results of the optimization and the progress of the sampling, by default True
-
-                - Dictionary of arguments for ReactiveNestedSampler.run() see https://johannesbuchner.github.io/UltraNest/ultranest.html#module-ultranest.integrator
+            Print the results of the sample and the progress of the sampling, by default True
+        use_stepsampler : :obj:`bool`, optional
+            Use the slice sampler as step sampler, by default False
+        resume : :obj:`bool`, optional
+            Resume the sampling from the previous run, by default True       
+        run_kwargs : :obj:`dict`, optional
+            Dictionary of arguments for ReactiveNestedSampler.run() see https://johannesbuchner.github.io/UltraNest/ultranest.html#module-ultranest.integrator
+        slice_steps : :obj:`int`, optional
+            Number of steps for the slice sampler, by default 100
         
         Returns
         -------
@@ -581,7 +641,6 @@ class Inference:
         
         if verbose: results = sampler.run(**viz)
         else: results = sampler.run(**run_kwargs, **viz)
-        
         return results,sampler
     
 def void(*args, **kwargs):
