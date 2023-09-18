@@ -138,7 +138,7 @@ class Inference:
         try:
             from mpi4py import MPI
             self.comm = MPI.COMM_WORLD
-            self.rank = comm.Get_rank()
+            self.rank = self.comm.Get_rank()
             self.use_MPI = True
         except ImportError:
             self.rank = 0
