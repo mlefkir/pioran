@@ -137,16 +137,16 @@ class Inference:
         # check if MPI is installed
         try:
             from mpi4py import MPI
-            comm = MPI.COMM_WORLD
-            rank = comm.Get_rank()
+            self.comm = MPI.COMM_WORLD
+            self.rank = comm.Get_rank()
             self.use_MPI = True
         except ImportError:
-            rank = 0
+            self.rank = 0
             self.use_MPI = False
             
             
         #run prior predictive checks
-        if run_checks and rank == 0: 
+        if run_checks and self.rank == 0: 
             self.prior_predictive_checks(n_samples,seed_check)
             
             if isinstance(Process, GaussianProcess) and isinstance(self.process.model,PSDToACV):
@@ -385,9 +385,9 @@ class Inference:
             results, sampler = self.nested_sampling(priors=self.priors,log_likelihood=log_likelihood,verbose=verbose,use_stepsampler=use_stepsampler)
             
             # make sure all the processes are done
-            if self.use_MPI: comm.Barrier()
+            if self.use_MPI: self.comm.Barrier()
             self.process.model.parameters.set_free_values(results['maximum_likelihood']['point'])#results['posterior']['median'])
-            if rank == 0:
+            if self.rank == 0:
                 print("\n>>>>>> Plotting corner and trace.")
                 sampler.plot()
         
