@@ -17,3 +17,8 @@ readme = "README.md"
 dependencies = {file = ["requirements.txt"]}
 [tool.setuptools.packages.find]
 where = ["src"]
+[project.optional-dependencies]
+ultranest = ["ultranest"]
+blackjax = ["asdf","blackjax"]
+test = ["pioran[ultranest]","pioran[blackjax]","mpi4py","jax_finufft"]
+all = ["pioran[test]"]
