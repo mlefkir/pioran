@@ -7,17 +7,11 @@ import os
 from functools import partial
 from typing import Union
 
-import asdf
-import blackjax
 import jax
 import jax.numpy as jnp
 import numpy as np
-import ultranest
-import ultranest.stepsampler
-from blackjax.diagnostics import (effective_sample_size,
-                                  potential_scale_reduction)
+
 from equinox import filter_jit
-from mpi4py import MPI
 
 from .acvf import CovarianceFunction
 from .carma_core import CARMAProcess
@@ -25,20 +19,17 @@ from .core import GaussianProcess
 from .plots import (diagnostics_psd_approx, plot_prior_predictive_PSD,
                     plot_priors_samples, residuals_quantiles,
                     violin_plots_psd_approx)
-from .psd import PowerSpectralDensity
 from .psdtoacv import PSDToACV
 from .utils.gp_utils import tinygp_methods
 from .utils.inference_utils import progress_bar_factory, save_sampling_results
+from .utils.mcmc_visualisations import (from_samples_to_inference_data,
+                                        plot_diagnostics_sampling)
 from .utils.psd_utils import get_samples_psd, wrapper_psd_true_samples
-from .utils.mcmc_visualisations import from_samples_to_inference_data, plot_diagnostics_sampling
 
 os.environ['OMP_NUM_THREADS'] = '1'
 os.environ["XLA_FLAGS"] = f"--xla_force_host_platform_device_count={multiprocessing.cpu_count()}"
 
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-
-valid_methods = ["ultranest","blackjax"]
+inference_methods = ["ultranest","blackjax"]
 
 class Inference:
     r"""Class to infer the value of the (hyper)parameters of the Gaussian Process.
@@ -59,6 +50,8 @@ class Inference:
         Directory to save the results of the inference.
     n_pars : :obj:`int`
         Number of free (hyper)parameters in the model to sample.
+    use_MPI : :obj:`bool`
+        Use MPI to parallelize the inference.
     
     Methods
     -------
@@ -115,22 +108,52 @@ class Inference:
             self.save_config()
         
         if isinstance(method, str):
-            if method not in valid_methods:
-                raise ValueError(f"method must be one of {valid_methods}, got {method}")
+            if method not in inference_methods:
+                raise ValueError(f"method must be one of {inference_methods}, got {method}")
             self.method = method
+            
+            # check if the required packages are installed
+            if method == 'blackjax':
+                try:
+                    import tqdm # for the progress bar
+                    import asdf # for saving the results
+                    import blackjax # for the HMC/MCMC sampling
+                    from blackjax.diagnostics import (effective_sample_size,
+                                                potential_scale_reduction)
+                except ImportError:
+                    raise ImportError("blackjax and/or asdf not installed. Please install them to use blackjax.")
+            
+            elif method == 'ultranest':
+                try:
+                    import ultranest # for the nested sampling
+                    import ultranest.stepsampler
+                except ImportError:
+                    raise ImportError("ultranest not installed. Please install it to use nested sampling.")
+                
+            
         else:
             raise TypeError("method must be a string.")  
 
+        # check if MPI is installed
+        try:
+            from mpi4py import MPI
+            comm = MPI.COMM_WORLD
+            rank = comm.Get_rank()
+            self.use_MPI = True
+        except ImportError:
+            rank = 0
+            self.use_MPI = False
+            
+            
         #run prior predictive checks
         if run_checks and rank == 0: 
-            # MPI.COMM_WORLD.Barrier()
             self.prior_predictive_checks(n_samples,seed_check)
             
             if isinstance(Process, GaussianProcess) and isinstance(self.process.model,PSDToACV):
                 if self.process.model.method in tinygp_methods:
                     print(f"The PSD model is a {self.process.model.method} decomposition, checking the approximation.")
                     self.check_approximation(n_samples,seed_check)
-        MPI.COMM_WORLD.Barrier()
+        if self.use_MPI: MPI.COMM_WORLD.Barrier()
 
     def save_config(self,save_file=True):
         """Save the configuration of the inference.
@@ -362,7 +385,7 @@ class Inference:
             results, sampler = self.nested_sampling(priors=self.priors,log_likelihood=log_likelihood,verbose=verbose,use_stepsampler=use_stepsampler)
             
             # make sure all the processes are done
-            comm.Barrier()
+            if self.use_MPI: comm.Barrier()
             self.process.model.parameters.set_free_values(results['maximum_likelihood']['point'])#results['posterior']['median'])
             if rank == 0:
                 print("\n>>>>>> Plotting corner and trace.")
@@ -385,6 +408,7 @@ class Inference:
                                     num_warmup_steps=n_warmup_steps,
                                     num_samples=n_samples,
                                     num_chains=n_chains)
+            
             names = self.process.model.parameters.free_names
             dataset = from_samples_to_inference_data(names,samples)
             plot_diagnostics_sampling(dataset,plot_dir='log_dir')

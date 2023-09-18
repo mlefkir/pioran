@@ -1,7 +1,9 @@
 """Visualisations/Diagnostics sampling."""
+
 from typing import List
-import jax
+
 import arviz as az
+import jax
 import matplotlib.pyplot as plt
 import numpy as np
 

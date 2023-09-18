@@ -4,12 +4,9 @@
 
 import re
 
-import asdf
-import jax
 import numpy as np
 from jax import lax
 from jax.experimental import host_callback
-from tqdm.auto import tqdm as tqdm_auto
 
 _CHAIN_RE = re.compile(r"\d+$")  # e.g. get '3' from 'TFRT_CPU_3'
 
@@ -50,6 +47,8 @@ def save_sampling_results(info:dict,
         The name of the file to save the data to
     
     """
+    import asdf
+
     tree = {
         'info': info,
         'warmup': warmup,
@@ -79,6 +78,7 @@ def progress_bar_factory(num_samples:int, num_chains:int):
     num_chains: :obj:`int`
         The number of chains
     """
+    from tqdm.auto import tqdm as tqdm_auto
 
     if num_samples > 20:
         print_rate = int(num_samples / 20)

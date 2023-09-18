@@ -178,6 +178,13 @@ class GaussianProcess(eqx.Module):
         
         if method not in valid_methods:
             raise ValueError(f"Method {method} is not valid. Choose between {valid_methods}")
+        
+        if method == 'NuFFT':
+            try: 
+                import jax_finufft
+            except ImportError:
+                raise ImportError("The NuFFT method requires jax_finufft to be installed.")
+        
         self.use_tinygp = use_tinygp
         if method in tinygp_methods and not use_tinygp:
             raise ValueError(f"Method '{method}' can only be used with tinygp, please set `use_tinygp=True`")

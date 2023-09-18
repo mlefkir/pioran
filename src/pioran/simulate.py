@@ -5,8 +5,8 @@ import warnings
 
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
-from astropy.io import fits
-from astropy.table import Table
+# from astropy.io import fits
+# from astropy.table import Table
 from jax import random
 from jax.scipy.linalg import cholesky
 from numpy import savetxt
@@ -309,73 +309,73 @@ class Simulations:
         ts = self.triang@r
         return t_test,ts
        
-    def batch_simulations(self,seed,sample_size,filename,**simulations_kwargs):
-        """Generate a batch of time series.
+    # def batch_simulations(self,seed,sample_size,filename,**simulations_kwargs):
+    #     """Generate a batch of time series.
         
-        Function to generate a batch of time series using the same model. The time series are saved in a FITS file.
-        The seed is used to generate the seeds of simulated the time series.  
+    #     Function to generate a batch of time series using the same model. The time series are saved in a FITS file.
+    #     The seed is used to generate the seeds of simulated the time series.  
     
         
-        Parameters
-        ----------
-        seed  : :obj:`int`
-            Seed for the random number generator to draw the seeds of the time series.
-        sample_size  : :obj:`int`
-            Number of time series to generate.
-        filename  : :obj:`str`
-            Name of the file to save the time series.
-        simulations_kwargs  : :obj:`dict`
-            Keyword arguments for the function :func:`simulate`.
+    #     Parameters
+    #     ----------
+    #     seed  : :obj:`int`
+    #         Seed for the random number generator to draw the seeds of the time series.
+    #     sample_size  : :obj:`int`
+    #         Number of time series to generate.
+    #     filename  : :obj:`str`
+    #         Name of the file to save the time series.
+    #     simulations_kwargs  : :obj:`dict`
+    #         Keyword arguments for the function :func:`simulate`.
         
-        """
+    #     """
     
-        seeds = random.choice(random.PRNGKey(seed),jnp.arange(0,15*sample_size),shape=(sample_size,),replace=False)
+    #     seeds = random.choice(random.PRNGKey(seed),jnp.arange(0,15*sample_size),shape=(sample_size,),replace=False)
         
-        hdu_list = []
-        seeds_list = []
+    #     hdu_list = []
+    #     seeds_list = []
         
-        print(f"Generating {sample_size} time series")
+    #     print(f"Generating {sample_size} time series")
         
-        for it,cur_seed in enumerate(seeds):
+    #     for it,cur_seed in enumerate(seeds):
             
-            t,x,xerr = self.simulate(seed=cur_seed,**simulations_kwargs)
+    #         t,x,xerr = self.simulate(seed=cur_seed,**simulations_kwargs)
             
-            seeds_list.append(int(cur_seed))
+    #         seeds_list.append(int(cur_seed))
 
-            table = Table([t,x,xerr],names=['TIME','FLUX','ERROR'])
+    #         table = Table([t,x,xerr],names=['TIME','FLUX','ERROR'])
             
-            hdu = fits.BinTableHDU(table, name=f'TS_{cur_seed}')
+    #         hdu = fits.BinTableHDU(table, name=f'TS_{cur_seed}')
             
-            hdu.header['SEED'] = int(cur_seed)
-            hdu.header['DURATION'] = self.duration
-            hdu.header['SCALELO'] = self.S_low
-            hdu.header['SCALEHI'] = self.S_high
-            hdu.header['SAMPLING'] = 'REGULAR' if simulations_kwargs.get('irregular_sampling',False) else 'IRREGULAR'
-            hdu.header['ERRORS'] = simulations_kwargs.get('errors','gauss')
-            hdu.header['RANDOMI'] = str(simulations_kwargs.get('randomise_fluxes',True))
-            hdu.header['MODELTYP'] = 'PSD' if isinstance(self.model,PowerSpectralDensity) else 'ACVF'
-            hdu.header['METHOD'] = simulations_kwargs.get('method','GP')
-            hdu.header['MEAN'] = simulations_kwargs.get('mean','None')
-            hdu.header['MODEL'] = self.model.expression # or 'Exponential' 'Lorentzian' 'ExponentialSquared'
-            for i in range(len(self.model.parameters)):
-                par = self.model.parameters[i+1]
-                if par.ID < 10:
-                    hdu.header[f'{par.name[:7]}{par.ID}'] = par.value
-                else:       
-                    hdu.header[f'{par.name[:6]}{par.ID}'] = par.value
-            hdu_list.append(hdu)
+    #         hdu.header['SEED'] = int(cur_seed)
+    #         hdu.header['DURATION'] = self.duration
+    #         hdu.header['SCALELO'] = self.S_low
+    #         hdu.header['SCALEHI'] = self.S_high
+    #         hdu.header['SAMPLING'] = 'REGULAR' if simulations_kwargs.get('irregular_sampling',False) else 'IRREGULAR'
+    #         hdu.header['ERRORS'] = simulations_kwargs.get('errors','gauss')
+    #         hdu.header['RANDOMI'] = str(simulations_kwargs.get('randomise_fluxes',True))
+    #         hdu.header['MODELTYP'] = 'PSD' if isinstance(self.model,PowerSpectralDensity) else 'ACVF'
+    #         hdu.header['METHOD'] = simulations_kwargs.get('method','GP')
+    #         hdu.header['MEAN'] = simulations_kwargs.get('mean','None')
+    #         hdu.header['MODEL'] = self.model.expression # or 'Exponential' 'Lorentzian' 'ExponentialSquared'
+    #         for i in range(len(self.model.parameters)):
+    #             par = self.model.parameters[i+1]
+    #             if par.ID < 10:
+    #                 hdu.header[f'{par.name[:7]}{par.ID}'] = par.value
+    #             else:       
+    #                 hdu.header[f'{par.name[:6]}{par.ID}'] = par.value
+    #         hdu_list.append(hdu)
 
-            print(f'{it+1}/{sample_size}', end='\r')
-            sys.stdout.flush()
+    #         print(f'{it+1}/{sample_size}', end='\r')
+    #         sys.stdout.flush()
         
-        print('Saving the time series')
-        seed_tab = Table([seeds],names=['SEED'])
-        hdu_seed = fits.BinTableHDU(seed_tab, name=f'SEEDS')
-        hdu  = fits.PrimaryHDU()
-        hdu.header['MAINSEED'] = seed  
-        hdu_list = [hdu,hdu_seed] + hdu_list
-        hdu = fits.HDUList(hdu_list)
-        hdu.writeto(f'{filename}.fits',overwrite=True)       
+    #     print('Saving the time series')
+    #     seed_tab = Table([seeds],names=['SEED'])
+    #     hdu_seed = fits.BinTableHDU(seed_tab, name=f'SEEDS')
+    #     hdu  = fits.PrimaryHDU()
+    #     hdu.header['MAINSEED'] = seed  
+    #     hdu_list = [hdu,hdu_seed] + hdu_list
+    #     hdu = fits.HDUList(hdu_list)
+    #     hdu.writeto(f'{filename}.fits',overwrite=True)       
     
     def simulate(self, mean=None,method='GP',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,exponentiate_ts=False,**kwargs):
         """Method to simulate time series using either the GP method or the TK method.
