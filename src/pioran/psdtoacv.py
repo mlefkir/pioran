@@ -7,7 +7,6 @@ import equinox as eqx
 import jax
 import jax.numpy as jnp
 import tinygp
-from jax_finufft import nufft2
 from tinygp.kernels.quasisep import SHO as SHO_term
 
 from .parameters import ParametersModel
@@ -15,6 +14,13 @@ from .psd_base import PowerSpectralDensity
 from .utils.gp_utils import (EuclideanDistance, valid_methods,
                              decompose_triangular_matrix,
                              reconstruct_triangular_matrix)
+
+USE_JAX_FINUFFT = True
+try:
+    from jax_finufft import nufft2
+except ImportError:
+    nufft2 = None
+    USE_JAX_FINUFFT = False
 
 
 class PSDToACV(eqx.Module):
@@ -164,6 +170,8 @@ class PSDToACV(eqx.Module):
         
         if method not in valid_methods:
             raise ValueError(f"Method {method} not allowed. Choose between {valid_methods}")
+        if method == 'NuFFT' and (not USE_JAX_FINUFFT):
+            raise ValueError("NuFFT method requires jax_finufft package")
         
         if ('FFT' not in method ) and n_components < 1:
             raise ValueError("n_components must be greater than 1")

@@ -22,10 +22,10 @@ class TestPSDToACV(unittest.TestCase):
         self.assertEqual(acv.PSD,psd)
 
     
-    def test_init_NuFFT(self):
-        psd = Lorentzian([1.2,4,5])
-        acv = PSDToACV(psd,T=T,dt=dt,S_low=S_low,S_high=S_high,method='NuFFT')
-        self.assertEqual(acv.PSD,psd)
+    # def test_init_NuFFT(self):
+    #     psd = Lorentzian([1.2,4,5])
+    #     acv = PSDToACV(psd,T=T,dt=dt,S_low=S_low,S_high=S_high,method='NuFFT')
+    #     self.assertEqual(acv.PSD,psd)
     
 
 if __name__ == '__main__':
