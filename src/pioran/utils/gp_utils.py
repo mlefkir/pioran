@@ -2,49 +2,50 @@ import jax.numpy as jnp
 import numpy as np
 from jax import jit
 from jax.numpy import linalg as la
-from scipy.spatial.distance import cdist
 
-valid_methods = ['FFT','NuFFT', 'SHO']
-tinygp_methods = ['SHO']
+valid_methods = ["FFT", "NuFFT", "SHO"]
+tinygp_methods = ["SHO"]
+
 
 @jit
 def EuclideanDistance(xq, xp):
     r"""Compute the Euclidean distance between two arrays.
 
-    .. math:: :label: euclidian_distance  
-    
+    .. math:: :label: euclidian_distance
+
         D(\boldsymbol{x_q},\boldsymbol{x_p}) = \sqrt{(\boldsymbol{x_q} - \boldsymbol{x_p}^{\mathrm{T}})^2}
 
     Parameters
     ----------
     xq : (n, 1) :obj:`jax.Array`
         First array.
-    xp : (m, 1) :obj:`jax.Array` 
+    xp : (m, 1) :obj:`jax.Array`
         Second array.
     Returns
     -------
     (n, m) :obj:`jax.Array`
     """
-    return jnp.sqrt((xq - xp.T)**2)
+    return jnp.sqrt((xq - xp.T) ** 2)
+
 
 # ---- Code from Ahmed Fasih ---- https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd
 def nearest_positive_definite(A):
     """Find the nearest positive-definite matrix to input.
-    
+
     Code from Ahmed Fasih - https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd
     A Python/Numpy port of John D'Errico's `nearestSPD` MATLAB code [1], which
     credits [2].
-    
+
     Parameters
     ----------
     A : (N, N) :obj:`jax.Array`
         Matrix to find the nearest positive-definite
-        
+
     Returns
     -------
     (N, N) :obj:`jax.Array`
-        Nearest positive-definite matrix to A.  
-    
+        Nearest positive-definite matrix to A.
+
     Notes
     -----
     1. https://www.mathworks.com/matlabcentral/fileexchange/42885-nearestspd
@@ -82,9 +83,10 @@ def nearest_positive_definite(A):
 
     return A3
 
+
 def decompose_triangular_matrix(M):
     """Decompose a triangular matrix into a vector of unique values.
-    
+
     Decompose a triangular matrix into a vector of unique values and returns the
     indexes to reconstruct the original matrix.
 
@@ -102,20 +104,20 @@ def decompose_triangular_matrix(M):
     tril_indexes : :obj:`jax.Array`
         Indexes of the lower triangular matrix.
     n : :obj:`int`
-        Size of the original matrix.        
+        Size of the original matrix.
     """
-    
+
     n = M.shape[0]
     tril_indexes = jnp.tril_indices(n, k=0)
     trunc = M[tril_indexes]
-    unique, reverse_indexes = jnp.unique(trunc,return_inverse=True,size=len(trunc))
+    unique, reverse_indexes = jnp.unique(trunc, return_inverse=True, size=len(trunc))
     return unique, reverse_indexes, tril_indexes, n
 
 
 def reconstruct_triangular_matrix(unique, reverse_indexes, tril_indexes, n):
     """Recompose a triangular matrix from a vector of unique values.
-    
-    Recompose a triangular matrix from a vector of unique values and the indexes    
+
+    Recompose a triangular matrix from a vector of unique values and the indexes
 
     Parameters
     ----------
@@ -127,30 +129,31 @@ def reconstruct_triangular_matrix(unique, reverse_indexes, tril_indexes, n):
         Indexes of the lower triangular matrix.
     n : :obj:`int`
         Size of the original matrix.
-        
+
     Returns
     -------
     :obj:`jax.Array`
         Triangular matrix of shape (n,n).
-    
+
     Raises
     ------
     ValueError
         If the matrix is not triangular.
     """
 
-    M = jnp.zeros((n,n))
+    M = jnp.zeros((n, n))
     M = M.at[tril_indexes].set(unique[reverse_indexes])
-    return M+M.T-jnp.diag(jnp.diag(M))
+    return M + M.T - jnp.diag(jnp.diag(M))
+
 
 def isPD(B):
     """Returns true when input is positive-definite, via Cholesky.
-    
+
     Parameters
     ----------
     B : (n,n) :obj:`jax.Array`
         Matrix to test.
-        
+
     Returns
     -------
     :obj:`bool`

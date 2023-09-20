@@ -5,7 +5,7 @@ from .parameters import ParametersModel
 from .psd_base import PowerSpectralDensity
 
 class Lorentzian(PowerSpectralDensity):
-    """Class for the Lorentzian power spectral density.
+    """Lorentzian power spectral density.
     
     .. math:: :label: lorentzianpsd 
     
@@ -25,28 +25,21 @@ class Lorentzian(PowerSpectralDensity):
         Values of the parameters of the power spectral density function. [position, amplitude, halfwidth]
     free_parameters: :obj:`list` of :obj:`bool`, optional
         List of bool to indicate if the parameters are free or not. Default is `[True, True,True]`.
-            
-    Attributes
-    ----------
-    parameters : :class:`~pioran.parameters.ParametersModel`
-        Parameters of the power spectral density function.
-        
-    Methods
-    -------
-    calculate(t)
-        Computes the power spectral density function on an array of frequencies :math:`f`.
     """
     parameters: ParametersModel
+    """Parameters of the power spectral density function."""
     expression = 'lorentzian'
+    """Expression of the power spectral density function."""
     analytical = True
+    """If True, the power spectral density function is analytical, otherwise it is not."""
     
-    def __init__(self, parameters_values, free_parameters = [True, True,True]):
+    def __init__(self, parameters_values:list, free_parameters:list = [True, True,True]):
         assert len(parameters_values) == 3, 'The number of parameters for the lorentzian PSD must be 3'
         # initialise the parameters and check
         PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=["position",'amplitude', 'halfwidth'], free_parameters=free_parameters)
     
     def calculate(self,f) -> jax.Array:
-        r"""Computes the Lorentzian power spectral density function on an array of frequencies :math:`f`.
+        r"""Computes the power spectral density.        
         
         The expression is given by Equation :math:numref:`lorentzianpsd`.
         with the variance :math:`A\ge 0`, the position :math:`f_0\ge 0` and the halfwidth :math:`\gamma>0`.
@@ -64,7 +57,7 @@ class Lorentzian(PowerSpectralDensity):
         return self.parameters['amplitude'].value  /  ( self.parameters['halfwidth'].value**2 + 4 * jnp.pi**2 * ( f - self.parameters['position'].value )**2 )
 
 class Gaussian(PowerSpectralDensity):
-    r""" Class for the Gaussian power spectral density.
+    r""" Gaussian power spectral density.
 
     .. math:: :label: gaussianpsd 
     
@@ -84,24 +77,13 @@ class Gaussian(PowerSpectralDensity):
         Values of the parameters of the power spectral density function.
     free_parameters : :obj:`list` of :obj:`bool`, optional
         List of bool to indicate if the parameters are free or not. Default is `[True, True,True]`.
-            
-    Attributes
-    ----------
-    parameters : :class:`~pioran.parameters.ParametersModel`
-        Parameters of the power spectral density function.
-    expression : :obj:`str`
-        Expression of the power spectral density function.
-    analytical : :obj:`bool`
-        If True, the power spectral density function is analytical, otherwise it is not.
-        
-    Methods
-    -------
-    calculate(t)
-        Computes the power spectral density function on an array of frequencies :math:`f`.
     """
     expression = 'gaussian'
+    """Expression of the power spectral density function."""
     parameters: ParametersModel
+    """Expression of the power spectral density function."""
     analytical = True
+    """If True, the power spectral density function is analytical, otherwise it is not."""
     
     def __init__(self, parameters_values, free_parameters=[True, True,True]):
         assert len(parameters_values) == 3, f'The number of parameters for the power spectral density function "{self.expression}" must be 3'
@@ -109,7 +91,7 @@ class Gaussian(PowerSpectralDensity):
         PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=["position",'amplitude', 'sigma'], free_parameters=free_parameters)
     
     def calculate(self,f) -> jax.Array:
-        r"""Computes the Gaussian power spectral density function on an array of frequencies :math:`f`.
+        r"""Computes the power spectral density.
         
         The expression is given by Equation :math:numref:`gaussianpsd` 
         with the variance :math:`A\ge 0`, the position :math:`f_0\ge 0` and the standard-deviation :math:`\sigma>0`.
@@ -128,7 +110,7 @@ class Gaussian(PowerSpectralDensity):
 
     
 class OneBendPowerLaw(PowerSpectralDensity):
-    r"""Class for the one-bend power-law power spectral density.
+    r"""One-bend power-law power spectral density.
     
     .. math:: :label: onebendpowerlawpsd
 
@@ -147,7 +129,11 @@ class OneBendPowerLaw(PowerSpectralDensity):
     """
     
     expression = 'onebend-powerlaw'
+    """Expression of the power spectral density function."""
     parameters: ParametersModel    
+    """Parameters of the power spectral density function."""
+    analytical = False
+    """If True, the power spectral density function is analytical, otherwise it is not."""
 
     def __init__(self, parameters_values, free_parameters = [False, True,True,True]):     
         assert len(parameters_values) == 4 , f'The number of parameters for onebend-powerlaw must be 4, not {len(parameters_values)}'
@@ -158,7 +144,7 @@ class OneBendPowerLaw(PowerSpectralDensity):
         PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=names, free_parameters=free_parameters)
                                     
     def calculate(self,f):
-        r"""Computes the one-bend power-law model on an array of frequencies :math:`f`.
+        r"""Computes the power spectral density.        
         
         The expression is given by Equation :math:numref:`onebendpowerlawpsd`
         with the variance :math:`A\ge 0` and the scale :math:`\gamma>0`.
@@ -180,7 +166,7 @@ class OneBendPowerLaw(PowerSpectralDensity):
     
 
 class Matern32PSD(PowerSpectralDensity):
-    """Class for the power spectral density of the Matern 3/2 covariance function.
+    """Power spectral density of the Matern 3/2 covariance function.
     
     .. math:: :label: matern32psd 
     
@@ -200,20 +186,13 @@ class Matern32PSD(PowerSpectralDensity):
         Values of the parameters of the power spectral density function.
     free_parameters : :obj:`list` of :obj:`bool`, optional
         List of bool to indicate if the parameters are free or not. Default is `[True,True]`.
-        
-        
-    Attributes
-    ----------
-    parameters : :class:`~pioran.parameters.ParametersModel`
-        Parameters of the power spectral density function.
-        
-    Methods
-    -------
-    calculate(t)
-        Computes the power spectral density function on an array of frequencies :math:`f`.
     """
     parameters: ParametersModel
+    """Parameters of the power spectral density function."""
     expression = 'matern32psd'
+    """Expression of the power spectral density function."""
+    analytical = True
+    """If True, the power spectral density function is analytical, otherwise it is not."""
     
     def __init__(self, parameters_values, free_parameters = [True,True]):     
         assert len(parameters_values) == 2, f'The number of parameters for the Matern3/2 PSD must be 2, not {len(parameters_values)}'
@@ -222,7 +201,7 @@ class Matern32PSD(PowerSpectralDensity):
         PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=["amplitude",'scale'], free_parameters=free_parameters)
     
     def calculate(self,f) -> jax.Array:
-        r"""Computes the power spectral density of the Matern 3/2 covariance function on an array of frequencies :math:`f`.
+        r"""Computes the power spectral density.
         
         The expression is given by Equation :math:numref:`matern32psd`
         with the variance :math:`A\ge 0` and the scale :math:`\gamma>0`.

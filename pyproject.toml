@@ -23,8 +23,7 @@ blackjax = ["asdf","blackjax"]
 test = ["pioran[ultranest]",
         "pioran[blackjax]",
         "mpi4py","jax_finufft"]
-doc = ["sphinx",'numpydoc','sphinx_togglebutton','myst_nb','sphinx_copybutton',
-        'sphinxcontrib.tikz','furo',
-        'sphinx_design',"sphinx_codeautolink","sphinx_rtd_theme",
-        "sphinxcontrib-bibtex"]
+doc = ["sphinx",'numpydoc','sphinx_togglebutton','myst-nb','sphinx_copybutton',
+        'sphinxcontrib.tikz','furo','autoapi','sphinxcontrib-tikz',
+        'sphinx_design',"sphinx_codeautolink",]
 all = ["pioran[test]"]

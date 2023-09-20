@@ -15,17 +15,16 @@ import numpy as np
 from equinox import filter_jit
 
 from .acvf import CovarianceFunction
-from .carma_core import CARMAProcess
+from .carma.carma_core import CARMAProcess
 from .core import GaussianProcess
 from .plots import (diagnostics_psd_approx, plot_prior_predictive_PSD,
                     plot_priors_samples, residuals_quantiles,
                     violin_plots_psd_approx)
 from .psdtoacv import PSDToACV
-from .utils.gp_utils import tinygp_methods
-from .utils.inference_utils import progress_bar_factory, save_sampling_results
+
+from .utils import tinygp_methods,get_samples_psd, wrapper_psd_true_samples, progress_bar_factory, save_sampling_results
 from .utils.mcmc_visualisations import (from_samples_to_inference_data,
                                         plot_diagnostics_sampling)
-from .utils.psd_utils import get_samples_psd, wrapper_psd_true_samples
 
 os.environ['OMP_NUM_THREADS'] = '1'
 os.environ["XLA_FLAGS"] = f"--xla_force_host_platform_device_count={multiprocessing.cpu_count()}"
@@ -303,7 +302,7 @@ class Inference:
         
         if plot_prior_samples:
             fig,_ = plot_priors_samples(self.params_samples,self.process.model.parameters.free_names)
-            fig.savefig(f"{self.log_dir}/prior_samples.pdf")
+            fig.savefig(f"{self.plot_dir}/prior_samples.pdf")
             
         if plot_prior_predictive_distribution:
             
@@ -375,13 +374,13 @@ class Inference:
                                             ratio=ratio,
                                             f_min=self.process.model.f_min_obs,
                                             f_max=self.process.model.f_max_obs)
-            fig.savefig(f"{self.log_dir}/diagnostics_psd_approx.pdf")
+            fig.savefig(f"{self.plot_dir}/diagnostics_psd_approx.pdf")
             figs.append(fig)
         
         if plot_violins:     
             fig,_ = violin_plots_psd_approx(res=residuals,
                                             ratio=ratio)
-            fig.savefig(f"{self.log_dir}/violin_plots_psd_approx.pdf")
+            fig.savefig(f"{self.plot_dir}/violin_plots_psd_approx.pdf")
             figs.append(fig)
         
         if plot_quantiles:
@@ -390,7 +389,7 @@ class Inference:
                                         f=freqs,
                                         f_min=self.process.model.f_min_obs,
                                         f_max=self.process.model.f_max_obs)
-            fig.savefig(f"{self.log_dir}/quantiles_psd_approx.pdf")
+            fig.savefig(f"{self.plot_dir}/quantiles_psd_approx.pdf")
             figs.append(fig)
             
         return figs,residuals,ratio

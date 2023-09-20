@@ -14,7 +14,7 @@ from scipy.interpolate import interp1d
 
 from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity
-from .utils.gp_utils import EuclideanDistance
+from .utils import EuclideanDistance
 
 
 class Simulations: 
