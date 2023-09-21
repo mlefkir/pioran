@@ -2,7 +2,6 @@
 The sum and product of PSD are implemented with the ``+`` and ``*`` operators, respectively.
 """
 from copy import deepcopy
-from typing import Union
 
 import equinox as eqx
 import jax
@@ -11,7 +10,7 @@ from .parameters import ParametersModel
 
 
 class PowerSpectralDensity(eqx.Module):
-    """Represents a power density function function, inherited from the :obj:`equinox.Module` class.
+    """Represents a power density function function.
 
     Bridge between the parameters and the power spectral density function. All power spectral density functions
     inherit from this class.
@@ -40,7 +39,7 @@ class PowerSpectralDensity(eqx.Module):
 
     def __init__(
         self,
-        param_values: Union[ParametersModel, list[float]],
+        param_values: ParametersModel | list[float],
         param_names: list[str],
         free_parameters: list[bool],
     ):

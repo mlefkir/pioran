@@ -46,15 +46,15 @@ Overview
    * - :py:obj:`GaussianProcess <pioran.GaussianProcess>`
      - Gaussian Process Regression of univariate time series.
    * - :py:obj:`CovarianceFunction <pioran.CovarianceFunction>`
-     - Represents a covariance function model, inherited from :class:`equinox.Module`.
+     - Represents a covariance function model.
    * - :py:obj:`PowerSpectralDensity <pioran.PowerSpectralDensity>`
-     - Represents a power density function function, inherited from the :obj:`equinox.Module` class.
+     - Represents a power density function function.
    * - :py:obj:`PSDToACV <pioran.PSDToACV>`
      - Represents the tranformation of a power spectral density to an autocovariance function.
    * - :py:obj:`Inference <pioran.Inference>`
      - Class to infer the value of the (hyper)parameters of the Gaussian Process.
    * - :py:obj:`Simulations <pioran.Simulations>`
-     - Class to simulate time series from a given PSD or ACVF.
+     - Simulate time series from a given PSD or ACVF model.
    * - :py:obj:`Visualisations <pioran.Visualisations>`
      - Class for visualising the results after an inference run.
 
@@ -74,7 +74,7 @@ Overview
 Classes
 -------
 
-.. py:class:: GaussianProcess(function: Union[pioran.acvf_base.CovarianceFunction, pioran.psd_base.PowerSpectralDensity], observation_indexes: jax.Array, observation_values: jax.Array, observation_errors: Union[jax.Array, None] = None, S_low: float = 10, S_high: float = 10, method: str = 'FFT', use_tinygp: bool = False, n_components: int = 0, estimate_variance: bool = True, estimate_mean: bool = True, scale_errors: bool = True, log_transform: bool = False, nb_prediction_points: int = 0, prediction_indexes: Union[jax.Array, None] = None)
+.. py:class:: GaussianProcess(function: pioran.acvf_base.CovarianceFunction, PowerSpectralDensity, observation_indexes: jax.Array, observation_values: jax.Array, observation_errors: jax.Array | None = None, S_low: float = 10, S_high: float = 10, method: str = 'FFT', use_tinygp: bool = False, n_components: int = 0, estimate_variance: bool = True, estimate_mean: bool = True, scale_errors: bool = True, log_transform: bool = False, nb_prediction_points: int = 0, prediction_indexes: jax.Array | None = None)
 
    Bases: :py:obj:`equinox.Module`
 
@@ -216,7 +216,7 @@ Classes
    .. rubric:: Members
 
    .. py:attribute:: model
-      :type: Union[pioran.acvf_base.CovarianceFunction, pioran.psdtoacv.PSDToACV]
+      :type: pioran.acvf_base.CovarianceFunction | pioran.psdtoacv.PSDToACV
 
       
       Model associated to the Gaussian Process, can be a covariance function or a power spectral density to autocovariance function converter.
@@ -484,7 +484,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: get_cov(xt: jax.Array, xp: jax.Array, errors: Union[jax.Array, None] = None) -> jax.Array
+   .. py:method:: get_cov(xt: jax.Array, xp: jax.Array, errors: jax.Array | None = None) -> jax.Array
 
       
       Compute the covariance matrix between two arrays.
@@ -564,7 +564,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: compute_predictive_distribution(log_transform: Union[bool, None] = None, prediction_indexes: Union[jax.Array, None] = None)
+   .. py:method:: compute_predictive_distribution(log_transform: bool | None = None, prediction_indexes: jax.Array | None = None)
 
       
       Compute the predictive mean and the predictive covariance of the GP.
@@ -815,12 +815,12 @@ Classes
 
 
 
-.. py:class:: CovarianceFunction(param_values: Union[pioran.parameters.ParametersModel, list[float]], param_names: list[str], free_parameters: list[bool])
+.. py:class:: CovarianceFunction(param_values: pioran.parameters.ParametersModel | list[float], param_names: list[str], free_parameters: list[bool])
 
    Bases: :py:obj:`equinox.Module`
 
    
-   Represents a covariance function model, inherited from :class:`equinox.Module`.
+   Represents a covariance function model.
 
    Bridge between the parameters and the covariance function model. All covariance functions
    inherit from this class.
@@ -1091,12 +1091,12 @@ Classes
 
 
 
-.. py:class:: PowerSpectralDensity(param_values: Union[pioran.parameters.ParametersModel, list[float]], param_names: list[str], free_parameters: list[bool])
+.. py:class:: PowerSpectralDensity(param_values: pioran.parameters.ParametersModel | list[float], param_names: list[str], free_parameters: list[bool])
 
    Bases: :py:obj:`equinox.Module`
 
    
-   Represents a power density function function, inherited from the :obj:`equinox.Module` class.
+   Represents a power density function function.
 
    Bridge between the parameters and the power spectral density function. All power spectral density functions
    inherit from this class.
@@ -1757,7 +1757,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: n_freq_grid
-      :type: Union[int, None]
+      :type: int | None
 
       
       Number of points in the frequency grid.
@@ -1781,7 +1781,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: frequencies
-      :type: Union[jax.Array, None]
+      :type: jax.Array | None
 
       
       Frequency grid.
@@ -1880,7 +1880,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: spectral_points
-      :type: Union[jax.Array, None]
+      :type: jax.Array | None
 
       
       Frequencies of the SHO kernels.
@@ -1904,7 +1904,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: spectral_matrix
-      :type: Union[jax.Array, None]
+      :type: jax.Array | None
 
       
       Matrix of the SHO kernels.
@@ -2277,67 +2277,82 @@ Classes
 
 
 
-.. py:class:: Inference(Process: Union[pioran.core.GaussianProcess, pioran.carma.carma_core.CARMAProcess], priors, method, n_samples_checks=1000, seed_check=0, run_checks=True, log_dir='log_dir')
+.. py:class:: Inference(Process: pioran.core.GaussianProcess | pioran.carma.carma_core.CARMAProcess, priors, method, n_samples_checks=1000, seed_check=0, run_checks=True, log_dir='log_dir')
 
    
    Class to infer the value of the (hyper)parameters of the Gaussian Process.
 
    Various methods to sample the posterior probability distribution of the (hyper)parameters of the Gaussian Process are implemented
-   as wrappers around the inference packages blackjax and ultranest.
+   as wrappers around the inference packages `blackjax` and `ultranest`.
 
+   :Parameters:
 
+       **Process** : :class:`~pioran.core.GaussianProcess`
+           Process object.
 
-
-
-
-
-
-
-
-
-
-
-   :Attributes:
-
-       **process** : :class:`~pioran.core.GaussianProcess`
-           Gaussian Process object.
-
-       **priors: :obj:`function`**
+       **priors** : :obj:`function`
            Function to define the priors for the (hyper)parameters.
 
-       **method** : :obj:`str`
-           - "ultranest": nested sampling via ultranest.
-           - "blackjax_nuts": NUTS sampling via blackjax.
+       **method** : :obj:`str`, optional
+           "NS": using nested sampling via ultranest
 
-       **results** : :obj:`dict`
-           Results of the inference.
+       **n_samples_checks** : :obj:`int`, optional
+           Number of samples to take from the prior distribution, by default 1000
 
-       **log_dir** : :obj:`str`
-           Directory to save the results of the inference.
+       **seed_check** : :obj:`int`, optional
+           Seed for the random number generator, by default 0
 
-       **n_pars** : :obj:`int`
-           Number of free (hyper)parameters in the model to sample.
+       **run_checks** : :obj:`bool`, optional
+           Run the prior predictive checks, by default True
 
-       **use_MPI** : :obj:`bool`
-           Use MPI to parallelize the inference.
-
-   .. rubric:: Methods
+       **log_dir** : :obj:`str`, optional
+           Directory to save the results of the inference, by default 'log_dir'
 
 
 
-   ===========================================================================================================================================  ==========
-                                                                                                               **save_config(save_file=True)**  Save the configuration of the inference.  
-   **prior_predictive_checks(n_samples_checks,seed_check,n_frequencies=1000,plot_prior_samples=True,plot_prior_predictive_distribution=True)**  Check the prior predictive distribution.  
-           **check_approximation(n_samples_checks,seed_check,n_frequencies=1000,plot_diagnostics=True,plot_violins=True,plot_quantiles=True)**  Check the approximation of the PSD with the kernel decomposition.  
-             **run(verbose=True, user_log_likelihood=None, seed=0, n_chains=1, n_samples=1_000, n_warmup_steps=1_000, use_stepsampler=False)**  Estimate the (hyper)parameters of the Gaussian Process.  
-              **blackjax_NUTS(rng_key, initial_position, log_likelihood, log_prior, num_warmup_steps=1_000, num_samples=1_000, num_chains=1)**  Sample the posterior distribution using the NUTS sampler from blackjax.  
-                 **nested_sampling(priors, log_likelihood, verbose=True, use_stepsampler=False, resume=True, run_kwargs={}, slice_steps=100)**  Sample the posterior distribution using nested sampling via ultranest.  
-   ===========================================================================================================================================  ==========
+
+
+   :Raises:
+
+       ImportError
+           If the required packages are not installed.
+
+       ValueError
+           If the saved config file is different from the current config, or if the method is not valid.
+
+       TypeError
+           If the method is not a string.
+
+
+
+
+
+
+
+
 
    ..
        !! processed by numpydoc !!
 
    .. rubric:: Overview
+
+   .. list-table:: Attributes
+      :header-rows: 0
+      :widths: auto
+      :class: summarytable
+
+      * - :py:obj:`process <pioran.Inference.process>`
+        - Process object.
+      * - :py:obj:`n_pars <pioran.Inference.n_pars>`
+        - Number of (hyper)parameters.
+      * - :py:obj:`priors <pioran.Inference.priors>`
+        - Function to define the priors for the (hyper)parameters.
+      * - :py:obj:`log_dir <pioran.Inference.log_dir>`
+        - Directory to save the results of the inference.
+      * - :py:obj:`plot_dir <pioran.Inference.plot_dir>`
+        - Directory to save the plots of the inference.
+      * - :py:obj:`method <pioran.Inference.method>`
+        - Method to use for the inference.
 
 
    .. list-table:: Methods
@@ -2361,12 +2376,156 @@ Classes
 
    .. rubric:: Members
 
+   .. py:attribute:: process
+      :type: pioran.core.GaussianProcess | pioran.carma.carma_core.CARMAProcess
+
+      
+      Process object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: n_pars
+      :type: int
+
+      
+      Number of (hyper)parameters.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: priors
+      :type: callable
+
+      
+      Function to define the priors for the (hyper)parameters.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: log_dir
+      :type: str
+
+      
+      Directory to save the results of the inference.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: plot_dir
+      :type: str
+
+      
+      Directory to save the plots of the inference.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: method
+      :type: str
+
+      
+      Method to use for the inference.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
    .. py:method:: save_config(save_file=True)
 
       
       Save the configuration of the inference.
 
-      Save the configuration of the inference, process and model in a json file.        
+      Save the configuration of the inference, process and model in a json file.
 
       :Parameters:
 
@@ -2399,7 +2558,7 @@ Classes
       Check the prior predictive distribution.
 
       Get samples from the prior distribution and plot them, and calculate the prior predictive
-      distribution of the model and plot it. 
+      distribution of the model and plot it.
 
       :Parameters:
 
@@ -2436,7 +2595,7 @@ Classes
       
       Check the approximation of the PSD with the kernel decomposition.
 
-      This method will take random samples from the prior distribution and compare the PSD obtained 
+      This method will take random samples from the prior distribution and compare the PSD obtained
       with the SHO decomposition with the true PSD.
 
       :Parameters:
@@ -2471,7 +2630,7 @@ Classes
               Residuals of the PSD approximation.
 
           **ratio** : :obj:`jax.Array`
-              Ratio of the PSD approximation. 
+              Ratio of the PSD approximation.
 
 
 
@@ -2488,7 +2647,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: run(verbose=True, user_log_likelihood=None, seed: int = 0, n_chains: int = 1, n_samples: int = 1000, n_warmup_steps: int = 1000, use_stepsampler: bool = False)
+   .. py:method:: run(verbose: bool = True, user_log_likelihood=None, seed: int = 0, n_chains: int = 1, n_samples: int = 1000, n_warmup_steps: int = 1000, use_stepsampler: bool = False)
 
       
       Estimate the (hyper)parameters of the Gaussian Process.
@@ -2543,7 +2702,7 @@ Classes
       
       Sample the posterior distribution using the NUTS sampler from blackjax.
 
-      Wrapper around the NUTS sampler from blackjax to sample the posterior distribution.        
+      Wrapper around the NUTS sampler from blackjax to sample the posterior distribution.
       This function also performs the warmup via window adaptation.
 
       :Parameters:
@@ -2597,7 +2756,7 @@ Classes
       
       Sample the posterior distribution of the (hyper)parameters of the Gaussian Process with nested sampling via ultranest.
 
-      Perform nested sampling to sample the (hyper)parameters of the Gaussian Process.    
+      Perform nested sampling to sample the (hyper)parameters of the Gaussian Process.
 
       :Parameters:
 
@@ -2614,7 +2773,7 @@ Classes
               Use the slice sampler as step sampler, by default False
 
           **resume** : :obj:`bool`, optional
-              Resume the sampling from the previous run, by default True       
+              Resume the sampling from the previous run, by default True
 
           **run_kwargs** : :obj:`dict`, optional
               Dictionary of arguments for ReactiveNestedSampler.run() see https://johannesbuchner.github.io/UltraNest/ultranest.html#module-ultranest.integrator
@@ -2625,7 +2784,7 @@ Classes
       :Returns:
 
           results: dict
-              Dictionary of results from the nested sampling. 
+              Dictionary of results from the nested sampling.
 
 
 
@@ -2644,10 +2803,10 @@ Classes
 
 
 
-.. py:class:: Simulations(T, dt, model, N=None, S_low=None, S_high=None)
+.. py:class:: Simulations(T, dt, model: pioran.psd_base.PowerSpectralDensity | pioran.acvf_base.CovarianceFunction, N=None, S_low=None, S_high=None)
 
    
-   Class to simulate time series from a given PSD or ACVF.
+   Simulate time series from a given PSD or ACVF model.
 
 
    :Parameters:
@@ -2684,79 +2843,52 @@ Classes
 
 
 
-   :Attributes:
 
-       **duration** : :obj:`float`
-           duration of the time series.
-
-       **sampling_period** : :obj:`float`
-           sampling period of the time series.
-
-       **n_time** : :obj:`int`
-           number of time indexes.
-
-       **t** : :obj:`jax.Array`
-           time :obj:`jnp.array` of the time series.
-
-       **f_max_obs** : :obj:`float`
-           maximum frequency of the observed frequency grid.
-
-       **f_min_obs** : :obj:`float`
-           minimum frequency of the observed frequency grid.
-
-       **f0** : :obj:`float`
-           minimum frequency of the total frequency grid.
-
-       **fN** : :obj:`float`
-           maximum frequency of the total frequency grid.
-
-       **n_freq_grid** : :obj:`int`
-           number of frequency indexes.
-
-       **frequencies** : :obj:`jax.Array`
-           frequency array of the total frequency grid.
-
-       **tau_max** : :obj:`float`
-           maximum lag of the autocovariance function.
-
-       **dtau** : :obj:`float`
-           sampling period of the autocovariance function.
-
-       **tau** : :obj:`jax.Array`
-           lag array of the autocovariance function.
-
-       **psd** : :obj:`jax.Array`
-           power spectral density of the time series.
-
-       **acvf** : :obj:`jax.Array`
-           autocovariance function of the time series.
-
-       **triang** : :obj:`jax.Array`
-           triangular matrix used to generate the time series with the Cholesky decomposition.
-
-       **keys** : dict
-           dictionary of the keys used to generate the random numbers. See :func:`~pioran.simulate.Simulations.generate_keys` for more details.
-
-   .. rubric:: Methods
-
-
-
-   =============================================================================================================================================  ==========
-                                                          **batch_simulations(self,seed:int,sample_size:int,filename:str,**simulations_kwargs)**  Simulate a batch of time series.  
-                                                                                                                         **generate_keys(seed)**  Generate the keys for the random numbers.  
-                                                                                                                  **plot_psd(figsize,filename)**  Plot the PSD of the time series.  
-                                                                                                                 **plot_acvf(figsize,filename)**  Plot the ACVF of the time series.  
-                                                                                                                                 **GP_method()**  Generate the time series with the GP method.  
-                                                                                                                      **timmer_Koenig_method()**  Generate the time series with the Timmer-Koenig method.  
-                                                                                          **sample_time_series(t,y,M,irregular_sampling=False)**  Sample the timeseries.  
-                                                                                                            **extract_subset_timeseries(t,y,M)**  Extract a subset of the time series.  
-   **simulate(mean=None,variance=None,method='GP',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs)**  Simulate a time series.  
-   =============================================================================================================================================  ==========
 
    ..
        !! processed by numpydoc !!
 
    .. rubric:: Overview
+
+   .. list-table:: Attributes
+      :header-rows: 0
+      :widths: auto
+      :class: summarytable
+
+      * - :py:obj:`duration <pioran.Simulations.duration>`
+        - duration of the time series.
+      * - :py:obj:`sampling_period <pioran.Simulations.sampling_period>`
+        - sampling period of the time series.
+      * - :py:obj:`n_time <pioran.Simulations.n_time>`
+        - number of time indexes.
+      * - :py:obj:`t <pioran.Simulations.t>`
+        - time :obj:`jax.Array` of the time series.
+      * - :py:obj:`f_max_obs <pioran.Simulations.f_max_obs>`
+        - maximum frequency of the observed frequency grid.
+      * - :py:obj:`f_min_obs <pioran.Simulations.f_min_obs>`
+        - minimum frequency of the observed frequency grid.
+      * - :py:obj:`f0 <pioran.Simulations.f0>`
+        - minimum frequency of the total frequency grid.
+      * - :py:obj:`fN <pioran.Simulations.fN>`
+        - maximum frequency of the total frequency grid.
+      * - :py:obj:`n_freq_grid <pioran.Simulations.n_freq_grid>`
+        - number of frequency indexes.
+      * - :py:obj:`frequencies <pioran.Simulations.frequencies>`
+        - frequency array of the total frequency grid.
+      * - :py:obj:`tau_max <pioran.Simulations.tau_max>`
+        - maximum lag of the autocovariance function.
+      * - :py:obj:`dtau <pioran.Simulations.dtau>`
+        - sampling period of the autocovariance function.
+      * - :py:obj:`tau <pioran.Simulations.tau>`
+        - lag array of the autocovariance function.
+      * - :py:obj:`psd <pioran.Simulations.psd>`
+        - power spectral density of the time series.
+      * - :py:obj:`acvf <pioran.Simulations.acvf>`
+        - autocovariance function of the time series.
+      * - :py:obj:`triang <pioran.Simulations.triang>`
+        - triangular matrix used to generate the time series with the Cholesky decomposition.
+      * - :py:obj:`keys <pioran.Simulations.keys>`
+        - dictionary of the keys used to generate the random numbers. See :func:`~pioran.simulate.Simulations.generate_keys` for more details.
 
 
    .. list-table:: Methods
@@ -2790,7 +2922,415 @@ Classes
 
    .. rubric:: Members
 
-   .. py:method:: generate_keys(seed=0)
+   .. py:attribute:: duration
+      :type: float
+
+      
+      duration of the time series.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: sampling_period
+      :type: float
+
+      
+      sampling period of the time series.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: n_time
+      :type: int
+
+      
+      number of time indexes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: t
+      :type: jax.Array
+
+      
+      time :obj:`jax.Array` of the time series.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: f_max_obs
+      :type: float
+
+      
+      maximum frequency of the observed frequency grid.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: f_min_obs
+      :type: float
+
+      
+      minimum frequency of the observed frequency grid.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: f0
+      :type: float
+
+      
+      minimum frequency of the total frequency grid.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: fN
+      :type: float
+
+      
+      maximum frequency of the total frequency grid.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: n_freq_grid
+      :type: int
+
+      
+      number of frequency indexes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: frequencies
+      :type: jax.Array
+
+      
+      frequency array of the total frequency grid.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: tau_max
+      :type: float
+
+      
+      maximum lag of the autocovariance function.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: dtau
+      :type: float
+
+      
+      sampling period of the autocovariance function.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: tau
+      :type: jax.Array
+
+      
+      lag array of the autocovariance function.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: psd
+      :type: jax.Array
+
+      
+      power spectral density of the time series.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: acvf
+      :type: jax.Array
+
+      
+      autocovariance function of the time series.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: triang
+      :type: bool
+
+      
+      triangular matrix used to generate the time series with the Cholesky decomposition.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: keys
+      :type: dict
+
+      
+      dictionary of the keys used to generate the random numbers. See :func:`~pioran.simulate.Simulations.generate_keys` for more details.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: generate_keys(seed: int = 0) -> None
 
       
       Generate the keys to generate the random numbers.
@@ -2848,11 +3388,10 @@ Classes
 
       :Returns:
 
-          fig: :obj:`matplotlib.figure.Figure`
-              Figure of the plot
-
-          ax: :obj:`matplotlib.axes.Axes`
-              Axes of the plot
+          :obj:`matplotlib.figure.Figure`
+                 Figure of the plot
+              :obj:`matplotlib.axes.Axes`
+                 Axes of the plot
 
 
 
@@ -2895,10 +3434,10 @@ Classes
 
       :Returns:
 
-          fig: :obj:`matplotlib.figure.Figure`
+          :obj:`matplotlib.figure.Figure`
               Figure of the plot
 
-          ax: :obj:`matplotlib.axes.Axes`
+          :obj:`matplotlib.axes.Axes`
               Axes of the plot
 
 
@@ -2916,12 +3455,12 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: GP_method(t_test, interpolation='cubic')
+   .. py:method:: GP_method(t_test: jax.Array, interpolation='cubic') -> tuple[jax.Array, jax.Array]
 
       
       Generate a time series using the GP method.
 
-      If the ACVF is not already calculated, it is calculated from the PSD 
+      If the ACVF is not already calculated, it is calculated from the PSD
       using the inverse Fourier transform.
 
       :Parameters:
@@ -2959,7 +3498,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: simulate(mean=None, method='GP', irregular_sampling=False, randomise_fluxes=True, errors='gauss', seed=0, filename=None, exponentiate_ts=False, **kwargs)
+   .. py:method:: simulate(mean=None, method='GP', irregular_sampling=False, randomise_fluxes=True, errors='gauss', seed=0, filename=None, exponentiate_ts=False, **kwargs) -> tuple[jax.Array, jax.Array, jax.Array]
 
       
       Method to simulate time series using either the GP method or the TK method.
@@ -2979,7 +3518,7 @@ Classes
               Mean of the time series, if None the mean will be set to -2 min(ts)
 
           **method** : :obj:`str`, optional
-              method to simulate the time series, by default 'GP' 
+              method to simulate the time series, by default 'GP'
               can be 'TK' which uses Timmer and Koening method
 
           **randomise_fluxes** : :obj:`bool`, optional
@@ -3043,12 +3582,12 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: extract_subset_timeseries(t, y, M)
+   .. py:method:: extract_subset_timeseries(t: jax.Array, y: jax.Array, M: int) -> tuple[jax.Array, jax.Array]
 
       
       Select a random subset of points from an input time series.
 
-      The input time series is regularly sampled of size N. 
+      The input time series is regularly sampled of size N.
       The output time series is of size M with the same sampling rate as the input time series.
 
       :Parameters:
@@ -3085,7 +3624,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: sample_timeseries(t, y, M, irregular_sampling=False)
+   .. py:method:: sample_timeseries(t: jax.Array, y: jax.Array, M: int, irregular_sampling: bool = False)
 
       
       Extract a random subset of points from the time series.
@@ -3131,13 +3670,13 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: timmer_Koenig_method()
+   .. py:method:: timmer_Koenig_method() -> tuple[jax.Array, jax.Array]
 
       
       Generate a time series using the Timmer-Konig method.
 
       Use the Timmer-Konig method to generate a time series with a given power spectral density
-      stored in the attribute psd. 
+      stored in the attribute psd.
 
       Assuming a power-law shaped PSD, the method is as follows:
 
@@ -3177,7 +3716,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: split_longtimeseries(t, ts, n_slices)
+   .. py:method:: split_longtimeseries(t: jax.Array, ts: jax.Array, n_slices: int) -> tuple[list, list]
 
       
       Split a long time series into shorter time series.
@@ -3218,7 +3757,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: resample_longtimeseries(t_slices, ts_slices)
+   .. py:method:: resample_longtimeseries(t_slices: list, ts_slices: list) -> tuple[list, list]
 
       
       Resample the time series to have a regular sampling period with n_time points.
@@ -3255,7 +3794,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: simulate_longtimeseries(mean=None, randomise_fluxes=True, errors='gauss', seed=0)
+   .. py:method:: simulate_longtimeseries(mean: float | None = None, randomise_fluxes: bool = True, errors: str = 'gauss', seed: int = 0) -> tuple[list, list, list]
 
       
       Method to simulate several long time series using the Timmer-Koenig method.
@@ -3279,13 +3818,13 @@ Classes
 
       :Returns:
 
-          **t_segments** : :obj:`list`
+          :obj:`list`
               A list of the time indexes of the segments.
 
-          **ts_segments** : :obj:`list`
+          :obj:`list`
               A list of the values of the segments.
 
-          **ts_errors** : :obj:`list`
+          :obj:`list`
               A list of the errors of the segments.
 
 
@@ -3309,7 +3848,7 @@ Classes
 
 
 
-.. py:class:: Visualisations(process: Union[pioran.core.GaussianProcess, pioran.carma.carma_core.CARMAProcess], filename: str, n_frequencies: int = 2500)
+.. py:class:: Visualisations(process: pioran.core.GaussianProcess | pioran.carma.carma_core.CARMAProcess, filename: str, n_frequencies: int = 2500)
 
    
    Class for visualising the results after an inference run.
@@ -3389,7 +3928,7 @@ Classes
    .. rubric:: Members
 
    .. py:attribute:: process
-      :type: Union[pioran.core.GaussianProcess, pioran.carma.carma_core.CARMAProcess]
+      :type: pioran.core.GaussianProcess | pioran.carma.carma_core.CARMAProcess
 
       
       The process to be visualised.
@@ -3676,7 +4215,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: plot_timeseries_diagnostics(prediction_indexes: Union[jax.Array, None] = None, **kwargs) -> None
+   .. py:method:: plot_timeseries_diagnostics(prediction_indexes: jax.Array | None = None, **kwargs) -> None
 
       
       Plot the timeseries diagnostics.

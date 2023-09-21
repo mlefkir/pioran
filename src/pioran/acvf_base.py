@@ -2,7 +2,6 @@
 The sum and product of covariance functions are implemented with the ``+`` and ``*`` operators, respectively.
 """
 from copy import deepcopy
-from typing import Union
 
 import equinox as eqx
 import jax
@@ -12,7 +11,7 @@ from .utils import EuclideanDistance
 
 
 class CovarianceFunction(eqx.Module):
-    """Represents a covariance function model, inherited from :class:`equinox.Module`.
+    """Represents a covariance function model.
 
     Bridge between the parameters and the covariance function model. All covariance functions
     inherit from this class.
@@ -39,7 +38,7 @@ class CovarianceFunction(eqx.Module):
 
     def __init__(
         self,
-        param_values: Union[ParametersModel, list[float]],
+        param_values: ParametersModel | list[float],
         param_names: list[str],
         free_parameters: list[bool],
     ):

@@ -29,7 +29,7 @@ Overview
 Classes
 -------
 
-.. py:class:: GaussianProcess(function: Union[pioran.acvf_base.CovarianceFunction, pioran.psd_base.PowerSpectralDensity], observation_indexes: jax.Array, observation_values: jax.Array, observation_errors: Union[jax.Array, None] = None, S_low: float = 10, S_high: float = 10, method: str = 'FFT', use_tinygp: bool = False, n_components: int = 0, estimate_variance: bool = True, estimate_mean: bool = True, scale_errors: bool = True, log_transform: bool = False, nb_prediction_points: int = 0, prediction_indexes: Union[jax.Array, None] = None)
+.. py:class:: GaussianProcess(function: pioran.acvf_base.CovarianceFunction, PowerSpectralDensity, observation_indexes: jax.Array, observation_values: jax.Array, observation_errors: jax.Array | None = None, S_low: float = 10, S_high: float = 10, method: str = 'FFT', use_tinygp: bool = False, n_components: int = 0, estimate_variance: bool = True, estimate_mean: bool = True, scale_errors: bool = True, log_transform: bool = False, nb_prediction_points: int = 0, prediction_indexes: jax.Array | None = None)
 
    Bases: :py:obj:`equinox.Module`
 
@@ -171,7 +171,7 @@ Classes
    .. rubric:: Members
 
    .. py:attribute:: model
-      :type: Union[pioran.acvf_base.CovarianceFunction, pioran.psdtoacv.PSDToACV]
+      :type: pioran.acvf_base.CovarianceFunction | pioran.psdtoacv.PSDToACV
 
       
       Model associated to the Gaussian Process, can be a covariance function or a power spectral density to autocovariance function converter.
@@ -439,7 +439,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: get_cov(xt: jax.Array, xp: jax.Array, errors: Union[jax.Array, None] = None) -> jax.Array
+   .. py:method:: get_cov(xt: jax.Array, xp: jax.Array, errors: jax.Array | None = None) -> jax.Array
 
       
       Compute the covariance matrix between two arrays.
@@ -519,7 +519,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: compute_predictive_distribution(log_transform: Union[bool, None] = None, prediction_indexes: Union[jax.Array, None] = None)
+   .. py:method:: compute_predictive_distribution(log_transform: bool | None = None, prediction_indexes: jax.Array | None = None)
 
       
       Compute the predictive mean and the predictive covariance of the GP.

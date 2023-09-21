@@ -69,7 +69,7 @@ Functions
            Values of the prediction.
 
        **cov_pred** : :obj:`numpy.ndarray`
-           Covariance matrix of the prediction.    
+           Covariance matrix of the prediction.
 
        **filename** : :obj:`str`
            Name of the file to save the figure.
@@ -187,8 +187,8 @@ Functions
    
    Plot the posterior predictive Autocorrelation function of the process.
 
-   This function will also compute the interpolated cross-correlation function using the 
-   code from https://bitbucket.org/cgrier/python_ccf_code/src/master/   
+   This function will also compute the interpolated cross-correlation function using the
+   code from https://bitbucket.org/cgrier/python_ccf_code/src/master/
 
    :Parameters:
 
@@ -264,7 +264,7 @@ Functions
            Time series values.
 
        **yerr** : :obj:`numpy.ndarray`
-           Time series errors.  
+           Time series errors.
 
        **posterior_PSD_approx** : :obj:`numpy.ndarray`, optional
            Array of PSDs posterior samples for the approximation, by default None
@@ -456,7 +456,7 @@ Functions
            Figure object.
 
        :obj:`matplotlib.axes.Axes`
-           Axes object.    
+           Axes object.
 
 
 

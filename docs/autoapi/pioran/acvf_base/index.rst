@@ -22,7 +22,7 @@ Overview
    :class: summarytable
 
    * - :py:obj:`CovarianceFunction <pioran.acvf_base.CovarianceFunction>`
-     - Represents a covariance function model, inherited from :class:`equinox.Module`.
+     - Represents a covariance function model.
    * - :py:obj:`ProductCovarianceFunction <pioran.acvf_base.ProductCovarianceFunction>`
      - Represents the product of two covariance functions.
    * - :py:obj:`SumCovarianceFunction <pioran.acvf_base.SumCovarianceFunction>`
@@ -34,12 +34,12 @@ Overview
 Classes
 -------
 
-.. py:class:: CovarianceFunction(param_values: Union[pioran.parameters.ParametersModel, list[float]], param_names: list[str], free_parameters: list[bool])
+.. py:class:: CovarianceFunction(param_values: pioran.parameters.ParametersModel | list[float], param_names: list[str], free_parameters: list[bool])
 
    Bases: :py:obj:`equinox.Module`
 
    
-   Represents a covariance function model, inherited from :class:`equinox.Module`.
+   Represents a covariance function model.
 
    Bridge between the parameters and the covariance function model. All covariance functions
    inherit from this class.

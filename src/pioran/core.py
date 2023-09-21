@@ -1,6 +1,4 @@
 """Gaussian process regression for time series analysis."""
-from typing import Union
-
 import equinox as eqx
 import jax
 import jax.numpy as jnp
@@ -59,7 +57,7 @@ class GaussianProcess(eqx.Module):
     prediction_indexes : :obj:`jax.Array`, optional
         indexes of the prediction data, by default linspace(min(observation_indexes),max(observation_indexes),nb_prediction_points)
     """
-    model: Union[CovarianceFunction, PSDToACV]
+    model: CovarianceFunction | PSDToACV
     """Model associated to the Gaussian Process, can be a covariance function or a power spectral density to autocovariance function converter."""
     observation_indexes: jax.Array
     """Indexes of the observed data, in this case it is the time."""
@@ -84,10 +82,10 @@ class GaussianProcess(eqx.Module):
 
     def __init__(
         self,
-        function: Union[CovarianceFunction, PowerSpectralDensity],
+        function: CovarianceFunction | PowerSpectralDensity,
         observation_indexes: jax.Array,
         observation_values: jax.Array,
-        observation_errors: Union[jax.Array, None] = None,
+        observation_errors: jax.Array | None = None,
         S_low: float = 10,
         S_high: float = 10,
         method: str = "FFT",
@@ -98,7 +96,7 @@ class GaussianProcess(eqx.Module):
         scale_errors: bool = True,
         log_transform: bool = False,
         nb_prediction_points: int = 0,
-        prediction_indexes: Union[jax.Array, None] = None,
+        prediction_indexes: jax.Array | None = None,
     ) -> None:
         """Constructor method for the GaussianProcess class."""
 
@@ -230,7 +228,7 @@ class GaussianProcess(eqx.Module):
             else reshape_array(prediction_indexes)
         )
 
-    def get_cov(self, xt:jax.Array, xp:jax.Array, errors:Union[jax.Array,None]=None) -> jax.Array:
+    def get_cov(self, xt:jax.Array, xp:jax.Array, errors: jax.Array|None =None) -> jax.Array:
         r"""Compute the covariance matrix between two arrays.
 
         To compute the covariance matrix, this function calls the get_cov_matrix method of the model.
@@ -320,7 +318,7 @@ class GaussianProcess(eqx.Module):
         return Cov_xx, Cov_inv, alpha
 
     def compute_predictive_distribution(
-        self, log_transform:Union[bool,None]=None, prediction_indexes:Union[jax.Array,None]=None
+        self, log_transform:bool |None =None, prediction_indexes: jax.Array | None=None
     ):
         r"""Compute the predictive mean and the predictive covariance of the GP.
 

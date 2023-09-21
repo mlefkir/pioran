@@ -1,6 +1,5 @@
 import os
 import sys
-from typing import Union
 
 import jax
 import jax.numpy as jnp
@@ -38,7 +37,7 @@ class Visualisations:
 
     """
 
-    process: Union[GaussianProcess, CARMAProcess]
+    process: GaussianProcess | CARMAProcess
     """The process to be visualised."""
     x: jax.Array
     """The observation times."""
@@ -65,7 +64,7 @@ class Visualisations:
 
     def __init__(
         self,
-        process: Union[GaussianProcess, CARMAProcess],
+        process: GaussianProcess | CARMAProcess,
         filename: str,
         n_frequencies: int = 2500,
     ) -> None:
@@ -84,7 +83,7 @@ class Visualisations:
         self.tau = jnp.linspace(0, self.x[-1], 1000)
         self.filename_prefix = filename
 
-    def plot_timeseries_diagnostics(self, prediction_indexes:Union[jax.Array,None]=None, **kwargs) -> None:
+    def plot_timeseries_diagnostics(self, prediction_indexes: jax.Array | None =None, **kwargs) -> None:
         """Plot the timeseries diagnostics.
 
         This function will call the :func:`plot_prediction` and :func:`plot_residuals` functions to

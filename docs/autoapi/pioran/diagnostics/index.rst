@@ -22,7 +22,7 @@ Overview
 Classes
 -------
 
-.. py:class:: Visualisations(process: Union[pioran.core.GaussianProcess, pioran.carma.carma_core.CARMAProcess], filename: str, n_frequencies: int = 2500)
+.. py:class:: Visualisations(process: pioran.core.GaussianProcess | pioran.carma.carma_core.CARMAProcess, filename: str, n_frequencies: int = 2500)
 
    
    Class for visualising the results after an inference run.
@@ -102,7 +102,7 @@ Classes
    .. rubric:: Members
 
    .. py:attribute:: process
-      :type: Union[pioran.core.GaussianProcess, pioran.carma.carma_core.CARMAProcess]
+      :type: pioran.core.GaussianProcess | pioran.carma.carma_core.CARMAProcess
 
       
       The process to be visualised.
@@ -389,7 +389,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: plot_timeseries_diagnostics(prediction_indexes: Union[jax.Array, None] = None, **kwargs) -> None
+   .. py:method:: plot_timeseries_diagnostics(prediction_indexes: jax.Array | None = None, **kwargs) -> None
 
       
       Plot the timeseries diagnostics.

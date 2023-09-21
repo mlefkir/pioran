@@ -443,7 +443,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: n_freq_grid
-      :type: Union[int, None]
+      :type: int | None
 
       
       Number of points in the frequency grid.
@@ -467,7 +467,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: frequencies
-      :type: Union[jax.Array, None]
+      :type: jax.Array | None
 
       
       Frequency grid.
@@ -566,7 +566,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: spectral_points
-      :type: Union[jax.Array, None]
+      :type: jax.Array | None
 
       
       Frequencies of the SHO kernels.
@@ -590,7 +590,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: spectral_matrix
-      :type: Union[jax.Array, None]
+      :type: jax.Array | None
 
       
       Matrix of the SHO kernels.

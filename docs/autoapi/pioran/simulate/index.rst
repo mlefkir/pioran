@@ -6,7 +6,7 @@ simulate
 
 .. autoapi-nested-parse::
 
-   Generic class and functions to generate fake time series.
+   Generate time series from a given PSD or ACVF model.
 
    ..
        !! processed by numpydoc !!
@@ -21,7 +21,7 @@ Overview
    :class: summarytable
 
    * - :py:obj:`Simulations <pioran.simulate.Simulations>`
-     - Class to simulate time series from a given PSD or ACVF.
+     - Simulate time series from a given PSD or ACVF model.
 
 
 
@@ -29,10 +29,10 @@ Overview
 Classes
 -------
 
-.. py:class:: Simulations(T, dt, model, N=None, S_low=None, S_high=None)
+.. py:class:: Simulations(T, dt, model: pioran.psd_base.PowerSpectralDensity | pioran.acvf_base.CovarianceFunction, N=None, S_low=None, S_high=None)
 
    
-   Class to simulate time series from a given PSD or ACVF.
+   Simulate time series from a given PSD or ACVF model.
 
 
    :Parameters:
@@ -69,79 +69,52 @@ Classes
 
 
 
-   :Attributes:
 
-       **duration** : :obj:`float`
-           duration of the time series.
-
-       **sampling_period** : :obj:`float`
-           sampling period of the time series.
-
-       **n_time** : :obj:`int`
-           number of time indexes.
-
-       **t** : :obj:`jax.Array`
-           time :obj:`jnp.array` of the time series.
-
-       **f_max_obs** : :obj:`float`
-           maximum frequency of the observed frequency grid.
-
-       **f_min_obs** : :obj:`float`
-           minimum frequency of the observed frequency grid.
-
-       **f0** : :obj:`float`
-           minimum frequency of the total frequency grid.
-
-       **fN** : :obj:`float`
-           maximum frequency of the total frequency grid.
-
-       **n_freq_grid** : :obj:`int`
-           number of frequency indexes.
-
-       **frequencies** : :obj:`jax.Array`
-           frequency array of the total frequency grid.
-
-       **tau_max** : :obj:`float`
-           maximum lag of the autocovariance function.
-
-       **dtau** : :obj:`float`
-           sampling period of the autocovariance function.
-
-       **tau** : :obj:`jax.Array`
-           lag array of the autocovariance function.
-
-       **psd** : :obj:`jax.Array`
-           power spectral density of the time series.
-
-       **acvf** : :obj:`jax.Array`
-           autocovariance function of the time series.
-
-       **triang** : :obj:`jax.Array`
-           triangular matrix used to generate the time series with the Cholesky decomposition.
-
-       **keys** : dict
-           dictionary of the keys used to generate the random numbers. See :func:`~pioran.simulate.Simulations.generate_keys` for more details.
-
-   .. rubric:: Methods
-
-
-
-   =============================================================================================================================================  ==========
-                                                          **batch_simulations(self,seed:int,sample_size:int,filename:str,**simulations_kwargs)**  Simulate a batch of time series.  
-                                                                                                                         **generate_keys(seed)**  Generate the keys for the random numbers.  
-                                                                                                                  **plot_psd(figsize,filename)**  Plot the PSD of the time series.  
-                                                                                                                 **plot_acvf(figsize,filename)**  Plot the ACVF of the time series.  
-                                                                                                                                 **GP_method()**  Generate the time series with the GP method.  
-                                                                                                                      **timmer_Koenig_method()**  Generate the time series with the Timmer-Koenig method.  
-                                                                                          **sample_time_series(t,y,M,irregular_sampling=False)**  Sample the timeseries.  
-                                                                                                            **extract_subset_timeseries(t,y,M)**  Extract a subset of the time series.  
-   **simulate(mean=None,variance=None,method='GP',irregular_sampling=False,randomise_fluxes=True,errors='gauss',seed=0,filename=None,**kwargs)**  Simulate a time series.  
-   =============================================================================================================================================  ==========
 
    ..
        !! processed by numpydoc !!
 
    .. rubric:: Overview
+
+   .. list-table:: Attributes
+      :header-rows: 0
+      :widths: auto
+      :class: summarytable
+
+      * - :py:obj:`duration <pioran.simulate.Simulations.duration>`
+        - duration of the time series.
+      * - :py:obj:`sampling_period <pioran.simulate.Simulations.sampling_period>`
+        - sampling period of the time series.
+      * - :py:obj:`n_time <pioran.simulate.Simulations.n_time>`
+        - number of time indexes.
+      * - :py:obj:`t <pioran.simulate.Simulations.t>`
+        - time :obj:`jax.Array` of the time series.
+      * - :py:obj:`f_max_obs <pioran.simulate.Simulations.f_max_obs>`
+        - maximum frequency of the observed frequency grid.
+      * - :py:obj:`f_min_obs <pioran.simulate.Simulations.f_min_obs>`
+        - minimum frequency of the observed frequency grid.
+      * - :py:obj:`f0 <pioran.simulate.Simulations.f0>`
+        - minimum frequency of the total frequency grid.
+      * - :py:obj:`fN <pioran.simulate.Simulations.fN>`
+        - maximum frequency of the total frequency grid.
+      * - :py:obj:`n_freq_grid <pioran.simulate.Simulations.n_freq_grid>`
+        - number of frequency indexes.
+      * - :py:obj:`frequencies <pioran.simulate.Simulations.frequencies>`
+        - frequency array of the total frequency grid.
+      * - :py:obj:`tau_max <pioran.simulate.Simulations.tau_max>`
+        - maximum lag of the autocovariance function.
+      * - :py:obj:`dtau <pioran.simulate.Simulations.dtau>`
+        - sampling period of the autocovariance function.
+      * - :py:obj:`tau <pioran.simulate.Simulations.tau>`
+        - lag array of the autocovariance function.
+      * - :py:obj:`psd <pioran.simulate.Simulations.psd>`
+        - power spectral density of the time series.
+      * - :py:obj:`acvf <pioran.simulate.Simulations.acvf>`
+        - autocovariance function of the time series.
+      * - :py:obj:`triang <pioran.simulate.Simulations.triang>`
+        - triangular matrix used to generate the time series with the Cholesky decomposition.
+      * - :py:obj:`keys <pioran.simulate.Simulations.keys>`
+        - dictionary of the keys used to generate the random numbers. See :func:`~pioran.simulate.Simulations.generate_keys` for more details.
 
 
    .. list-table:: Methods
@@ -175,7 +148,415 @@ Classes
 
    .. rubric:: Members
 
-   .. py:method:: generate_keys(seed=0)
+   .. py:attribute:: duration
+      :type: float
+
+      
+      duration of the time series.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: sampling_period
+      :type: float
+
+      
+      sampling period of the time series.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: n_time
+      :type: int
+
+      
+      number of time indexes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: t
+      :type: jax.Array
+
+      
+      time :obj:`jax.Array` of the time series.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: f_max_obs
+      :type: float
+
+      
+      maximum frequency of the observed frequency grid.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: f_min_obs
+      :type: float
+
+      
+      minimum frequency of the observed frequency grid.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: f0
+      :type: float
+
+      
+      minimum frequency of the total frequency grid.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: fN
+      :type: float
+
+      
+      maximum frequency of the total frequency grid.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: n_freq_grid
+      :type: int
+
+      
+      number of frequency indexes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: frequencies
+      :type: jax.Array
+
+      
+      frequency array of the total frequency grid.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: tau_max
+      :type: float
+
+      
+      maximum lag of the autocovariance function.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: dtau
+      :type: float
+
+      
+      sampling period of the autocovariance function.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: tau
+      :type: jax.Array
+
+      
+      lag array of the autocovariance function.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: psd
+      :type: jax.Array
+
+      
+      power spectral density of the time series.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: acvf
+      :type: jax.Array
+
+      
+      autocovariance function of the time series.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: triang
+      :type: bool
+
+      
+      triangular matrix used to generate the time series with the Cholesky decomposition.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: keys
+      :type: dict
+
+      
+      dictionary of the keys used to generate the random numbers. See :func:`~pioran.simulate.Simulations.generate_keys` for more details.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: generate_keys(seed: int = 0) -> None
 
       
       Generate the keys to generate the random numbers.
@@ -233,11 +614,10 @@ Classes
 
       :Returns:
 
-          fig: :obj:`matplotlib.figure.Figure`
-              Figure of the plot
-
-          ax: :obj:`matplotlib.axes.Axes`
-              Axes of the plot
+          :obj:`matplotlib.figure.Figure`
+                 Figure of the plot
+              :obj:`matplotlib.axes.Axes`
+                 Axes of the plot
 
 
 
@@ -280,10 +660,10 @@ Classes
 
       :Returns:
 
-          fig: :obj:`matplotlib.figure.Figure`
+          :obj:`matplotlib.figure.Figure`
               Figure of the plot
 
-          ax: :obj:`matplotlib.axes.Axes`
+          :obj:`matplotlib.axes.Axes`
               Axes of the plot
 
 
@@ -301,12 +681,12 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: GP_method(t_test, interpolation='cubic')
+   .. py:method:: GP_method(t_test: jax.Array, interpolation='cubic') -> tuple[jax.Array, jax.Array]
 
       
       Generate a time series using the GP method.
 
-      If the ACVF is not already calculated, it is calculated from the PSD 
+      If the ACVF is not already calculated, it is calculated from the PSD
       using the inverse Fourier transform.
 
       :Parameters:
@@ -344,7 +724,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: simulate(mean=None, method='GP', irregular_sampling=False, randomise_fluxes=True, errors='gauss', seed=0, filename=None, exponentiate_ts=False, **kwargs)
+   .. py:method:: simulate(mean=None, method='GP', irregular_sampling=False, randomise_fluxes=True, errors='gauss', seed=0, filename=None, exponentiate_ts=False, **kwargs) -> tuple[jax.Array, jax.Array, jax.Array]
 
       
       Method to simulate time series using either the GP method or the TK method.
@@ -364,7 +744,7 @@ Classes
               Mean of the time series, if None the mean will be set to -2 min(ts)
 
           **method** : :obj:`str`, optional
-              method to simulate the time series, by default 'GP' 
+              method to simulate the time series, by default 'GP'
               can be 'TK' which uses Timmer and Koening method
 
           **randomise_fluxes** : :obj:`bool`, optional
@@ -428,12 +808,12 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: extract_subset_timeseries(t, y, M)
+   .. py:method:: extract_subset_timeseries(t: jax.Array, y: jax.Array, M: int) -> tuple[jax.Array, jax.Array]
 
       
       Select a random subset of points from an input time series.
 
-      The input time series is regularly sampled of size N. 
+      The input time series is regularly sampled of size N.
       The output time series is of size M with the same sampling rate as the input time series.
 
       :Parameters:
@@ -470,7 +850,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: sample_timeseries(t, y, M, irregular_sampling=False)
+   .. py:method:: sample_timeseries(t: jax.Array, y: jax.Array, M: int, irregular_sampling: bool = False)
 
       
       Extract a random subset of points from the time series.
@@ -516,13 +896,13 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: timmer_Koenig_method()
+   .. py:method:: timmer_Koenig_method() -> tuple[jax.Array, jax.Array]
 
       
       Generate a time series using the Timmer-Konig method.
 
       Use the Timmer-Konig method to generate a time series with a given power spectral density
-      stored in the attribute psd. 
+      stored in the attribute psd.
 
       Assuming a power-law shaped PSD, the method is as follows:
 
@@ -562,7 +942,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: split_longtimeseries(t, ts, n_slices)
+   .. py:method:: split_longtimeseries(t: jax.Array, ts: jax.Array, n_slices: int) -> tuple[list, list]
 
       
       Split a long time series into shorter time series.
@@ -603,7 +983,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: resample_longtimeseries(t_slices, ts_slices)
+   .. py:method:: resample_longtimeseries(t_slices: list, ts_slices: list) -> tuple[list, list]
 
       
       Resample the time series to have a regular sampling period with n_time points.
@@ -640,7 +1020,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: simulate_longtimeseries(mean=None, randomise_fluxes=True, errors='gauss', seed=0)
+   .. py:method:: simulate_longtimeseries(mean: float | None = None, randomise_fluxes: bool = True, errors: str = 'gauss', seed: int = 0) -> tuple[list, list, list]
 
       
       Method to simulate several long time series using the Timmer-Koenig method.
@@ -664,13 +1044,13 @@ Classes
 
       :Returns:
 
-          **t_segments** : :obj:`list`
+          :obj:`list`
               A list of the time indexes of the segments.
 
-          **ts_segments** : :obj:`list`
+          :obj:`list`
               A list of the values of the segments.
 
-          **ts_errors** : :obj:`list`
+          :obj:`list`
               A list of the errors of the segments.
 
 

@@ -1,7 +1,5 @@
 """Convert a power spectral density to an autocovariance function via the inverse Fourier transform methods or kernel decomposition.
 """
-from typing import Union
-
 import equinox as eqx
 import jax
 import jax.numpy as jnp
@@ -81,9 +79,9 @@ class PSDToACV(eqx.Module):
     """Upper bound of the frequency grid."""
     estimate_variance: bool
     """If True, the amplitude of the autocovariance function is estimated."""
-    n_freq_grid: Union[int, None] = None
+    n_freq_grid: int | None = None
     """Number of points in the frequency grid."""
-    frequencies: Union[jax.Array, None] = None
+    frequencies: jax.Array | None = None
     """Frequency grid."""
     tau: jax.Array = 0
     """Time lag grid."""
@@ -91,9 +89,9 @@ class PSDToACV(eqx.Module):
     """Time lag step."""
     n_components: int = 0
     """Number of components used to approximate the power spectral density using the 'SHO' method."""
-    spectral_points: Union[jax.Array, None] = None
+    spectral_points: jax.Array | None = None
     """Frequencies of the SHO kernels."""
-    spectral_matrix: Union[jax.Array, None] = None
+    spectral_matrix: jax.Array | None = None
     """Matrix of the SHO kernels."""
 
     def __init__(

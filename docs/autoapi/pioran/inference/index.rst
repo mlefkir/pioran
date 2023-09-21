@@ -6,7 +6,7 @@ inference
 
 .. autoapi-nested-parse::
 
-   Class and functions for inference with Gaussian Processes and other methods.
+   Infer the (hyper)parameters of processes.
 
    ..
        !! processed by numpydoc !!
@@ -39,13 +39,7 @@ Overview
    :class: summarytable
 
    * - :py:obj:`inference_methods <pioran.inference.inference_methods>`
-     - \-
-   * - :py:obj:`USE_BLACKJAX <pioran.inference.USE_BLACKJAX>`
-     - \-
-   * - :py:obj:`USE_ULTRANEST <pioran.inference.USE_ULTRANEST>`
-     - \-
-   * - :py:obj:`USE_MPI <pioran.inference.USE_MPI>`
-     - \-
+     - List of inference methods implemented.
    * - :py:obj:`blackjax <pioran.inference.blackjax>`
      - \-
    * - :py:obj:`ultranest <pioran.inference.ultranest>`
@@ -57,67 +51,82 @@ Overview
 Classes
 -------
 
-.. py:class:: Inference(Process: Union[pioran.core.GaussianProcess, pioran.carma.carma_core.CARMAProcess], priors, method, n_samples_checks=1000, seed_check=0, run_checks=True, log_dir='log_dir')
+.. py:class:: Inference(Process: pioran.core.GaussianProcess | pioran.carma.carma_core.CARMAProcess, priors, method, n_samples_checks=1000, seed_check=0, run_checks=True, log_dir='log_dir')
 
    
    Class to infer the value of the (hyper)parameters of the Gaussian Process.
 
    Various methods to sample the posterior probability distribution of the (hyper)parameters of the Gaussian Process are implemented
-   as wrappers around the inference packages blackjax and ultranest.
+   as wrappers around the inference packages `blackjax` and `ultranest`.
 
+   :Parameters:
 
+       **Process** : :class:`~pioran.core.GaussianProcess`
+           Process object.
 
-
-
-
-
-
-
-
-
-
-
-   :Attributes:
-
-       **process** : :class:`~pioran.core.GaussianProcess`
-           Gaussian Process object.
-
-       **priors: :obj:`function`**
+       **priors** : :obj:`function`
            Function to define the priors for the (hyper)parameters.
 
-       **method** : :obj:`str`
-           - "ultranest": nested sampling via ultranest.
-           - "blackjax_nuts": NUTS sampling via blackjax.
+       **method** : :obj:`str`, optional
+           "NS": using nested sampling via ultranest
 
-       **results** : :obj:`dict`
-           Results of the inference.
+       **n_samples_checks** : :obj:`int`, optional
+           Number of samples to take from the prior distribution, by default 1000
 
-       **log_dir** : :obj:`str`
-           Directory to save the results of the inference.
+       **seed_check** : :obj:`int`, optional
+           Seed for the random number generator, by default 0
 
-       **n_pars** : :obj:`int`
-           Number of free (hyper)parameters in the model to sample.
+       **run_checks** : :obj:`bool`, optional
+           Run the prior predictive checks, by default True
 
-       **use_MPI** : :obj:`bool`
-           Use MPI to parallelize the inference.
-
-   .. rubric:: Methods
+       **log_dir** : :obj:`str`, optional
+           Directory to save the results of the inference, by default 'log_dir'
 
 
 
-   ===========================================================================================================================================  ==========
-                                                                                                               **save_config(save_file=True)**  Save the configuration of the inference.  
-   **prior_predictive_checks(n_samples_checks,seed_check,n_frequencies=1000,plot_prior_samples=True,plot_prior_predictive_distribution=True)**  Check the prior predictive distribution.  
-           **check_approximation(n_samples_checks,seed_check,n_frequencies=1000,plot_diagnostics=True,plot_violins=True,plot_quantiles=True)**  Check the approximation of the PSD with the kernel decomposition.  
-             **run(verbose=True, user_log_likelihood=None, seed=0, n_chains=1, n_samples=1_000, n_warmup_steps=1_000, use_stepsampler=False)**  Estimate the (hyper)parameters of the Gaussian Process.  
-              **blackjax_NUTS(rng_key, initial_position, log_likelihood, log_prior, num_warmup_steps=1_000, num_samples=1_000, num_chains=1)**  Sample the posterior distribution using the NUTS sampler from blackjax.  
-                 **nested_sampling(priors, log_likelihood, verbose=True, use_stepsampler=False, resume=True, run_kwargs={}, slice_steps=100)**  Sample the posterior distribution using nested sampling via ultranest.  
-   ===========================================================================================================================================  ==========
+
+
+   :Raises:
+
+       ImportError
+           If the required packages are not installed.
+
+       ValueError
+           If the saved config file is different from the current config, or if the method is not valid.
+
+       TypeError
+           If the method is not a string.
+
+
+
+
+
+
+
+
 
    ..
        !! processed by numpydoc !!
 
    .. rubric:: Overview
+
+   .. list-table:: Attributes
+      :header-rows: 0
+      :widths: auto
+      :class: summarytable
+
+      * - :py:obj:`process <pioran.inference.Inference.process>`
+        - Process object.
+      * - :py:obj:`n_pars <pioran.inference.Inference.n_pars>`
+        - Number of (hyper)parameters.
+      * - :py:obj:`priors <pioran.inference.Inference.priors>`
+        - Function to define the priors for the (hyper)parameters.
+      * - :py:obj:`log_dir <pioran.inference.Inference.log_dir>`
+        - Directory to save the results of the inference.
+      * - :py:obj:`plot_dir <pioran.inference.Inference.plot_dir>`
+        - Directory to save the plots of the inference.
+      * - :py:obj:`method <pioran.inference.Inference.method>`
+        - Method to use for the inference.
 
 
    .. list-table:: Methods
@@ -141,12 +150,156 @@ Classes
 
    .. rubric:: Members
 
+   .. py:attribute:: process
+      :type: pioran.core.GaussianProcess | pioran.carma.carma_core.CARMAProcess
+
+      
+      Process object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: n_pars
+      :type: int
+
+      
+      Number of (hyper)parameters.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: priors
+      :type: callable
+
+      
+      Function to define the priors for the (hyper)parameters.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: log_dir
+      :type: str
+
+      
+      Directory to save the results of the inference.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: plot_dir
+      :type: str
+
+      
+      Directory to save the plots of the inference.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: method
+      :type: str
+
+      
+      Method to use for the inference.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
    .. py:method:: save_config(save_file=True)
 
       
       Save the configuration of the inference.
 
-      Save the configuration of the inference, process and model in a json file.        
+      Save the configuration of the inference, process and model in a json file.
 
       :Parameters:
 
@@ -179,7 +332,7 @@ Classes
       Check the prior predictive distribution.
 
       Get samples from the prior distribution and plot them, and calculate the prior predictive
-      distribution of the model and plot it. 
+      distribution of the model and plot it.
 
       :Parameters:
 
@@ -216,7 +369,7 @@ Classes
       
       Check the approximation of the PSD with the kernel decomposition.
 
-      This method will take random samples from the prior distribution and compare the PSD obtained 
+      This method will take random samples from the prior distribution and compare the PSD obtained
       with the SHO decomposition with the true PSD.
 
       :Parameters:
@@ -251,7 +404,7 @@ Classes
               Residuals of the PSD approximation.
 
           **ratio** : :obj:`jax.Array`
-              Ratio of the PSD approximation. 
+              Ratio of the PSD approximation.
 
 
 
@@ -268,7 +421,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: run(verbose=True, user_log_likelihood=None, seed: int = 0, n_chains: int = 1, n_samples: int = 1000, n_warmup_steps: int = 1000, use_stepsampler: bool = False)
+   .. py:method:: run(verbose: bool = True, user_log_likelihood=None, seed: int = 0, n_chains: int = 1, n_samples: int = 1000, n_warmup_steps: int = 1000, use_stepsampler: bool = False)
 
       
       Estimate the (hyper)parameters of the Gaussian Process.
@@ -323,7 +476,7 @@ Classes
       
       Sample the posterior distribution using the NUTS sampler from blackjax.
 
-      Wrapper around the NUTS sampler from blackjax to sample the posterior distribution.        
+      Wrapper around the NUTS sampler from blackjax to sample the posterior distribution.
       This function also performs the warmup via window adaptation.
 
       :Parameters:
@@ -377,7 +530,7 @@ Classes
       
       Sample the posterior distribution of the (hyper)parameters of the Gaussian Process with nested sampling via ultranest.
 
-      Perform nested sampling to sample the (hyper)parameters of the Gaussian Process.    
+      Perform nested sampling to sample the (hyper)parameters of the Gaussian Process.
 
       :Parameters:
 
@@ -394,7 +547,7 @@ Classes
               Use the slice sampler as step sampler, by default False
 
           **resume** : :obj:`bool`, optional
-              Resume the sampling from the previous run, by default True       
+              Resume the sampling from the previous run, by default True
 
           **run_kwargs** : :obj:`dict`, optional
               Dictionary of arguments for ReactiveNestedSampler.run() see https://johannesbuchner.github.io/UltraNest/ultranest.html#module-ultranest.integrator
@@ -405,7 +558,7 @@ Classes
       :Returns:
 
           results: dict
-              Dictionary of results from the nested sampling. 
+              Dictionary of results from the nested sampling.
 
 
 
@@ -456,21 +609,25 @@ Attributes
    :value: ['ultranest', 'blackjax_nuts']
 
    
+   List of inference methods implemented.
 
-.. py:data:: USE_BLACKJAX
-   :value: True
 
-   
 
-.. py:data:: USE_ULTRANEST
-   :value: True
 
-   
 
-.. py:data:: USE_MPI
-   :value: True
 
-   
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:data:: blackjax
 

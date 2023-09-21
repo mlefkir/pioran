@@ -22,7 +22,7 @@ Overview
    :class: summarytable
 
    * - :py:obj:`PowerSpectralDensity <pioran.psd_base.PowerSpectralDensity>`
-     - Represents a power density function function, inherited from the :obj:`equinox.Module` class.
+     - Represents a power density function function.
    * - :py:obj:`ProductPowerSpectralDensity <pioran.psd_base.ProductPowerSpectralDensity>`
      - Represents the product of two power spectral densities.
    * - :py:obj:`SumPowerSpectralDensity <pioran.psd_base.SumPowerSpectralDensity>`
@@ -34,12 +34,12 @@ Overview
 Classes
 -------
 
-.. py:class:: PowerSpectralDensity(param_values: Union[pioran.parameters.ParametersModel, list[float]], param_names: list[str], free_parameters: list[bool])
+.. py:class:: PowerSpectralDensity(param_values: pioran.parameters.ParametersModel | list[float], param_names: list[str], free_parameters: list[bool])
 
    Bases: :py:obj:`equinox.Module`
 
    
-   Represents a power density function function, inherited from the :obj:`equinox.Module` class.
+   Represents a power density function function.
 
    Bridge between the parameters and the power spectral density function. All power spectral density functions
    inherit from this class.
