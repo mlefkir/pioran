@@ -1,5 +1,5 @@
 .. pioran documentation master file, created by
-   sphinx-quickstart on Fri Oct 28 17:29:20 2022.
+   sphinx-quickstart on Tue Sep 19 17:01:11 2023.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -15,11 +15,11 @@ Welcome to pioran's documentation!
    userguide/User
    tutorials/Tutorials
    references/references.rst
-   apidoc/API
-   
+   autoapi/index
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
+* :ref:`modindex`
 * :ref:`search`
