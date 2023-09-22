@@ -332,8 +332,8 @@ class Simulations:
         seed_gaps: int = 1,
         filename: str = "",
         exponentiate_ts: bool = False,
-        min_n_slices: int = 0,
-        max_n_slices: int = 10,
+        min_n_gaps: int = 0,
+        max_n_gaps: int = 10,
         interp_method: str = "cubic",
     ) -> tuple[jax.Array, jax.Array, jax.Array]:
         """Method to simulate time series using either the GP method or the TK method.
@@ -375,10 +375,10 @@ class Simulations:
             Exponentiate the time series to produce a lognormal flux distribution.
         filename : :obj:`str`, optional
             Name of the file to save the time series, by default ''
-        min_n_slices : :obj:`int`, optional
-            Minimum number of slices when simulating irregular gaps, by default 2
-        max_n_slices : :obj:`int`, optional
-            Maximum number of slices when simulating irregular gaps, by default 22
+        min_n_gaps : :obj:`int`, optional
+            Minimum number of gaps when simulating irregular gaps, by default 2
+        max_n_gaps : :obj:`int`, optional
+            Maximum number of gaps when simulating irregular gaps, by default 22
         interp_method : :obj:`str`, optional
             Interpolation method to use when calculating the autocovariance function from the power spectral density, by default 'linear'
         Raises
@@ -462,12 +462,13 @@ class Simulations:
                 f"method {method} is not accepted, use either 'GP' or 'TK'"
             )
 
+        if exponentiate_ts:
+            true_timeseries = jnp.exp(true_timeseries)
         if randomise_fluxes:
             if errors == "gauss":
                 # generate the variance of the errors
-                timeseries_error_size = (
-                    jnp.sqrt(errors_size)
-                    * jnp.std(true_timeseries)
+                timeseries_error_size = (errors_size*
+                    jnp.sqrt(true_timeseries)
                     * jnp.abs(random.normal(key=self.keys["errors"], shape=(len(t),)))
                 )
                 # generate the measured time series with the associated fluxes
@@ -488,8 +489,7 @@ class Simulations:
             timeseries_error_size = jnp.zeros_like(t)
             observed_timeseries = true_timeseries
 
-        if exponentiate_ts:
-            observed_timeseries = jnp.exp(observed_timeseries)
+
         # set the mean of the time series
         if mean is not None:
             observed_timeseries = (
@@ -511,8 +511,8 @@ class Simulations:
                 t,
                 seed=seed_gaps,
                 N_points=N_points,
-                min_n_slices=min_n_slices,
-                max_n_slices=max_n_slices,
+                min_n_gaps=min_n_gaps,
+                max_n_gaps=max_n_gaps,
             )
             return (
                 t_gappy,
@@ -525,8 +525,8 @@ class Simulations:
         a: jax.Array,
         seed: int,
         N_points: int,
-        min_n_slices: int = 2,
-        max_n_slices: int = 22,
+        min_n_gaps: int = 2,
+        max_n_gaps: int = 22,
     ):
         """Simulate irregular times from a regular time series with random gaps.
 
@@ -538,10 +538,10 @@ class Simulations:
             Random key.
         N_points : :obj:`int`
             Number of points to sample.
-        min_n_slices : :obj:`int`
-            Minimum number of slices. Default is 2.
-        max_n_slices : :obj:`int`
-            Maximum number of slices. Default is 22.
+        min_n_gaps : :obj:`int`
+            Minimum number of gaps. Default is 2.
+        max_n_gaps : :obj:`int`
+            Maximum number of gaps. Default is 22.
 
         Returns
         -------
@@ -558,7 +558,7 @@ class Simulations:
         while not sucess:
             N_slices = (
                 jax.random.randint(
-                    keys[0], minval=min_n_slices, maxval=max_n_slices, shape=(1,)
+                    keys[0], minval=min_n_gaps, maxval=max_n_gaps, shape=(1,)
                 )
                 .squeeze()
                 .astype(int)
