@@ -1,14 +1,11 @@
 """Generate time series from a given PSD or ACVF model.
 """
-import sys
 import warnings
 
 import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 
-# from astropy.io import fits
-# from astropy.table import Table
 from jax import random
 from jax.scipy.linalg import cholesky
 from numpy import savetxt
@@ -203,10 +200,10 @@ class Simulations:
             )
 
         fig, ax = plt.subplots(1, 1, figsize=figsize)
-        ax.plot(self.tau, self.acvf, ".-")
+        ax.plot(self.tau, self.acvf, "-")
         ax.set_xlim(0, self.duration)
         ax.set_xlabel(r"Time lag $ \tau" + f"(\mathrm{{{xunit}}})$")
-        ax.set_ylabel("ACVF")
+        ax.set_ylabel("Autocovariance function")
         if title is not None:
             ax.set_title(title)
         fig.tight_layout()
@@ -216,7 +213,7 @@ class Simulations:
         return fig, ax
 
     def plot_psd(
-        self, figsize=(9, 5.5), filename=None, title=None, xunit="d", loglog=True
+        self, figsize=(6, 4), filename=None, title=None, xunit="d", loglog=True
     ):
         """Plot the power spectral density model.
 
@@ -225,7 +222,7 @@ class Simulations:
         Parameters
         ----------
         figsize  : :obj:`tuple`, optional
-            Size of the figure, by default (15,3)
+            Size of the figure, by default (6,4)
         filename  : :obj:`str`, optional
             Name of the file to save the figure, by default None
         title  : :obj:`str`, optional
@@ -321,84 +318,23 @@ class Simulations:
         ts = self.triang @ r
         return t_test, ts
 
-    # def batch_simulations(self,seed,sample_size,filename,**simulations_kwargs):
-    #     """Generate a batch of time series.
-
-    #     Function to generate a batch of time series using the same model. The time series are saved in a FITS file.
-    #     The seed is used to generate the seeds of simulated the time series.
-
-    #     Parameters
-    #     ----------
-    #     seed  : :obj:`int`
-    #         Seed for the random number generator to draw the seeds of the time series.
-    #     sample_size  : :obj:`int`
-    #         Number of time series to generate.
-    #     filename  : :obj:`str`
-    #         Name of the file to save the time series.
-    #     simulations_kwargs  : :obj:`dict`
-    #         Keyword arguments for the function :func:`simulate`.
-
-    #     """
-
-    #     seeds = random.choice(random.PRNGKey(seed),jnp.arange(0,15*sample_size),shape=(sample_size,),replace=False)
-
-    #     hdu_list = []
-    #     seeds_list = []
-
-    #     print(f"Generating {sample_size} time series")
-
-    #     for it,cur_seed in enumerate(seeds):
-
-    #         t,x,xerr = self.simulate(seed=cur_seed,**simulations_kwargs)
-
-    #         seeds_list.append(int(cur_seed))
-
-    #         table = Table([t,x,xerr],names=['TIME','FLUX','ERROR'])
-
-    #         hdu = fits.BinTableHDU(table, name=f'TS_{cur_seed}')
-
-    #         hdu.header['SEED'] = int(cur_seed)
-    #         hdu.header['DURATION'] = self.duration
-    #         hdu.header['SCALELO'] = self.S_low
-    #         hdu.header['SCALEHI'] = self.S_high
-    #         hdu.header['SAMPLING'] = 'REGULAR' if simulations_kwargs.get('irregular_sampling',False) else 'IRREGULAR'
-    #         hdu.header['ERRORS'] = simulations_kwargs.get('errors','gauss')
-    #         hdu.header['RANDOMI'] = str(simulations_kwargs.get('randomise_fluxes',True))
-    #         hdu.header['MODELTYP'] = 'PSD' if isinstance(self.model,PowerSpectralDensity) else 'ACVF'
-    #         hdu.header['METHOD'] = simulations_kwargs.get('method','GP')
-    #         hdu.header['MEAN'] = simulations_kwargs.get('mean','None')
-    #         hdu.header['MODEL'] = self.model.expression # or 'Exponential' 'Lorentzian' 'ExponentialSquared'
-    #         for i in range(len(self.model.parameters)):
-    #             par = self.model.parameters[i+1]
-    #             if par.ID < 10:
-    #                 hdu.header[f'{par.name[:7]}{par.ID}'] = par.value
-    #             else:
-    #                 hdu.header[f'{par.name[:6]}{par.ID}'] = par.value
-    #         hdu_list.append(hdu)
-
-    #         print(f'{it+1}/{sample_size}', end='\r')
-    #         sys.stdout.flush()
-
-    #     print('Saving the time series')
-    #     seed_tab = Table([seeds],names=['SEED'])
-    #     hdu_seed = fits.BinTableHDU(seed_tab, name=f'SEEDS')
-    #     hdu  = fits.PrimaryHDU()
-    #     hdu.header['MAINSEED'] = seed
-    #     hdu_list = [hdu,hdu_seed] + hdu_list
-    #     hdu = fits.HDUList(hdu_list)
-    #     hdu.writeto(f'{filename}.fits',overwrite=True)
-
     def simulate(
         self,
         mean=None,
-        method="GP",
-        irregular_sampling=False,
-        randomise_fluxes=True,
-        errors="gauss",
-        seed=0,
-        filename=None,
-        exponentiate_ts=False,
-        **kwargs,
+        method: str = "GP",
+        irregular_sampling: bool = False,
+        irregular_gaps: bool = False,
+        randomise_fluxes: bool = True,
+        errors: str = "gauss",
+        errors_size: float = 0.02,
+        N_points: int = 0,
+        seed: int = 0,
+        seed_gaps: int = 1,
+        filename: str = "",
+        exponentiate_ts: bool = False,
+        min_n_slices: int = 0,
+        max_n_slices: int = 10,
+        interp_method: str = "cubic",
     ) -> tuple[jax.Array, jax.Array, jax.Array]:
         """Method to simulate time series using either the GP method or the TK method.
 
@@ -423,18 +359,28 @@ class Simulations:
             If True the fluxes will be randomised.
         errors : :obj:`str`, optional
             If 'gauss' the errors will be drawn from a gaussian distribution
+        errors_size : :obj:`float`, optional
+            Size of the errors on the time series, by default 0.02 (2%)
+        N_points : :obj:`int`, optional
+            Number of points to sample when simulating irregular gaps, by default 0
         irregular_sampling : :obj:`bool`, optional
             If True the time series will be sampled at irregular time intervals
+        irregular_gaps : :obj:`bool`, optional
+            If True the time series will be sampled at irregular time intervals with random gaps
         seed : :obj:`int`, optional
             Set the seed for the RNG
+        seed_gaps : :obj:`int`, optional
+            Set the seed for the RNG when simulating irregular gaps
         exponentiate_ts: :obj:`bool`, optional
             Exponentiate the time series to produce a lognormal flux distribution.
         filename : :obj:`str`, optional
-            Name of the file to save the time series, by default None
-        **kwargs : :obj:`dict`
-            Additional arguments to pass to the method
-                interp_method : :obj:`str`, optional
-                    Interpolation method to use when calculating the autocovariance function from the power spectral density, by default 'linear'
+            Name of the file to save the time series, by default ''
+        min_n_slices : :obj:`int`, optional
+            Minimum number of slices when simulating irregular gaps, by default 2
+        max_n_slices : :obj:`int`, optional
+            Maximum number of slices when simulating irregular gaps, by default 22
+        interp_method : :obj:`str`, optional
+            Interpolation method to use when calculating the autocovariance function from the power spectral density, by default 'linear'
         Raises
         ------
         ValueError
@@ -452,6 +398,9 @@ class Simulations:
             Errors on the simulated time series
 
         """
+        if irregular_gaps and N_points == 0:
+            raise ValueError("You must provide N_points when simulating irregular gaps")
+
         self.generate_keys(seed=seed)
 
         if method == "GP":
@@ -484,7 +433,6 @@ class Simulations:
                 warnings.warn(
                     "The desired number of point in the simulated time series is quite high"
                 )
-            interp_method = kwargs.get("interp_method", "cubic")
             t, true_timeseries = self.GP_method(
                 interpolation=interp_method, t_test=t_test
             )
@@ -518,8 +466,8 @@ class Simulations:
             if errors == "gauss":
                 # generate the variance of the errors
                 timeseries_error_size = (
-                    jnp.var(true_timeseries)
-                    / 2
+                    jnp.sqrt(errors_size)
+                    * jnp.std(true_timeseries)
                     * jnp.abs(random.normal(key=self.keys["errors"], shape=(len(t),)))
                 )
                 # generate the measured time series with the associated fluxes
@@ -548,15 +496,140 @@ class Simulations:
                 observed_timeseries - jnp.mean(observed_timeseries) + mean
             )
         else:
-            observed_timeseries = (
-                observed_timeseries  # - 2*jnp.min(observed_timeseries)
+            observed_timeseries = observed_timeseries + 2 * jnp.abs(
+                jnp.min(observed_timeseries)
             )
 
-        if filename is not None:
+        if filename != '':
             savetxt(
                 filename, jnp.vstack([t, observed_timeseries, timeseries_error_size]).T
             )
-        return t, observed_timeseries, timeseries_error_size
+        if not irregular_gaps:
+            return t, observed_timeseries, timeseries_error_size
+        else:
+            t_gappy, indexes_selected = self.simulate_irregular_gaps(
+                t,
+                seed=seed_gaps,
+                N_points=N_points,
+                min_n_slices=min_n_slices,
+                max_n_slices=max_n_slices,
+            )
+            return (
+                t_gappy,
+                observed_timeseries[indexes_selected],
+                timeseries_error_size[indexes_selected],
+            )
+
+    def simulate_irregular_gaps(
+        self,
+        a: jax.Array,
+        seed: int,
+        N_points: int,
+        min_n_slices: int = 2,
+        max_n_slices: int = 22,
+    ):
+        """Simulate irregular times from a regular time series with random gaps.
+
+        Parameters
+        ----------
+        a : :obj:`jax.Array`
+            Regular time series indexes.
+        key : :obj:`jax.random.PRNGKey`
+            Random key.
+        N_points : :obj:`int`
+            Number of points to sample.
+        min_n_slices : :obj:`int`
+            Minimum number of slices. Default is 2.
+        max_n_slices : :obj:`int`
+            Maximum number of slices. Default is 22.
+
+        Returns
+        -------
+        :obj:`jax.Array`
+            Irregular times.
+        :obj:`jax.Array`
+            Indexes of the irregular times.
+        """
+        N_tot = len(a)
+        key = jax.random.PRNGKey(seed)
+        keys = jax.random.split(key, 4)
+        sucess = False
+
+        while not sucess:
+            N_slices = (
+                jax.random.randint(
+                    keys[0], minval=min_n_slices, maxval=max_n_slices, shape=(1,)
+                )
+                .squeeze()
+                .astype(int)
+            )  # number of slices
+            min_size_slices = jnp.rint(0.05 * N_tot).astype(int)
+            max_size_slices = jnp.rint(1 / (N_slices) * N_tot).astype(int)
+            size_slices = jax.random.randint(
+                keys[2],
+                minval=min_size_slices,
+                maxval=max_size_slices,
+                shape=(N_slices,),
+            )  # size of each slice
+
+            keys_list = [keys[1]]
+            N_start = []
+            intervals = [[0, max_size_slices]]
+
+            for i, slice in enumerate(size_slices):
+                key, subkey = jax.random.split(keys_list[-1], 2)
+                N_start_slices = jax.random.randint(
+                    subkey, minval=intervals[i][0], maxval=intervals[i][1], shape=(1,)
+                )  # start time of each slice
+                keys_list.append(subkey)
+                N_start.append(N_start_slices)
+                if i == N_slices - 1:
+                    # print('Here we can take any startpoint as long as it does not exceed the total number of points')
+                    intervals.append(
+                        [
+                            N_start_slices + slice,
+                            N_tot - slice - max_size_slices // 2 - 5,
+                        ]
+                    )
+                    # print(f'Next time draw between {intervals[-1][0]} and {intervals[-1][1]}')
+                else:
+                    intervals.append(
+                        [
+                            N_start_slices + slice,
+                            N_start_slices + slice + max_size_slices - 5,
+                        ]
+                    )
+
+            N_start = jnp.array(N_start).flatten()  # start times of each slice
+            N_stop = N_start + size_slices  # stop times of each slice
+            if jnp.any(N_stop > N_tot):
+                sucess = False
+                keys = jax.random.split(keys[-1], 4)
+                # print("N_stop > N_tot")
+                continue
+            else:
+                sucess = True
+
+            L = jnp.array([], dtype=int)
+            for k in range(N_slices):
+                L = jnp.append(L, jnp.arange(N_start[k], N_stop[k], 1, dtype=int))
+
+            x_indexes = jnp.arange(0, N_tot, 1)
+            irreg = jnp.delete(x_indexes, L)
+            trunc = a[irreg]
+            if jnp.any(len(trunc) < N_points):
+                sucess = False
+                keys = jax.random.split(keys[-1], 4)
+                # print("N_stop > N_tot")
+                continue
+            else:
+                sucess = True
+
+            t_points = jnp.sort(
+                jax.random.choice(keys[3], trunc, shape=(N_points,), replace=False)
+            )
+            indexes_selected = jnp.searchsorted(a, t_points)
+        return t_points, indexes_selected
 
     def extract_subset_timeseries(
         self, t: jax.Array, y: jax.Array, M: int
