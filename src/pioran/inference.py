@@ -251,23 +251,23 @@ class Inference:
         # data_related
         dict_config["data"] = {}
         dict_config["data"]["nb_observation_points"] = len(
-            self.process.observation_indexes
+            self.process.observation_indexes.flatten()
         )
         dict_config["data"]["duration"] = float(
-            self.process.observation_indexes[-1] - self.process.observation_indexes[0]
+            self.process.observation_indexes.flatten()[-1] - self.process.observation_indexes.flatten()[0]
         )
         dict_config["data"]["min_sampling"] = np.diff(
-            self.process.observation_indexes
+            self.process.observation_indexes.flatten()
         ).min()
         dict_config["data"][
             "observation_indexes"
-        ] = self.process.observation_indexes.tolist()
+        ] = self.process.observation_indexes.flatten().tolist()
         dict_config["data"][
             "observation_values"
-        ] = self.process.observation_values.tolist()
+        ] = self.process.observation_values.flatten().tolist()
         dict_config["data"][
             "observation_errors"
-        ] = self.process.observation_errors.tolist()
+        ] = self.process.observation_errors.flatten().tolist()
 
         if save_file:
             with open(self.log_dir + "/config.json", "w", encoding="utf-8") as f:
