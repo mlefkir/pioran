@@ -334,6 +334,7 @@ class Simulations:
         exponentiate_ts: bool = False,
         min_n_gaps: int = 0,
         max_n_gaps: int = 10,
+        max_size_slices: float = 2.0,
         interp_method: str = "cubic",
     ) -> tuple[jax.Array, jax.Array, jax.Array]:
         """Method to simulate time series using either the GP method or the TK method.
@@ -379,6 +380,8 @@ class Simulations:
             Minimum number of gaps when simulating irregular gaps, by default 2
         max_n_gaps : :obj:`int`, optional
             Maximum number of gaps when simulating irregular gaps, by default 22
+        max_size_slices: obj:`float`
+            Max size factor, default it 2.
         interp_method : :obj:`str`, optional
             Interpolation method to use when calculating the autocovariance function from the power spectral density, by default 'linear'
         Raises
@@ -468,7 +471,7 @@ class Simulations:
             if errors == "gauss":
                 # generate the variance of the errors
                 timeseries_error_size = (errors_size*
-                    jnp.sqrt(true_timeseries)
+                    jnp.sqrt(jnp.abs(true_timeseries))
                     * jnp.abs(random.normal(key=self.keys["errors"], shape=(len(t),)))
                 )
                 # generate the measured time series with the associated fluxes
@@ -505,6 +508,13 @@ class Simulations:
                 filename, jnp.vstack([t, observed_timeseries, timeseries_error_size]).T
             )
         if not irregular_gaps:
+            if N_points != 0:
+                key = jax.random.PRNGKey(seed_gaps)
+                t_points = jnp.sort(jax.random.choice(key, t, shape=(N_points,), replace=False))
+                indexes_selected = jnp.searchsorted(t, t_points)
+                
+                return t_points, observed_timeseries[indexes_selected], timeseries_error_size[indexes_selected]
+
             return t, observed_timeseries, timeseries_error_size
         else:
             t_gappy, indexes_selected = self.simulate_irregular_gaps(
@@ -513,6 +523,7 @@ class Simulations:
                 N_points=N_points,
                 min_n_gaps=min_n_gaps,
                 max_n_gaps=max_n_gaps,
+                max_size_slices=max_size_slices
             )
             return (
                 t_gappy,
@@ -527,6 +538,7 @@ class Simulations:
         N_points: int,
         min_n_gaps: int = 2,
         max_n_gaps: int = 22,
+        max_size_slices: float = 2.0,
     ):
         """Simulate irregular times from a regular time series with random gaps.
 
@@ -542,7 +554,9 @@ class Simulations:
             Minimum number of gaps. Default is 2.
         max_n_gaps : :obj:`int`
             Maximum number of gaps. Default is 22.
-
+        max_size_slices : obj:`float`
+            Max size factor, default it 2.
+                
         Returns
         -------
         :obj:`jax.Array`
@@ -564,7 +578,7 @@ class Simulations:
                 .astype(int)
             )  # number of slices
             min_size_slices = jnp.rint(0.05 * N_tot).astype(int)
-            max_size_slices = jnp.rint(1 / (N_slices) * N_tot).astype(int)
+            max_size_slices = jnp.rint(1 / (N_slices*max_size_slices) * N_tot).astype(int)
             size_slices = jax.random.randint(
                 keys[2],
                 minval=min_size_slices,

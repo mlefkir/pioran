@@ -494,13 +494,13 @@ class GaussianProcess(eqx.Module):
                 self.observation_values.flatten() - self.model.parameters["const"].value
             )
         else:
-            yerr = self.observation_errors
+            yerr = self.observation_errors.flatten()
 
         if self.estimate_mean and self.scale_errors:
             gp = tinygp.GaussianProcess(
                 self.model.ACVF,
                 x,
-                noise=tinygp.noise.Diagonal(
+                diag=(
                     self.model.parameters["nu"].value * yerr**2
                 ),
                 mean=self.model.parameters["mu"].value,
@@ -513,7 +513,7 @@ class GaussianProcess(eqx.Module):
             gp = tinygp.GaussianProcess(
                 self.model.ACVF,
                 x,
-                noise=tinygp.noise.Diagonal(
+                diag=(
                     self.model.parameters["nu"].value * yerr**2
                 ),
             )

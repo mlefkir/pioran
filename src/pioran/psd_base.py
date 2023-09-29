@@ -3,6 +3,7 @@ The sum and product of PSD are implemented with the ``+`` and ``*`` operators, r
 """
 from copy import deepcopy
 
+import numpy as np
 import equinox as eqx
 import jax
 
@@ -45,7 +46,7 @@ class PowerSpectralDensity(eqx.Module):
     ):
         if isinstance(param_values, ParametersModel):
             self.parameters = param_values
-        elif isinstance(param_values, list) or isinstance(param_values, jax.Array):
+        elif isinstance(param_values, list) or isinstance(param_values, jax.Array) or isinstance(param_values, np.ndarray):
             self.parameters = ParametersModel(
                 param_names=param_names,
                 param_values=param_values,
