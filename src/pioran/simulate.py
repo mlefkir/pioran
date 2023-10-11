@@ -472,7 +472,7 @@ class Simulations:
                 # generate the variance of the errors
                 timeseries_error_size = (errors_size*
                     jnp.sqrt(jnp.abs(true_timeseries))
-                    * jnp.abs(random.normal(key=self.keys["errors"], shape=(len(t),)))
+                    * random.uniform(key=self.keys["errors"], shape=(len(t),))#* jnp.abs(random.normal(key=self.keys["errors"], shape=(len(t),)))
                 )
                 # generate the measured time series with the associated fluxes
                 observed_timeseries = (

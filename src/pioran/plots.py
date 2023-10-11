@@ -660,7 +660,7 @@ def residuals_quantiles(residuals, ratio, f, f_min, f_max):
         residuals, jnp.array([1, 5, 16, 50, 84, 95, 99]), axis=0
     )
 
-    fig, ax = plt.subplots(2, 1, figsize=(9, 8))
+    fig, ax = plt.subplots(2, 1, figsize=(9.5, 8))
     ax[0].fill_between(f, low_5, high_95, alpha=0.2, label="5% and 95% percentiles")
     ax[0].fill_between(f, low_16, high_84, alpha=0.4, label="16% and 84% percentiles")
     ax[0].plot(f, med, label="Median")
@@ -681,7 +681,7 @@ def residuals_quantiles(residuals, ratio, f, f_min, f_max):
     ax[1].axvline(f_max, color="k", ls=":", label=r"$f_\mathrm{max}$")
 
     ax[1].legend(
-        bbox_to_anchor=(0.95, -0.03),
+        bbox_to_anchor=(0.95, -0.0),
         loc="lower right",
         ncol=5,
         borderaxespad=0.0,
