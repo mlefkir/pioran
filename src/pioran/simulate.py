@@ -320,7 +320,7 @@ class Simulations:
 
     def simulate(
         self,
-        mean=None,
+        mean: float | str | None = "default",
         method: str = "GP",
         irregular_sampling: bool = False,
         irregular_gaps: bool = False,
@@ -351,8 +351,8 @@ class Simulations:
 
         Parameters
         ----------
-        mean : :obj:`float`, optional
-            Mean of the time series, if None the mean will be set to -2 min(ts)
+        mean : :obj:`float` or :obj:`str`, optional
+            Mean of the time series, 'default' sets the mean to 0 for non-exponentiated, if None the mean will be set to -2 min(ts)
         method : :obj:`str`, optional
             method to simulate the time series, by default 'GP'
             can be 'TK' which uses Timmer and Koening method
@@ -494,13 +494,15 @@ class Simulations:
 
 
         # set the mean of the time series
-        if mean is not None:
-            observed_timeseries = (
-                observed_timeseries - jnp.mean(observed_timeseries) + mean
-            )
-        else:
+        if mean == "default":
+            pass
+        elif mean is None:
             observed_timeseries = observed_timeseries + 2 * jnp.abs(
                 jnp.min(observed_timeseries)
+            )
+        else:
+            observed_timeseries = (
+                observed_timeseries - jnp.mean(observed_timeseries) + mean
             )
 
         if filename != '':
