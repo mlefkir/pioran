@@ -79,7 +79,9 @@ class GaussianProcess(eqx.Module):
     """Use a log transformation of the data."""
     use_tinygp: bool = False
     """Use tinygp to compute the log marginal likelihood."""
-
+    propagate_errors: bool = True
+    """Propagate the errors on the observed data."""
+    
     def __init__(
         self,
         function: CovarianceFunction | PowerSpectralDensity,
