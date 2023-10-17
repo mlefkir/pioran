@@ -470,9 +470,9 @@ class Simulations:
         if randomise_fluxes:
             if errors == "gauss":
                 # generate the variance of the errors
-                timeseries_error_size = (errors_size*
-                    jnp.sqrt(jnp.abs(true_timeseries))
-                    * random.uniform(key=self.keys["errors"], shape=(len(t),))#* jnp.abs(random.normal(key=self.keys["errors"], shape=(len(t),)))
+                timeseries_error_size = ( errors_size *
+                    jnp.abs(true_timeseries)**.5
+                    * jnp.abs(random.normal(key=self.keys["errors"], shape=(len(t),)))
                 )
                 # generate the measured time series with the associated fluxes
                 observed_timeseries = (
@@ -480,6 +480,12 @@ class Simulations:
                     + timeseries_error_size
                     * random.normal(key=self.keys["fluxes"], shape=(len(t),))
                 )
+                # if we exponentiated the time series, we need to make sure that the fluxes are positive
+                if exponentiate_ts:
+                    if jnp.any(observed_timeseries <= 0):
+                        print("Negative fluxes, adding offset 2*min(ts) to the time series")
+                        observed_timeseries = observed_timeseries + 2 * jnp.abs(jnp.min(observed_timeseries))
+
             elif errors == "poisson":
                 raise NotImplementedError("Poisson errors are not implemented yet")
                 #### IMPLEMENT POISSON ERRORS
@@ -494,8 +500,11 @@ class Simulations:
 
 
         # set the mean of the time series
-        if mean == "default":
-            pass
+        if isinstance(mean,str):
+            if mean == "default":
+                pass
+            else:
+                raise ValueError(f"mean {mean} is not accepted, use either 'default' or a float")
         elif mean is None:
             observed_timeseries = observed_timeseries + 2 * jnp.abs(
                 jnp.min(observed_timeseries)
