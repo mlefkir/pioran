@@ -96,6 +96,7 @@ class GaussianProcess(eqx.Module):
         scale_errors: bool = True,
         log_transform: bool = False,
         nb_prediction_points: int = 0,
+        propagate_errors: bool = True,
         prediction_indexes: jax.Array | None = None,
     ) -> None:
         """Constructor method for the GaussianProcess class."""
@@ -184,6 +185,7 @@ class GaussianProcess(eqx.Module):
         # add the mean of the observed data as a parameter
         self.estimate_mean = estimate_mean
         self.log_transform = log_transform
+        self.propagate_errors = propagate_errors
 
         if self.estimate_mean:
             self.model.parameters.append(
@@ -489,7 +491,7 @@ class GaussianProcess(eqx.Module):
         x = self.observation_indexes  # time
 
         # apply log transformation
-        if self.log_transform:
+        if self.log_transform and self.propagate_errors:
             yerr = self.observation_errors.flatten() / (
                 self.observation_values.flatten() - self.model.parameters["const"].value
             )
