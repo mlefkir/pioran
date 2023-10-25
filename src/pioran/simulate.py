@@ -469,10 +469,14 @@ class Simulations:
             true_timeseries = jnp.exp(true_timeseries)
         if randomise_fluxes:
             if errors == "gauss":
+                N = 1000
+                p = jnp.linspace(0.99,0.01,N)
+                a = jnp.linspace(1,4,N)
+
                 # generate the variance of the errors
                 timeseries_error_size = ( errors_size *
-                    jnp.abs(true_timeseries)**.5
-                    * jnp.abs(random.normal(key=self.keys["errors"], shape=(len(t),)))
+                    jnp.sqrt(jnp.abs(true_timeseries)) # jnp.sqrt(jnp.mean(true_timeseries))# 
+                    * jax.random.choice(key=self.keys["errors"],a=a,p=p,shape=(len(t),)) #random.uniform(key=self.keys["errors"], shape=(len(t),))
                 )
                 # generate the measured time series with the associated fluxes
                 observed_timeseries = (
