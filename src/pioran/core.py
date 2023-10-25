@@ -3,6 +3,7 @@ import equinox as eqx
 import jax
 import jax.numpy as jnp
 import tinygp
+import celerite2.jax as celerite
 from jax.scipy.linalg import cholesky, solve, solve_triangular
 
 from .acvf_base import CovarianceFunction
@@ -81,7 +82,7 @@ class GaussianProcess(eqx.Module):
     """Use tinygp to compute the log marginal likelihood."""
     propagate_errors: bool = True
     """Propagate the errors on the observed data."""
-    
+    use_celerite: bool = False
     def __init__(
         self,
         function: CovarianceFunction | PowerSpectralDensity,
@@ -100,6 +101,7 @@ class GaussianProcess(eqx.Module):
         nb_prediction_points: int = 0,
         propagate_errors: bool = True,
         prediction_indexes: jax.Array | None = None,
+        use_celerite: bool = False,
     ) -> None:
         """Constructor method for the GaussianProcess class."""
 
@@ -117,13 +119,14 @@ class GaussianProcess(eqx.Module):
                 )
 
         self.use_tinygp = use_tinygp
-        if method in tinygp_methods and not use_tinygp:
+        self.use_celerite = use_celerite
+        if method in tinygp_methods and not (use_tinygp or use_celerite):
             raise ValueError(
                 f"Method '{method}' can only be used with tinygp, please set `use_tinygp=True`"
             )
-        if method not in tinygp_methods and use_tinygp:
+        if method not in tinygp_methods and (use_tinygp or use_celerite):
             raise ValueError(f"tinygp is only compatible with method {tinygp_methods}")
-        if self.use_tinygp and (n_components == 0):
+        if (self.use_tinygp or self.use_celerite) and (n_components == 0):
             raise ValueError(
                 "The number of components must be specified when using tinygp, please set `n_components=...`"
             )
@@ -150,13 +153,13 @@ class GaussianProcess(eqx.Module):
                 n_components=n_components,
                 estimate_variance=self.estimate_variance,
                 init_variance=jnp.var(observation_values, ddof=1),
+                use_celerite = self.use_celerite,
             )
             # self.model.print_info()
         else:
             raise TypeError(
                 f"The input model must be a CovarianceFunction or a PowerSpectralDensity, not {type(function)}"
             )
-
         # add a factor to scale the errors
         self.scale_errors = scale_errors
         if observation_errors is None:
@@ -164,7 +167,7 @@ class GaussianProcess(eqx.Module):
         if self.scale_errors and (observation_errors is not None):
             self.model.parameters.append("nu", 1.0, True, hyperparameter=False)
 
-        if not use_tinygp:
+        if not (use_tinygp or use_celerite):
             # Reshape the arrays
             self.observation_indexes = reshape_array(observation_indexes)
             self.observation_values = reshape_array(observation_values)
@@ -478,7 +481,44 @@ class GaussianProcess(eqx.Module):
             )
 
             return -l + correction
+    
+    def build_gp_celerite(self):
+        r"""Build the Gaussian Process using :obj:`celerite2`.
 
+        This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
+        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep` objects.
+
+        Returns
+        -------
+        :obj:`tinygp.GaussianProcess`
+            Gaussian Process object.
+        """
+        x = self.observation_indexes  # time
+
+        # apply log transformation
+        if self.log_transform and self.propagate_errors:
+            yerr = self.observation_errors.flatten() / (
+                self.observation_values.flatten() - self.model.parameters["const"].value
+            )
+        else:
+            yerr = self.observation_errors.flatten()
+
+        if self.estimate_mean and self.scale_errors:
+            gp = celerite.GaussianProcess(self.model.ACVF, mean=self.model.parameters["mu"].value)
+            gp.compute(x,diag=(self.model.parameters["nu"].value * yerr**2))
+            
+        elif self.estimate_mean:
+            gp = celerite.GaussianProcess(self.model.ACVF, mean=self.model.parameters["mu"].value)
+            gp.compute(x)
+        elif self.scale_errors:
+            gp = celerite.GaussianProcess(self.model.ACVF)
+            gp.compute(x,diag=(self.model.parameters["nu"].value * yerr**2))
+        else:
+            gp = celerite.GaussianProcess(self.model.ACVF)
+            gp.compute(x)
+
+        return gp
+    
     def build_gp_tinygp(self) -> tinygp.GaussianProcess:
         r"""Build the Gaussian Process using :obj:`tinygp`.
 
@@ -525,6 +565,30 @@ class GaussianProcess(eqx.Module):
             gp = tinygp.GaussianProcess(self.model.ACVF, x)
 
         return gp
+        
+    def compute_log_marginal_likelihood_celerite(self) -> jax.Array:
+        r"""Compute the log marginal likelihood of the Gaussian Process using celerite.
+
+        This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
+        In this case, the covariance function is a sum of :obj:`celerite2.jax.Terms` objects.
+
+        Returns
+        -------
+        :obj:`float`
+            Log marginal likelihood of the GP.
+
+        """
+        gp = self.build_gp_celerite()
+
+        if self.log_transform:
+            y = jnp.log(
+                jnp.abs(self.observation_values - self.model.parameters["const"].value)
+            )
+        else:
+            y = self.observation_values
+
+        return gp.log_likelihood(y)
+
 
     def compute_log_marginal_likelihood_tinygp(self) -> jax.Array:
         r"""Compute the log marginal likelihood of the Gaussian Process using tinygp.
@@ -552,6 +616,8 @@ class GaussianProcess(eqx.Module):
     def compute_log_marginal_likelihood(self) -> float:
         if self.use_tinygp:
             return self.compute_log_marginal_likelihood_tinygp()
+        elif self.use_celerite:
+            return self.compute_log_marginal_likelihood_celerite()
         return self.compute_log_marginal_likelihood_pioran()
 
     def wrapper_log_marginal_likelihood(self, parameters:jax.Array) -> float:

@@ -4,6 +4,7 @@ import equinox as eqx
 import jax
 import jax.numpy as jnp
 import tinygp
+from celerite2.jax import terms
 from tinygp.kernels.quasisep import SHO as SHO_term
 
 from .parameters import ParametersModel
@@ -93,6 +94,7 @@ class PSDToACV(eqx.Module):
     """Frequencies of the SHO kernels."""
     spectral_matrix: jax.Array | None = None
     """Matrix of the SHO kernels."""
+    use_celerite: bool = False
 
     def __init__(
         self,
@@ -105,6 +107,7 @@ class PSDToACV(eqx.Module):
         n_components: int = 0,
         estimate_variance: bool = True,
         init_variance: float = 1.0,
+        use_celerite = False
     ):
         """Constructor of the PSDToACV class."""
 
@@ -154,6 +157,7 @@ class PSDToACV(eqx.Module):
 
         tau_max = 0.5 / self.f0
         self.dtau = tau_max / (self.n_freq_grid - 1)
+        self.use_celerite = use_celerite
 
         if self.method == "FFT" or self.method == "NuFFT":
             self.frequencies = jnp.arange(0, self.fN + self.f0, self.f0)
@@ -223,12 +227,44 @@ class PSDToACV(eqx.Module):
 
         a, f = self.decompose_model(psd)
         return a, f
-
-    def build_SHO_model(
+    
+    def build_SHO_model_cel(
         self, amplitudes: jax.Array, frequencies: jax.Array
     ) -> tinygp.kernels.quasisep.SHO:
         """Build the semi-separable SHO model in tinygp from the amplitudes and frequencies.
 
+        Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes,
+        which is not possible with the SHO kernel implementation in tinygp.
+        
+        Parameters
+        ----------
+        amplitudes : :obj:`jax.Array`
+            Amplitudes of the SHO kernels.
+        frequencies : :obj:`jax.Array`
+            Frequencies of the SHO kernels.
+
+        Returns
+        -------
+        :obj:`tinygp.kernels.quasisep.SHO`
+            Constructed SHO kernel.
+            
+        
+        """
+        kernel = terms.RealTerm(a=amplitudes[0],c=0) *  terms.SHOTerm(sigma=1,Q=1 / jnp.sqrt(2), w0=2 * jnp.pi * frequencies[0])
+        for j in range(1,self.n_components):
+            kernel += terms.RealTerm(a=amplitudes[j],c=0) *  terms.SHOTerm(sigma=1,
+                Q=1 / jnp.sqrt(2), w0=2 * jnp.pi * frequencies[j]
+            )
+        return kernel
+
+    def build_SHO_model_tinygp(
+        self, amplitudes: jax.Array, frequencies: jax.Array
+    ) -> tinygp.kernels.quasisep.SHO:
+        """Build the semi-separable SHO model in tinygp from the amplitudes and frequencies.
+
+        Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes,
+        which is not possible with the SHO kernel implementation in tinygp.
+        
         Parameters
         ----------
         amplitudes : :obj:`jax.Array`
@@ -242,8 +278,10 @@ class PSDToACV(eqx.Module):
             Constructed SHO kernel.
         """
 
-        kernel = 0
-        for j in range(self.n_components):
+        kernel = amplitudes[0] * SHO_term(
+                quality=1 / jnp.sqrt(2), omega=2 * jnp.pi * frequencies[0]
+            )
+        for j in range(1,self.n_components):
             kernel += amplitudes[j] * SHO_term(
                 quality=1 / jnp.sqrt(2), omega=2 * jnp.pi * frequencies[j]
             )
@@ -266,10 +304,16 @@ class PSDToACV(eqx.Module):
 
         a, f = self.decompose_model(psd)
         if self.method == "SHO":
-            kernel = self.build_SHO_model(a * f, f)
+            if self.use_celerite:
+                kernel = self.build_SHO_model_cel(a*f, f)
+            else:
+                kernel = self.build_SHO_model_tinygp(a * f, f)
         else:
             raise NotImplementedError("Only SHO is implemented for now")
         if self.estimate_variance:
+            if self.use_celerite:
+                return terms.RealTerm(a=self.parameters["var"].value / jnp.sum(a * f),c=0) * kernel 
+
             return kernel * (self.parameters["var"].value / jnp.sum(a * f))
         return kernel
 
