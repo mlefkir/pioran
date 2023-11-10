@@ -465,7 +465,6 @@ class GaussianProcess(eqx.Module):
                 L = cholesky(nearest_positive_definite(Cov_xx), lower=True)
 
             z = solve_triangular(L, latent_values, lower=True)
-
             l = jnp.take(
                 jnp.sum(jnp.log(jnp.diagonal(L)))
                 + 0.5 * len(self.observation_indexes) * jnp.log(2 * jnp.pi)

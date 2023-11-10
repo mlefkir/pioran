@@ -140,6 +140,11 @@ class Simulations:
             self.acvf = model.calculate(self.tau)
 
         self.model = model
+        
+        # for error randomisation
+        N = 100000
+        self.proba = jnp.linspace(0.99, 0.01, N)
+        self.arr = jnp.linspace(1, 4, N)
 
     def generate_keys(self, seed: int = 0) -> None:
         """Generate the keys to generate the random numbers.
@@ -467,28 +472,46 @@ class Simulations:
 
         if exponentiate_ts:
             true_timeseries = jnp.exp(true_timeseries)
+
+        # set the mean of the time series
+        if isinstance(mean, str):
+            if mean == "default":
+                pass
+            else:
+                raise ValueError(
+                    f"mean {mean} is not accepted, use either 'default' or a float"
+                )
+        elif mean is None:
+            true_timeseries = true_timeseries + 2 * jnp.abs(jnp.min(true_timeseries))
+        else:
+            true_timeseries = true_timeseries - jnp.mean(true_timeseries) + mean
         if randomise_fluxes:
             if errors == "gauss":
-                N = 1000
-                p = jnp.linspace(0.99,0.01,N)
-                a = jnp.linspace(1,4,N)
-
                 # generate the variance of the errors
-                timeseries_error_size = ( errors_size *
-                    jnp.sqrt(jnp.abs(true_timeseries)) # jnp.sqrt(jnp.mean(true_timeseries))# 
-                    * jax.random.choice(key=self.keys["errors"],a=a,p=p,shape=(len(t),)) #random.uniform(key=self.keys["errors"], shape=(len(t),))
-                )
+                timeseries_error_size = (
+                    errors_size
+                    * jnp.sqrt(jnp.abs(true_timeseries))
+                    * jax.random.choice(
+                        key=self.keys["errors"], a=self.arr, p=self.proba, shape=(len(t),)
+                    )
+                )  # random.uniform(key=self.keys["errors"], shape=(len(t),))
+
                 # generate the measured time series with the associated fluxes
                 observed_timeseries = (
                     true_timeseries
                     + timeseries_error_size
                     * random.normal(key=self.keys["fluxes"], shape=(len(t),))
                 )
+
                 # if we exponentiated the time series, we need to make sure that the fluxes are positive
                 if exponentiate_ts:
                     if jnp.any(observed_timeseries <= 0):
-                        print("Negative fluxes, adding offset 2*min(ts) to the time series")
-                        observed_timeseries = observed_timeseries + 2 * jnp.abs(jnp.min(observed_timeseries))
+                        print(
+                            "Negative fluxes, adding offset 2*min(ts) to the time series"
+                        )
+                        observed_timeseries = observed_timeseries + 2 * jnp.abs(
+                            jnp.min(observed_timeseries)
+                        )
 
             elif errors == "poisson":
                 raise NotImplementedError("Poisson errors are not implemented yet")
@@ -502,33 +525,38 @@ class Simulations:
             timeseries_error_size = jnp.zeros_like(t)
             observed_timeseries = true_timeseries
 
+        # # set the mean of the time series
+        # if isinstance(mean,str):
+        #     if mean == "default":
+        #         pass
+        #     else:
+        #         raise ValueError(f"mean {mean} is not accepted, use either 'default' or a float")
+        # elif mean is None:
+        #     observed_timeseries = observed_timeseries + 2 * jnp.abs(
+        #         jnp.min(observed_timeseries)
+        #     )
+        # else:
+        #     observed_timeseries = (
+        #         observed_timeseries - jnp.mean(observed_timeseries) + mean
+        #     )
 
-        # set the mean of the time series
-        if isinstance(mean,str):
-            if mean == "default":
-                pass
-            else:
-                raise ValueError(f"mean {mean} is not accepted, use either 'default' or a float")
-        elif mean is None:
-            observed_timeseries = observed_timeseries + 2 * jnp.abs(
-                jnp.min(observed_timeseries)
-            )
-        else:
-            observed_timeseries = (
-                observed_timeseries - jnp.mean(observed_timeseries) + mean
-            )
-
-        if filename != '':
+        if filename != "":
             savetxt(
                 filename, jnp.vstack([t, observed_timeseries, timeseries_error_size]).T
             )
         if not irregular_gaps:
             if N_points != 0:
                 key = jax.random.PRNGKey(seed_gaps)
-                t_points = jnp.sort(jax.random.choice(key, t, shape=(N_points,), replace=False))
+                t_points = jnp.sort(
+                    jax.random.choice(key, t, shape=(N_points,), replace=False)
+                )
                 indexes_selected = jnp.searchsorted(t, t_points)
-                
-                return t_points, observed_timeseries[indexes_selected], timeseries_error_size[indexes_selected]
+
+                return (
+                    t_points,
+                    observed_timeseries[indexes_selected],
+                    timeseries_error_size[indexes_selected],
+                )
 
             return t, observed_timeseries, timeseries_error_size
         else:
@@ -538,7 +566,7 @@ class Simulations:
                 N_points=N_points,
                 min_n_gaps=min_n_gaps,
                 max_n_gaps=max_n_gaps,
-                max_size_slices=max_size_slices
+                max_size_slices=max_size_slices,
             )
             return (
                 t_gappy,
@@ -571,7 +599,7 @@ class Simulations:
             Maximum number of gaps. Default is 22.
         max_size_slices : obj:`float`
             Max size factor, default it 2.
-                
+
         Returns
         -------
         :obj:`jax.Array`
@@ -593,7 +621,9 @@ class Simulations:
                 .astype(int)
             )  # number of slices
             min_size_slices = jnp.rint(0.05 * N_tot).astype(int)
-            max_size_slices = jnp.rint(1 / (N_slices*max_size_slices) * N_tot).astype(int)
+            max_size_slices = jnp.rint(1 / (N_slices * max_size_slices) * N_tot).astype(
+                int
+            )
             size_slices = jax.random.randint(
                 keys[2],
                 minval=min_size_slices,
