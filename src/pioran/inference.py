@@ -19,7 +19,7 @@ from .plots import (diagnostics_psd_approx, plot_prior_predictive_PSD,
                     violin_plots_psd_approx)
 from .psdtoacv import PSDToACV
 from .utils import (get_samples_psd, progress_bar_factory,
-                    save_sampling_results, tinygp_methods,
+                    save_sampling_results, scalable_methods,
                     wrapper_psd_true_samples)
 from .utils.mcmc_visualisations import (from_samples_to_inference_data,
                                         plot_diagnostics_sampling)
@@ -172,7 +172,7 @@ class Inference:
             if isinstance(Process, GaussianProcess) and isinstance(
                 self.process.model, PSDToACV
             ):
-                if self.process.model.method in tinygp_methods:
+                if self.process.model.method in scalable_methods:
                     print(
                         f"\n>>>>>> The PSD model is a {self.process.model.method} decomposition, checking the approximation."
                     )

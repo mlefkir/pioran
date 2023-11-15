@@ -5,3 +5,5 @@ numpy
 scipy
 arviz
 asdf
+celerite2[jax] @ git+https://github.com/exoplanet-dev/celerite2.git@main
+

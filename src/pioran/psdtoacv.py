@@ -19,7 +19,7 @@ from .utils import (
 _USE_JAX_FINUFFT = True
 try:
     from jax_finufft import nufft2
-except s:
+except ImportError:
     nufft2 = None
     _USE_JAX_FINUFFT = False
 

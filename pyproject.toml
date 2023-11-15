@@ -22,8 +22,9 @@ ultranest = ["ultranest"]
 blackjax = ["blackjax"]
 test = ["pioran[ultranest]",
         "pioran[blackjax]",
-        "jax_finufft",'flake8','coverage']
+        "jax_finufft @ git+https://github.com/flatironinstitute/jax-finufft.git@main",'flake8','coverage']
 doc = ["sphinx",'numpydoc','sphinx_togglebutton','myst-nb','sphinx_copybutton',
         'sphinxcontrib.tikz','furo','autoapi','sphinxcontrib-tikz',
         'sphinx_design',"sphinx_codeautolink",]
+        
 all = ["pioran[test]"]
