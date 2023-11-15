@@ -20,7 +20,7 @@ from .plots import (
     plot_residuals,
 )
 from .psdtoacv import PSDToACV
-from .utils import SHO_power_spectrum
+from .utils import SHO_power_spectrum, DRWCelerite_power_spectrum
 
 
 class Visualisations:
@@ -83,7 +83,9 @@ class Visualisations:
         self.tau = jnp.linspace(0, self.x[-1], 1000)
         self.filename_prefix = filename
 
-    def plot_timeseries_diagnostics(self, prediction_indexes: jax.Array | None =None, **kwargs) -> None:
+    def plot_timeseries_diagnostics(
+        self, prediction_indexes: jax.Array | None = None, **kwargs
+    ) -> None:
         """Plot the timeseries diagnostics.
 
         This function will call the :func:`plot_prediction` and :func:`plot_residuals` functions to
@@ -349,43 +351,45 @@ class Visualisations:
                     )
 
                 # when the PSD model is approximated with tinygp, it is normalised to the variance
-                elif (
-                    isinstance(self.process.model, PSDToACV) and self.process.use_tinygp
+                elif isinstance(self.process.model, PSDToACV) and (
+                    self.process.use_tinygp or self.process.use_celerite
                 ):
                     posterior_PSD_approx = []
-                    if self.process.model.method != "SHO":
-                        raise NotImplementedError(
-                            "Posterior predictive PSDs are not implemented for PSDToACV with tinygp."
-                        )
+                    if self.process.model.method == "SHO":
+                        Power_spectrum_model = SHO_power_spectrum
+                        norm = lambda a, f: jnp.sum(a * f)
+                    elif self.process.model.method == "DRWCelerite":
+                        Power_spectrum_model = DRWCelerite_power_spectrum
+                        norm = (lambda a, f: jnp.sum(a * f * 2 * jnp.pi / 3),)
 
                     print("Plotting posterior predictive PSDs with tinygp...")
                     fc = self.process.model.spectral_points
                     factors = []
                     for it in range(samples.shape[0]):
                         self.process.model.parameters.set_free_values(samples[it])
-                        amps, _ = self.process.model.get_SHO_coefs()
-                        factors.append(jnp.sum(amps * fc))
+                        amps, _ = self.process.model.get_approx_coefs()
+                        factors.append(norm(amps, fc))
 
                         psd = self.process.model.PSD.calculate(f)  # calculate the PSD
-                        psd_sho = SHO_power_spectrum(
+                        psd_samples = Power_spectrum_model(
                             f, amps[..., None], fc[..., None]
                         ).sum(axis=0)
 
                         psd /= psd[0]  # normalise the PSD to the first value
-                        psd_sho /= psd_sho[0]  # normalise the PSD to the first value
+                        psd_samples /= psd_samples[
+                            0
+                        ]  # normalise the PSD to the first value
 
-                        psd /= jnp.sum(
-                            amps * fc
-                        )  # normalise the PSD to the sum of the amplitudes
-                        psd_sho /= jnp.sum(
-                            amps * fc
-                        )  # normalise the PSD to the sum of the amplitudes
+                        psd /= norm(amps, fc)
+                        # normalise the PSD to the sum of the amplitudes
+                        psd_samples /= norm(amps, fc)
+                        # normalise the PSD to the sum of the amplitudes
 
                         psd *= variance[it]  # scale the PSD to the variance
-                        psd_sho *= variance[it]  # scale the PSD to the variance
+                        psd_samples *= variance[it]  # scale the PSD to the variance
 
                         posterior_PSD.append(psd)
-                        posterior_PSD_approx.append(psd_sho)
+                        posterior_PSD_approx.append(psd_samples)
                         print(f"Samples: {it+1}/{samples.shape[0]}", end="\r")
                         sys.stdout.flush()
 

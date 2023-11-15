@@ -3,8 +3,8 @@ import numpy as np
 from jax import jit
 from jax.numpy import linalg as la
 
-valid_methods = ["FFT", "NuFFT", "SHO"]
-tinygp_methods = ["SHO"]
+valid_methods = ["FFT", "NuFFT", "SHO","DRWCelerite"]
+scalable_methods = ["SHO","DRWCelerite"]
 
 
 @jit

@@ -10,7 +10,7 @@ from .acvf_base import CovarianceFunction
 from .psd_base import PowerSpectralDensity
 from .psdtoacv import PSDToACV
 from .tools import reshape_array, sanity_checks
-from .utils import valid_methods, nearest_positive_definite, tinygp_methods
+from .utils import valid_methods, nearest_positive_definite, scalable_methods
 
 
 class GaussianProcess(eqx.Module):
@@ -39,6 +39,7 @@ class GaussianProcess(eqx.Module):
             - 'FFT': use the FFT to compute the autocovariance function.
             - 'NuFFT': use the non-uniform FFT to compute the autocovariance function.
             - 'SHO': approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function.
+            - 'DRWCelerite': approximate the power spectrum as a sum of DRW+Celerite basis functions to compute the autocovariance function.
     use_tinygp : :obj:`bool`, optional
         Use tinygp to compute the log marginal likelihood, by default False. Should only be used when the power spectrum model
         is expressed as a sum of quasi-separable kernels, i.e. method is not 'FFT' or 'NuFFT'.
@@ -83,6 +84,8 @@ class GaussianProcess(eqx.Module):
     propagate_errors: bool = True
     """Propagate the errors on the observed data."""
     use_celerite: bool = False
+    """Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood."""
+
     def __init__(
         self,
         function: CovarianceFunction | PowerSpectralDensity,
@@ -120,12 +123,14 @@ class GaussianProcess(eqx.Module):
 
         self.use_tinygp = use_tinygp
         self.use_celerite = use_celerite
-        if method in tinygp_methods and not (use_tinygp or use_celerite):
+        if method in scalable_methods and not (use_tinygp or use_celerite):
             raise ValueError(
                 f"Method '{method}' can only be used with tinygp, please set `use_tinygp=True`"
             )
-        if method not in tinygp_methods and (use_tinygp or use_celerite):
-            raise ValueError(f"tinygp is only compatible with method {tinygp_methods}")
+        if method not in scalable_methods and (use_tinygp or use_celerite):
+            raise ValueError(
+                f"tinygp is only compatible with method {scalable_methods}"
+            )
         if (self.use_tinygp or self.use_celerite) and (n_components == 0):
             raise ValueError(
                 "The number of components must be specified when using tinygp, please set `n_components=...`"
@@ -153,7 +158,7 @@ class GaussianProcess(eqx.Module):
                 n_components=n_components,
                 estimate_variance=self.estimate_variance,
                 init_variance=jnp.var(observation_values, ddof=1),
-                use_celerite = self.use_celerite,
+                use_celerite=self.use_celerite,
             )
             # self.model.print_info()
         else:
@@ -235,20 +240,22 @@ class GaussianProcess(eqx.Module):
             else reshape_array(prediction_indexes)
         )
 
-    def get_cov(self, xt:jax.Array, xp:jax.Array, errors: jax.Array|None =None) -> jax.Array:
+    def get_cov(
+        self, xt: jax.Array, xp: jax.Array, errors: jax.Array | None = None
+    ) -> jax.Array:
         r"""Compute the covariance matrix between two arrays.
 
         To compute the covariance matrix, this function calls the get_cov_matrix method of the model.
         If the errors are not None, then the covariance matrix is computed for the observationst,
         i.e. with observed data as input (xt=xp=observed data) and the errors on the measurement.
         The total covariance matrix is computed as:
-        
-        .. math:: 
-            
+
+        .. math::
+
             C = K + \nu \sigma ^ 2 \times [I]
-        
+
         With :math:`I` the identity matrix, :math:`K` the covariance matrix, :math:`\sigma` the errors and :math:`\nu` a free parameter to scale the errors.
-        
+
 
         Parameters
         ----------
@@ -325,7 +332,9 @@ class GaussianProcess(eqx.Module):
         return Cov_xx, Cov_inv, alpha
 
     def compute_predictive_distribution(
-        self, log_transform:bool |None =None, prediction_indexes: jax.Array | None=None
+        self,
+        log_transform: bool | None = None,
+        prediction_indexes: jax.Array | None = None,
     ):
         r"""Compute the predictive mean and the predictive covariance of the GP.
 
@@ -352,7 +361,7 @@ class GaussianProcess(eqx.Module):
         else:
             prediction_indexes = self.prediction_indexes
 
-        if not self.use_tinygp:
+        if (not self.use_tinygp) and (not self.use_celerite):
             # Compute the covariance matrix between the observed indexes
             _, Cov_inv, alpha = self.get_cov_training()
             # Compute the covariance matrix between the observed indexes and the prediction indexes
@@ -375,7 +384,7 @@ class GaussianProcess(eqx.Module):
             predictive_covariance = nearest_positive_definite(
                 Cov_xpxp - Cov_xxp.T @ Cov_inv @ Cov_xxp
             )
-        else:
+        elif self.use_tinygp:
             gp = self.build_gp_tinygp()
             if log_transform:
                 y = jnp.log(
@@ -385,6 +394,20 @@ class GaussianProcess(eqx.Module):
                 )
             else:
                 y = self.observation_values
+            predictive_mean, predictive_covariance = gp.predict(
+                y, prediction_indexes.flatten(), include_mean=True, return_cov=True
+            )
+        else:
+            gp = self.build_gp_celerite()
+            if log_transform:
+                y = jnp.log(
+                    jnp.abs(
+                        self.observation_values - self.model.parameters["const"].value
+                    )
+                )
+            else:
+                y = self.observation_values
+            ## need to check this!!!!
             predictive_mean, predictive_covariance = gp.predict(
                 y, prediction_indexes.flatten(), include_mean=True, return_cov=True
             )
@@ -480,7 +503,7 @@ class GaussianProcess(eqx.Module):
             )
 
             return -l + correction
-    
+
     def build_gp_celerite(self):
         r"""Build the Gaussian Process using :obj:`celerite2`.
 
@@ -503,21 +526,25 @@ class GaussianProcess(eqx.Module):
             yerr = self.observation_errors.flatten()
 
         if self.estimate_mean and self.scale_errors:
-            gp = celerite.GaussianProcess(self.model.ACVF, mean=self.model.parameters["mu"].value)
-            gp.compute(x,diag=(self.model.parameters["nu"].value * yerr**2))
-            
+            gp = celerite.GaussianProcess(
+                self.model.ACVF, mean=self.model.parameters["mu"].value
+            )
+            gp.compute(x, diag=(self.model.parameters["nu"].value * yerr**2))
+
         elif self.estimate_mean:
-            gp = celerite.GaussianProcess(self.model.ACVF, mean=self.model.parameters["mu"].value)
+            gp = celerite.GaussianProcess(
+                self.model.ACVF, mean=self.model.parameters["mu"].value
+            )
             gp.compute(x)
         elif self.scale_errors:
             gp = celerite.GaussianProcess(self.model.ACVF)
-            gp.compute(x,diag=(self.model.parameters["nu"].value * yerr**2))
+            gp.compute(x, diag=(self.model.parameters["nu"].value * yerr**2))
         else:
             gp = celerite.GaussianProcess(self.model.ACVF)
             gp.compute(x)
 
         return gp
-    
+
     def build_gp_tinygp(self) -> tinygp.GaussianProcess:
         r"""Build the Gaussian Process using :obj:`tinygp`.
 
@@ -543,9 +570,7 @@ class GaussianProcess(eqx.Module):
             gp = tinygp.GaussianProcess(
                 self.model.ACVF,
                 x,
-                diag=(
-                    self.model.parameters["nu"].value * yerr**2
-                ),
+                diag=(self.model.parameters["nu"].value * yerr**2),
                 mean=self.model.parameters["mu"].value,
             )
         elif self.estimate_mean:
@@ -556,15 +581,13 @@ class GaussianProcess(eqx.Module):
             gp = tinygp.GaussianProcess(
                 self.model.ACVF,
                 x,
-                diag=(
-                    self.model.parameters["nu"].value * yerr**2
-                ),
+                diag=(self.model.parameters["nu"].value * yerr**2),
             )
         else:
             gp = tinygp.GaussianProcess(self.model.ACVF, x)
 
         return gp
-        
+
     def compute_log_marginal_likelihood_celerite(self) -> jax.Array:
         r"""Compute the log marginal likelihood of the Gaussian Process using celerite.
 
@@ -587,7 +610,6 @@ class GaussianProcess(eqx.Module):
             y = self.observation_values
 
         return gp.log_likelihood(y)
-
 
     def compute_log_marginal_likelihood_tinygp(self) -> jax.Array:
         r"""Compute the log marginal likelihood of the Gaussian Process using tinygp.
@@ -619,7 +641,7 @@ class GaussianProcess(eqx.Module):
             return self.compute_log_marginal_likelihood_celerite()
         return self.compute_log_marginal_likelihood_pioran()
 
-    def wrapper_log_marginal_likelihood(self, parameters:jax.Array) -> float:
+    def wrapper_log_marginal_likelihood(self, parameters: jax.Array) -> float:
         """Wrapper to compute the log marginal likelihood in function of the (hyper)parameters.
 
         Parameters
@@ -635,7 +657,7 @@ class GaussianProcess(eqx.Module):
         self.model.parameters.set_free_values(parameters)
         return self.compute_log_marginal_likelihood()
 
-    def wrapper_neg_log_marginal_likelihood(self, parameters:jax.Array) -> float:
+    def wrapper_neg_log_marginal_likelihood(self, parameters: jax.Array) -> float:
         """Wrapper to compute the negative log marginal likelihood in function of the (hyper)parameters.
 
         Parameters

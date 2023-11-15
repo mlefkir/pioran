@@ -10,7 +10,7 @@ def SHO_power_spectrum(f: jax.Array, A: float, f0: float) -> jax.Array:
 
     .. math:: :label: sho_power_spectrum
 
-       \mathcal{P}(f) = \dfrac{A}{1 + (f-f_0)^4}.
+       \mathcal{P}(f) = \dfrac{A}{1 + (f/f_0)^4}.
 
     with the amplitude :math:`A`, the position :math:`f_0\ge 0`.
 
@@ -29,6 +29,33 @@ def SHO_power_spectrum(f: jax.Array, A: float, f0: float) -> jax.Array:
     :obj:`jax.Array`
     """
     P = A / (1 + jnp.power((f / f0), 4))
+
+    return P
+
+def DRWCelerite_power_spectrum(f: jax.Array, A: float, f0: float) -> jax.Array:
+    r"""Power spectrum of the DRW+Celerite component.
+
+    .. math:: :label: sho_power_spectrum
+
+       \mathcal{P}(f) = \dfrac{A}{1 + (f/f_0)^6}.
+
+    with the amplitude :math:`A`, the position :math:`f_0\ge 0`.
+
+
+    Parameters
+    ----------
+    f : :obj:`jax.Array`
+        Frequency array.
+    A : :obj:`float`
+        Amplitude.
+    f0 : :obj:`float`
+        Position.
+
+    Returns
+    -------
+    :obj:`jax.Array`
+    """
+    P = A / (1 + jnp.power((f / f0), 6))
 
     return P
 

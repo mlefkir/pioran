@@ -9,13 +9,17 @@ from tinygp.kernels.quasisep import SHO as SHO_term
 
 from .parameters import ParametersModel
 from .psd_base import PowerSpectralDensity
-from .utils import (EuclideanDistance, decompose_triangular_matrix,
-                    reconstruct_triangular_matrix, valid_methods)
+from .utils import (
+    EuclideanDistance,
+    decompose_triangular_matrix,
+    reconstruct_triangular_matrix,
+    valid_methods,
+)
 
 _USE_JAX_FINUFFT = True
 try:
     from jax_finufft import nufft2
-except ImportError:
+except s:
     nufft2 = None
     _USE_JAX_FINUFFT = False
 
@@ -65,7 +69,8 @@ class PSDToACV(eqx.Module):
     """Method to compute the covariance function from the power spectral density, by default 'FFT'.Possible values are:
             - 'FFT': use the FFT to compute the autocovariance function.
             - 'NuFFT': use the non-uniform FFT to compute the autocovariance function.
-            - 'SHO': approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function."""
+            - 'SHO': approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function.
+            - 'DRWCelerite' : approximate the power spectrum as a sum of DRW+Celerite basis functions to compute the autocovariance function."""
     f_max_obs: float
     """Maximum observed frequency, i.e. the Nyquist frequency."""
     f_min_obs: float
@@ -95,6 +100,7 @@ class PSDToACV(eqx.Module):
     spectral_matrix: jax.Array | None = None
     """Matrix of the SHO kernels."""
     use_celerite: bool = False
+    """Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood."""
 
     def __init__(
         self,
@@ -107,7 +113,7 @@ class PSDToACV(eqx.Module):
         n_components: int = 0,
         estimate_variance: bool = True,
         init_variance: float = 1.0,
-        use_celerite = False
+        use_celerite=False,
     ):
         """Constructor of the PSDToACV class."""
 
@@ -141,6 +147,7 @@ class PSDToACV(eqx.Module):
         self.method = method
         self.S_low = S_low
         self.S_high = S_high
+        self.use_celerite = use_celerite
 
         if self.estimate_variance:
             self.parameters.append("var", init_variance, True, hyperparameter=False)
@@ -157,12 +164,12 @@ class PSDToACV(eqx.Module):
 
         tau_max = 0.5 / self.f0
         self.dtau = tau_max / (self.n_freq_grid - 1)
-        self.use_celerite = use_celerite
 
         if self.method == "FFT" or self.method == "NuFFT":
             self.frequencies = jnp.arange(0, self.fN + self.f0, self.f0)
             self.tau = jnp.arange(0, tau_max + self.dtau, self.dtau)
 
+        # here we define the spectral matrix for the PSD approximation
         elif self.method == "SHO":
             self.n_components = n_components
             self.spectral_points = jnp.geomspace(self.f0, self.fN, self.n_components)
@@ -172,13 +179,22 @@ class PSDToACV(eqx.Module):
                     jnp.atleast_2d(self.spectral_points).T / self.spectral_points, 4
                 )
             )
+        elif self.method == "DRWCelerite":
+            self.n_components = n_components
+            self.spectral_points = jnp.geomspace(self.f0, self.fN, self.n_components)
+            self.spectral_matrix = 1 / (
+                1
+                + jnp.power(
+                    jnp.atleast_2d(self.spectral_points).T / self.spectral_points, 6
+                )
+            )
         else:
             raise NotImplementedError(f"Method {self.method} not implemented")
 
     def decompose_model(self, psd_normalised: jax.Array):
-        r"""Decompose the model into a sum of SHO kernels.
+        r"""Decompose the PSD model into a sum of basis functions.
 
-        Assuming that the model can be written as a sum of :math:`J` SHO kernels, this method
+        Assuming that the PSD model can be written as a sum of :math:`J` , this method
         solve the linear system to find the amplitude :math:`a_j` of each kernel.
 
         .. math:: :label: sho_power_spectrum
@@ -186,12 +202,17 @@ class PSDToACV(eqx.Module):
         \boldsymbol{y} = B \boldsymbol{a}
 
         with :math:`\boldsymbol{y}=\begin{bmatrix}1 & \mathcal{P}(f_1)/\mathcal{P}(f_0) & \cdots & \mathcal{P}(f_J)/\mathcal{P}(f_0) \end{bmatrix}^\mathrm{T}`
-        the normalised power spectral density vector, :math:`B` the spectral matrix associated to the linear system and :math:`\boldsymbol{a}` the amplitudes of the SHO kernels.
+        the normalised power spectral density vector, :math:`B` the spectral matrix associated to the linear system and :math:`\boldsymbol{a}` the amplitudes of the functions.
 
 
         .. math:: :label: sho_spectral_matrix
 
         B_{ij} = \dfrac{1}{1 + \left(\dfrac{f_i}{f_j}\right)^4}
+
+
+        .. math:: :label: drwcel_spectral_matrix
+
+        B_{ij} = \dfrac{1}{1 + \left(\dfrac{f_i}{f_j}\right)^6}
 
 
         Parameters
@@ -202,18 +223,18 @@ class PSDToACV(eqx.Module):
         Returns
         -------
         :obj:`jax.Array`
-            Amplitudes of the SHO kernels.
+            Amplitudes of the functions.
         :obj:`jax.Array`
-            Frequencies of the SHO kernels.
+            Frequencies of the function.
         """
 
         a = jnp.linalg.solve(self.spectral_matrix, psd_normalised)
         return a, self.spectral_points
 
-    def get_SHO_coefs(self):
-        """Get the amplitudes and frequencies of the SHO kernels.
+    def get_approx_coefs(self):
+        """Get the amplitudes and frequencies of the basis functions.
 
-        Estimate the amplitudes and frequencies of the SHO kernels by solving the linear system.
+        Estimate the amplitudes and frequencies of the basis functions by solving the linear system.
 
         Returns
         -------
@@ -227,15 +248,15 @@ class PSDToACV(eqx.Module):
 
         a, f = self.decompose_model(psd)
         return a, f
-    
+
     def build_SHO_model_cel(
         self, amplitudes: jax.Array, frequencies: jax.Array
-    ) -> tinygp.kernels.quasisep.SHO:
-        """Build the semi-separable SHO model in tinygp from the amplitudes and frequencies.
+    ) -> terms.Term:
+        """Build the semi-separable SHO model in celerite from the amplitudes and frequencies.
 
-        Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes,
-        which is not possible with the SHO kernel implementation in tinygp.
-        
+        Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes.
+        The amplitudes are modelled as a DRW model with c=0.
+
         Parameters
         ----------
         amplitudes : :obj:`jax.Array`
@@ -245,15 +266,48 @@ class PSDToACV(eqx.Module):
 
         Returns
         -------
-        :obj:`tinygp.kernels.quasisep.SHO`
+        :obj:`term.Term`
             Constructed SHO kernel.
-            
-        
         """
-        kernel = terms.RealTerm(a=amplitudes[0],c=0) *  terms.SHOTerm(sigma=1,Q=1 / jnp.sqrt(2), w0=2 * jnp.pi * frequencies[0])
-        for j in range(1,self.n_components):
-            kernel += terms.RealTerm(a=amplitudes[j],c=0) *  terms.SHOTerm(sigma=1,
-                Q=1 / jnp.sqrt(2), w0=2 * jnp.pi * frequencies[j]
+        kernel = terms.RealTerm(a=amplitudes[0], c=0) * terms.SHOTerm(
+            sigma=1, Q=1 / jnp.sqrt(2), w0=2 * jnp.pi * frequencies[0]
+        )
+        for j in range(1, self.n_components):
+            kernel += terms.RealTerm(a=amplitudes[j], c=0) * terms.SHOTerm(
+                sigma=1, Q=1 / jnp.sqrt(2), w0=2 * jnp.pi * frequencies[j]
+            )
+        return kernel
+
+    def build_DRWCelerite_model_cel(
+        self, amplitudes: jax.Array, frequencies: jax.Array
+    ) -> terms.Term:
+        """Build the semi-separable DRW+Celerite model in celerite from the amplitudes and frequencies.
+
+        The amplitudes
+
+        Parameters
+        ----------
+        amplitudes : :obj:`jax.Array`
+            Amplitudes of the SHO kernels.
+        frequencies : :obj:`jax.Array`
+            Frequencies of the SHO kernels.
+
+        Returns
+        -------
+        :obj:`term.Term`
+            Constructed SHO kernel.
+        """
+        w_j = 2 * jnp.pi * frequencies
+        a = amplitudes * w_j / 6
+        b = jnp.sqrt(3) * w_j * amplitudes / 6
+        c = w_j / 2
+        d = w_j * jnp.sqrt(3) / 2
+        kernel = terms.RealTerm(a=a[0], c=w_j[0]) + terms.ComplexTerm(
+            a=a[0], b=b[0], c=c[0], d=d[0]
+        )
+        for j in range(1, self.n_components):
+            kernel += terms.RealTerm(a=a[j], c=w_j[j]) + terms.ComplexTerm(
+                a=a[j], b=b[j], c=c[j], d=d[j]
             )
         return kernel
 
@@ -264,7 +318,7 @@ class PSDToACV(eqx.Module):
 
         Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes,
         which is not possible with the SHO kernel implementation in tinygp.
-        
+
         Parameters
         ----------
         amplitudes : :obj:`jax.Array`
@@ -279,9 +333,9 @@ class PSDToACV(eqx.Module):
         """
 
         kernel = amplitudes[0] * SHO_term(
-                quality=1 / jnp.sqrt(2), omega=2 * jnp.pi * frequencies[0]
-            )
-        for j in range(1,self.n_components):
+            quality=1 / jnp.sqrt(2), omega=2 * jnp.pi * frequencies[0]
+        )
+        for j in range(1, self.n_components):
             kernel += amplitudes[j] * SHO_term(
                 quality=1 / jnp.sqrt(2), omega=2 * jnp.pi * frequencies[j]
             )
@@ -305,27 +359,45 @@ class PSDToACV(eqx.Module):
         a, f = self.decompose_model(psd)
         if self.method == "SHO":
             if self.use_celerite:
-                kernel = self.build_SHO_model_cel(a*f, f)
+                kernel = self.build_SHO_model_cel(a * f, f)
             else:
                 kernel = self.build_SHO_model_tinygp(a * f, f)
+        elif self.method == "DRWSHO":
+            if self.use_celerite:
+                kernel = self.build_DRWCelerite_model_cel(a, f)
+            else:
+                raise NotImplementedError(
+                    "DRWCelerite is only implemented for the celerite2 backend"
+                )
         else:
             raise NotImplementedError("Only SHO is implemented for now")
+
         if self.estimate_variance:
             if self.use_celerite:
-                return terms.RealTerm(a=self.parameters["var"].value / jnp.sum(a * f),c=0) * kernel 
+                if self.method == "SHO":
+                    return (
+                        terms.RealTerm(
+                            a=self.parameters["var"].value / jnp.sum(a * f), c=0
+                        )
+                        * kernel
+                    )
+                elif self.method == "DRWSHO":
+                    return (
+                        terms.RealTerm(
+                            a=self.parameters["var"].value
+                            / jnp.sum(a * f * 2 * jnp.pi / 3),
+                            c=0,
+                        )
+                        * kernel
+                    )
+
+                else:
+                    raise NotImplementedError(
+                        "The estimation of the variance is implemented for SHO and DRWSHO only"
+                    )
 
             return kernel * (self.parameters["var"].value / jnp.sum(a * f))
         return kernel
-
-    def calculate_rescale(self, t: jax.Array) -> jax.Array:
-        if self.method == "FFT":
-            psd = self.PSD.calculate(self.frequencies[1:])
-            # add a zero at the beginning to account for the zero frequency
-            psd = jnp.insert(psd, 0, 0)
-            acvf = self.get_acvf_byFFT(psd)
-            if self.estimate_variance:
-                # normalize by the variance instead of integrating the PSD with the trapezium rule
-                return acvf[0]
 
     def calculate(self, t: jax.Array, with_ACVF_factor: bool = False) -> jax.Array:
         """
