@@ -5,6 +5,8 @@ import jax
 import jax.numpy as jnp
 import tinygp
 from celerite2.jax import terms
+import celerite2.terms as legacy_terms
+
 from tinygp.kernels.quasisep import SHO as SHO_term
 
 from .parameters import ParametersModel
@@ -101,6 +103,8 @@ class PSDToACV(eqx.Module):
     """Matrix of the SHO kernels."""
     use_celerite: bool = False
     """Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood."""
+    use_legacy_celerite: bool = False
+    """Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood."""
 
     def __init__(
         self,
@@ -114,6 +118,7 @@ class PSDToACV(eqx.Module):
         estimate_variance: bool = True,
         init_variance: float = 1.0,
         use_celerite=False,
+        use_legacy_celerite: bool = False
     ):
         """Constructor of the PSDToACV class."""
 
@@ -148,6 +153,7 @@ class PSDToACV(eqx.Module):
         self.S_low = S_low
         self.S_high = S_high
         self.use_celerite = use_celerite
+        self.use_legacy_celerite = use_legacy_celerite
 
         if self.estimate_variance:
             self.parameters.append("var", init_variance, True, hyperparameter=False)
@@ -248,6 +254,37 @@ class PSDToACV(eqx.Module):
 
         a, f = self.decompose_model(psd)
         return a, f
+
+    def build_SHO_model_legacy_cel(
+        self, amplitudes: jax.Array, frequencies: jax.Array
+    ) -> terms.Term:
+        """Build the semi-separable SHO model in celerite from the amplitudes and frequencies.
+
+        Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes.
+        The amplitudes are modelled as a DRW model with c=0.
+
+        Parameters
+        ----------
+        amplitudes : :obj:`jax.Array`
+            Amplitudes of the SHO kernels.
+        frequencies : :obj:`jax.Array`
+            Frequencies of the SHO kernels.
+
+        Returns
+        -------
+        :obj:`term.Term`
+            Constructed SHO kernel.
+        """
+        kernel = legacy_terms.RealTerm(a=amplitudes[0], c=0) * legacy_terms.SHOTerm(
+            sigma=1, Q=1 / jnp.sqrt(2), w0=2 * jnp.pi * frequencies[0]
+        )
+        for j in range(1, self.n_components):
+            kernel += legacy_terms.RealTerm(
+                a=amplitudes[j], c=0
+            ) * legacy_terms.SHOTerm(
+                sigma=1, Q=1 / jnp.sqrt(2), w0=2 * jnp.pi * frequencies[j]
+            )
+        return kernel
 
     def build_SHO_model_cel(
         self, amplitudes: jax.Array, frequencies: jax.Array
@@ -359,12 +396,18 @@ class PSDToACV(eqx.Module):
         a, f = self.decompose_model(psd)
         if self.method == "SHO":
             if self.use_celerite:
-                kernel = self.build_SHO_model_cel(a * f, f)
+                if self.use_legacy_celerite:
+                    kernel = self.build_SHO_model_legacy_cel(a * f, f)
+                else:
+                    kernel = self.build_SHO_model_cel(a * f, f)
             else:
                 kernel = self.build_SHO_model_tinygp(a * f, f)
         elif self.method == "DRWSHO":
             if self.use_celerite:
-                kernel = self.build_DRWCelerite_model_cel(a, f)
+                if self.use_legacy_celerite:
+                    raise NotImplementedError("Not implemented for legacy celerite")
+                else:
+                    kernel = self.build_DRWCelerite_model_cel(a, f)
             else:
                 raise NotImplementedError(
                     "DRWCelerite is only implemented for the celerite2 backend"
@@ -375,6 +418,13 @@ class PSDToACV(eqx.Module):
         if self.estimate_variance:
             if self.use_celerite:
                 if self.method == "SHO":
+                    if self.use_legacy_celerite:
+                        return (
+                            legacy_terms.RealTerm(
+                                a=self.parameters["var"].value / jnp.sum(a * f), c=0
+                            )
+                            * kernel
+                        )
                     return (
                         terms.RealTerm(
                             a=self.parameters["var"].value / jnp.sum(a * f), c=0
@@ -382,6 +432,8 @@ class PSDToACV(eqx.Module):
                         * kernel
                     )
                 elif self.method == "DRWSHO":
+                    if self.use_legacy_celerite:
+                        raise NotImplementedError("Not implemented for legacy celerite")
                     return (
                         terms.RealTerm(
                             a=self.parameters["var"].value

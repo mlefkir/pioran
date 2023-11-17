@@ -4,6 +4,7 @@ import jax
 import jax.numpy as jnp
 import tinygp
 import celerite2.jax as celerite
+import celerite2 as celerite_legacy
 from jax.scipy.linalg import cholesky, solve, solve_triangular
 
 from .acvf_base import CovarianceFunction
@@ -84,8 +85,9 @@ class GaussianProcess(eqx.Module):
     propagate_errors: bool = True
     """Propagate the errors on the observed data."""
     use_celerite: bool = False
+    """Use celerite2 jax as a backend to model the autocovariance function and compute the log marginal likelihood."""
+    use_legacy_celerite: bool = False
     """Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood."""
-
     def __init__(
         self,
         function: CovarianceFunction | PowerSpectralDensity,
@@ -105,6 +107,7 @@ class GaussianProcess(eqx.Module):
         propagate_errors: bool = True,
         prediction_indexes: jax.Array | None = None,
         use_celerite: bool = False,
+        use_legacy_celerite: bool = False,
     ) -> None:
         """Constructor method for the GaussianProcess class."""
 
@@ -123,6 +126,7 @@ class GaussianProcess(eqx.Module):
 
         self.use_tinygp = use_tinygp
         self.use_celerite = use_celerite
+        self.use_legacy_celerite = use_legacy_celerite
         if method in scalable_methods and not (use_tinygp or use_celerite):
             raise ValueError(
                 f"Method '{method}' can only be used with tinygp, please set `use_tinygp=True`"
@@ -158,7 +162,7 @@ class GaussianProcess(eqx.Module):
                 n_components=n_components,
                 estimate_variance=self.estimate_variance,
                 init_variance=jnp.var(observation_values, ddof=1),
-                use_celerite=self.use_celerite,
+                use_celerite=self.use_celerite,use_legacy_celerite=self.use_legacy_celerite,
             )
             # self.model.print_info()
         else:
@@ -505,10 +509,10 @@ class GaussianProcess(eqx.Module):
             return -l + correction
 
     def build_gp_celerite(self):
-        r"""Build the Gaussian Process using :obj:`celerite2`.
+        r"""Build the Gaussian Process using :obj:`celerite2.jax`.
 
         This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
-        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep` objects.
+        In this case, the covariance function is a sum of :obj:`celerite2.jax.terms` objects.
 
         Returns
         -------
@@ -541,6 +545,47 @@ class GaussianProcess(eqx.Module):
             gp.compute(x, diag=(self.model.parameters["nu"].value * yerr**2))
         else:
             gp = celerite.GaussianProcess(self.model.ACVF)
+            gp.compute(x)
+
+        return gp
+
+    def build_gp_celerite_legacy(self):
+        r"""Build the Gaussian Process using :obj:`celerite2`.
+
+        This function is called when the power spectrum model is expressed as a sum of quasi-separable kernels.
+        In this case, the covariance function is a sum of :obj:`tinygp.kernels.quasisep` objects.
+
+        Returns
+        -------
+        :obj:`tinygp.GaussianProcess`
+            Gaussian Process object.
+        """
+        x = self.observation_indexes  # time
+
+        # apply log transformation
+        if self.log_transform and self.propagate_errors:
+            yerr = self.observation_errors.flatten() / (
+                self.observation_values.flatten() - self.model.parameters["const"].value
+            )
+        else:
+            yerr = self.observation_errors.flatten()
+
+        if self.estimate_mean and self.scale_errors:
+            gp = celerite_legacy.GaussianProcess(
+                self.model.ACVF, mean=self.model.parameters["mu"].value
+            )
+            gp.compute(x, diag=(self.model.parameters["nu"].value * yerr**2))
+
+        elif self.estimate_mean:
+            gp = celerite_legacy.GaussianProcess(
+                self.model.ACVF, mean=self.model.parameters["mu"].value
+            )
+            gp.compute(x)
+        elif self.scale_errors:
+            gp = celerite_legacy.GaussianProcess(self.model.ACVF)
+            gp.compute(x, diag=(self.model.parameters["nu"].value * yerr**2))
+        else:
+            gp = celerite_legacy.GaussianProcess(self.model.ACVF)
             gp.compute(x)
 
         return gp
@@ -600,7 +645,10 @@ class GaussianProcess(eqx.Module):
             Log marginal likelihood of the GP.
 
         """
-        gp = self.build_gp_celerite()
+        if self.use_legacy_celerite:
+            gp = self.build_gp_celerite_legacy()
+        else:
+            gp = self.build_gp_celerite()
 
         if self.log_transform:
             y = jnp.log(
