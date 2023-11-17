@@ -101,7 +101,7 @@ class Visualisations:
         print("Plotting timeseries diagnostics...")
         log_transform = (
             False
-            if (not self.process.use_tinygp and self.process.log_transform)
+            if ( (not (self.process.use_tinygp or self.process.use_celerite )) and self.process.log_transform)
             else None
         )
 
@@ -271,10 +271,9 @@ class Visualisations:
                 posterior_PSD = []
                 posterior_ACVF = []
 
-                if (
-                    isinstance(self.process.model, PSDToACV)
-                    and not self.process.use_tinygp
-                ):
+                if isinstance(self.process.model, PSDToACV) and not (
+                    self.process.use_tinygp or self.process.use_celerite
+                ):  # when the PSD model is not approximated with tinygp or celerite
                     if self.process.estimate_variance:
                         sumP = np.array([])
                         if not os.path.isfile(
