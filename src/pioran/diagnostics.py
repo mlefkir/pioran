@@ -22,6 +22,8 @@ from .plots import (
 from .psdtoacv import PSDToACV
 from .utils import SHO_power_spectrum, DRWCelerite_power_spectrum
 
+import matplotlib.pyplot as plt
+
 
 class Visualisations:
     """Class for visualising the results after an inference run.
@@ -61,6 +63,7 @@ class Visualisations:
     """The times at which to evaluate the ACFs."""
     filename_prefix: str
     """The filename prefix for the output plots."""
+    process_legacy: GaussianProcess
 
     def __init__(
         self,
@@ -83,7 +86,172 @@ class Visualisations:
         self.tau = jnp.linspace(0, self.x[-1], 1000)
         self.filename_prefix = filename
 
+        if isinstance(self.process, GaussianProcess):
+            if self.process.use_legacy_celerite:
+                self.process_legacy = self.process
+            else:
+                self.process_legacy = GaussianProcess(
+                    process.model.PSD,
+                    process.observation_indexes,
+                    process.observation_values,
+                    process.observation_errors,
+                    S_low=process.S_low,
+                    S_high=process.S_high,
+                    method=process.method,
+                    estimate_variance=process.estimate_variance,
+                    estimate_mean=process.estimate_mean,
+                    log_transform=process.log_transform,
+                    scale_errors=process.scale_errors,
+                    n_components=process.n_components,
+                    use_tinygp=False,
+                    use_celerite=True,
+                    use_legacy_celerite=True,
+                )
+
     def plot_timeseries_diagnostics(
+        self, samples, prediction_indexes: jax.Array | None = None, n_samples: int = 400
+    ) -> None:
+        """Plot the timeseries diagnostics using samples from the posterior distribution.
+
+        This function will call the :func:`plot_prediction` and :func:`plot_residuals` functions to
+        plot the predicted timeseries and the residuals.
+
+        Parameters
+        ----------
+        samples : :obj:`jax.Array`
+            The samples from the posterior distribution.
+        prediction_indexes : :obj:`jax.Array`, optional
+            The prediction times, by default None
+        n_samples : :obj:`int`, optional
+            The number of samples to use for the posterior predictive checks, by default 400
+        **kwargs
+            Additional keyword arguments to be passed to the :func:`plot_prediction` and :func:`plot_residuals` functions.
+        """
+        print("Plotting timeseries diagnostics...")
+        log_transform = (
+            False
+            if (
+                (
+                    not (
+                        self.process_legacy.use_tinygp
+                        or self.process_legacy.use_celerite
+                    )
+                )
+                and self.process_legacy.log_transform
+            )
+            else None
+        )
+
+        print("Sampling from the posterior residuals...")
+        t_cont = jnp.unique(
+            jnp.concatenate((jnp.linspace(self.x[0], self.x[-1], 1000), self.x))
+        )
+        indexes_obs = np.searchsorted(t_cont, self.x)
+        n_points = len(t_cont)
+        conditioned_realisations = np.zeros((n_points, n_samples))
+
+        if not os.path.isfile(f"{self.filename_prefix}conditioned_realisations.txt"):
+            for j in range(n_samples):
+                print(f"{j}/{n_samples}", end="\r")
+                sys.stdout.flush()
+                # change the values of the parameters
+                self.process.model.parameters.set_free_values(samples[j, :])
+                # get the celerite GP
+                gp_cel_legacy = self.process.build_gp_celerite_legacy()
+
+                # latent values
+                y_cel = jnp.log(
+                    jnp.abs(
+                        self.process.observation_values
+                        - self.process.model.parameters["const"].value
+                    )
+                )
+                # condition the GP
+                gp_cond = gp_cel_legacy.condition(y_cel, t_cont)
+                # sample from the GP and transform back to the original space
+                conditioned_realisations[:, j] = jnp.exp(gp_cond.sample())
+            np.savetxt(
+                f"{self.filename_prefix}conditioned_realisations.txt",
+                conditioned_realisations,
+            )
+        else:
+            conditioned_realisations = np.loadtxt(
+                f"{self.filename_prefix}conditioned_realisations.txt"
+            )
+
+        # plot the posterior predictive checks for the residuals
+        res = (
+            self.y.T - conditioned_realisations[indexes_obs, :n_samples].T
+        ) / self.yerr.T
+        res_bands = np.percentile(res, [2.5, 16, 50, 84, 97.5], axis=0)
+        res_mean = np.mean(res, axis=0)
+
+        fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+        ax.plot(
+            self.x,
+            res_bands[2],
+            label="median",
+            marker=".",
+            linestyle="none",
+            color="b",
+        )
+        ax.plot(self.x, res_mean, label="mean", marker=".", linestyle="none", color="k")
+        ax.fill_between(self.x, res_bands[1], res_bands[3], alpha=0.5, label="68%")
+        ax.fill_between(self.x, res_bands[0], res_bands[4], alpha=0.2, label="95%")
+        ax.update(
+            {"xlabel": "Time (days)", "ylabel": "Residuals/Error", "title": "Residuals"}
+        )
+        ax.legend()
+        fig.tight_layout()
+        fig.savefig(f"{self.filename_prefix}_residuals.png", dpi=300)
+
+        ## plot the posterior predictive checks for the timeseries
+        realisations_percentiles = np.percentile(
+            conditioned_realisations, [2.5, 16, 50, 84, 97.5], axis=1
+        )
+        realisations_mean = np.mean(conditioned_realisations, axis=1)
+
+        fig, ax = plt.subplots(1, 1, figsize=(15, 6.5))
+
+        ax.plot(t_cont, realisations_percentiles[2], label="median", color="b")
+        ax.plot(t_cont, realisations_mean, label="mean", color="k")
+        ax.fill_between(
+            t_cont,
+            realisations_percentiles[1],
+            realisations_percentiles[3],
+            alpha=0.5,
+            label="68%",
+        )
+        ax.fill_between(
+            t_cont,
+            realisations_percentiles[0],
+            realisations_percentiles[4],
+            alpha=0.2,
+            label="95%",
+        )
+
+        ax.errorbar(
+            self.x,
+            self.y,
+            yerr=self.yerr,
+            fmt="o",
+            mfc="k",
+            label="data",
+        )
+        ax.update(
+            {
+                "xlabel": "Time (days)",
+                "ylabel": "Flux",
+                "title": f"Posterior predictive checks - {n_samples} realisations",
+            }
+        )
+        ax.legend(ncol=5, loc="best")
+        fig.tight_layout()
+        fig.savefig(
+            f"{self.filename_prefix}_posterior_predictive_timeseries.png", dpi=300
+        )
+
+    def plot_timeseries_diagnostics_old(
         self, prediction_indexes: jax.Array | None = None, **kwargs
     ) -> None:
         """Plot the timeseries diagnostics.
@@ -101,7 +269,10 @@ class Visualisations:
         print("Plotting timeseries diagnostics...")
         log_transform = (
             False
-            if ( (not (self.process.use_tinygp or self.process.use_celerite )) and self.process.log_transform)
+            if (
+                (not (self.process.use_tinygp or self.process.use_celerite))
+                and self.process.log_transform
+            )
             else None
         )
 
