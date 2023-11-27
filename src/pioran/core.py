@@ -3,8 +3,14 @@ import equinox as eqx
 import jax
 import jax.numpy as jnp
 import tinygp
-import celerite2.jax as celerite
-import celerite2 as celerite_legacy
+
+try:
+    import celerite2.jax as celerite
+    import celerite2 as celerite_legacy
+except ImportError:
+    celerite = None
+    celerite_legacy = None
+
 from jax.scipy.linalg import cholesky, solve, solve_triangular
 
 from .acvf_base import CovarianceFunction

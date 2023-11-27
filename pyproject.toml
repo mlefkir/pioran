@@ -6,25 +6,41 @@ build-backend = "setuptools.build_meta"
 name = "pioran"
 dynamic = ["dependencies"]
 
-authors = [
-    {name = "Mehdy Lefkir", email = "mehdylefkir.work@gmail.com"},
-    ]
+authors = [{ name = "Mehdy Lefkir", email = "mehdylefkir.work@gmail.com" }]
 description = "Timing package"
 requires-python = ">=3.10"
 version = "0.1.0"
 readme = "README.md"
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+dependencies = { file = ["requirements.txt"] }
 [tool.setuptools.packages.find]
 where = ["src"]
 [project.optional-dependencies]
 ultranest = ["ultranest"]
-blackjax = ["blackjax"]
-test = ["pioran[ultranest]",
+blackjax = ["blackjax", "asdf"]
+celerite2 = [
+        "celerite2[jax] @ git+https://github.com/exoplanet-dev/celerite2.git@main",
+]
+test = [
+        "pioran[ultranest]",
         "pioran[blackjax]",
-        "jax_finufft @ git+https://github.com/flatironinstitute/jax-finufft.git@main",'flake8','coverage']
-doc = ["sphinx",'numpydoc','sphinx_togglebutton','myst-nb','sphinx_copybutton',
-        'sphinxcontrib.tikz','furo','autoapi','sphinxcontrib-tikz',
-        'sphinx_design',"sphinx_codeautolink",]
-        
+        "pioran[celerite2]",
+        "jax_finufft @ git+https://github.com/flatironinstitute/jax-finufft.git@main",
+        'flake8',
+        'coverage',
+]
+doc = [
+        "sphinx",
+        'numpydoc',
+        'sphinx_togglebutton',
+        'myst-nb',
+        'sphinx_copybutton',
+        'sphinxcontrib.tikz',
+        'furo',
+        'autoapi',
+        'sphinxcontrib-tikz',
+        'sphinx_design',
+        "sphinx_codeautolink",
+]
+
 all = ["pioran[test]"]

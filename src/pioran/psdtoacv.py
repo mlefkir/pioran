@@ -4,8 +4,13 @@ import equinox as eqx
 import jax
 import jax.numpy as jnp
 import tinygp
-from celerite2.jax import terms
-import celerite2.terms as legacy_terms
+
+try:
+    from celerite2.jax import terms
+    import celerite2.terms as legacy_terms
+except ImportError:
+    terms = None
+    legacy_terms = None
 
 from tinygp.kernels.quasisep import SHO as SHO_term
 
@@ -118,7 +123,7 @@ class PSDToACV(eqx.Module):
         estimate_variance: bool = True,
         init_variance: float = 1.0,
         use_celerite=False,
-        use_legacy_celerite: bool = False
+        use_legacy_celerite: bool = False,
     ):
         """Constructor of the PSDToACV class."""
 
