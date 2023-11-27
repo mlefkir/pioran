@@ -4,8 +4,7 @@ import unittest
 import sys
 sys.path.append('../../src')
 
-from pioran.parameters import ParametersModel
-from pioran.parameter_base import Parameter
+from pioran.parameters import ParametersModel, Parameter
 
 
 class TestParameterIntegration(unittest.TestCase):

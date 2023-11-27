@@ -1,43 +1,24 @@
 # Configuration file for the Sphinx documentation builder.
 #
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
+# For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-import os
-import sys
-sys.path.insert(0, os.path.abspath('..'))
-
-
 # -- Project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'pioran'
-copyright = '2022, Mehdy Lefkir'
+copyright = '2023, Mehdy Lefkir'
 author = 'Mehdy Lefkir'
 
-# The full version, including alpha/beta/rc tags
-release = '0.1.0'
-
-
 # -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
+extensions = ['numpydoc','sphinx.ext.autodoc.typehints','sphinx_codeautolink',
+              'sphinx_copybutton','sphinx.ext.mathjax','myst_nb','sphinxcontrib.tikz',
+              'sphinx.ext.viewcode','autoapi.extension','sphinx.ext.intersphinx',]
 
-
-extensions = [ 'sphinx.ext.autodoc','sphinx.ext.intersphinx',
-                'sphinx.ext.mathjax', 'sphinx.ext.autosummary','sphinx_togglebutton','sphinx.ext.autosectionlabel',
-                'sphinx.ext.viewcode',   'numpydoc', 'sphinx.ext.napoleon',
-                'myst_nb','sphinx.ext.autodoc.typehints',                 "sphinx_design",
-                'sphinx_codeautolink',  
-                'sphinx_copybutton','sphinxcontrib.tikz']
+templates_path = ['_templates']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 intersphinx_mapping = {
     'IPython': ('https://ipython.readthedocs.io/en/stable/', None),
@@ -49,16 +30,21 @@ intersphinx_mapping = {
     'tinygp': ('https://tinygp.readthedocs.io/en/latest/', None)
 }
 
-autodoc_default_options = {
-    'members':          True,
-    'undoc-members':    True,
-}
-source_suffix = {
-    '.rst': 'restructuredtext',
-    '.md': 'myst-nb',
-    '.ipynb': 'myst-nb',
-    '.myst': 'myst-nb',
-}
+autoapi_dirs = ['../src/pioran']
+autoapi_type = "python"
+autoapi_keep_files = True
+autoapi_options = [
+    "members",
+    "undoc-members","special-members",
+    "show-inheritance",
+    "show-module-summary",
+    "imported-members" ]
+    
+autoapi_template_dir = "_templates/autoapi"
+autoapi_python_use_implicit_namespaces = True
+
+myst_dmath_allow_labels = True
+
 
 myst_enable_extensions = [
     "amsmath",
@@ -75,37 +61,6 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-autosectionlabel_prefix_document = True
-numpydoc_class_members_toctree = False
-numpydoc_show_class_members = False
-numpydoc_show_inherited_class_members = False
-
-napoleon_include_init_with_doc = True
-napoleon_include_private_with_doc = True
-napoleon_include_special_with_doc  = True
-napoleon_use_ivar = True
-napoleon_attr_annotations = True
-
-
-autodoc_default_options = {
-    'members':          True,
-    'undoc-members':    True}
-
-autosummary_generate = True
-
-
-
-myst_dmath_allow_labels = True
-#'sphinx_autodoc_typehints'
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates/autosummary']
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','**.ipynb_checkpoints']
-
-
 latex_elements = {'papersize': 'a4paper',
     'preamble':r'''\usepackage{graphicx}
     \usepackage{enumitem}
@@ -115,19 +70,18 @@ latex_elements = {'papersize': 'a4paper',
 }
 tikz_latex_preamble = r'''\usepackage{amsmath}\usepackage{amssymb}'''
 
-
 # -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
 html_theme = 'furo'
 html_title = "pioran"
 html_short_title = "pioran"
 html_logo = '_static/logo_borderbis.png'
 latex_logo = '_static/logo_bg.pdf'
 html_favicon = '_static/favico.ico'
-
+html_css_files = [
+    "css/custom.css",
+]
 html_theme_options = {
     'navigation_with_keys': True,
     "light_css_variables": {
@@ -135,8 +89,19 @@ html_theme_options = {
         "color-brand-content": "#0077bb",
     },
 }
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+
+# https://bylr.info/articles/2022/05/10/api-doc-with-sphinx-autoapi/#autoapi-objects
+rst_prolog = """
+.. role:: summarylabel
+"""
+
+def contains(seq, item):
+    return item in seq
+
+
+def prepare_jinja_env(jinja_env) -> None:
+    jinja_env.tests["contains"] = contains
+
+autoapi_prepare_jinja_env = prepare_jinja_env
