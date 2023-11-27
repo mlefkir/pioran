@@ -5,7 +5,6 @@ import os
 from functools import partial
 
 import arviz as az
-import asdf
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -33,11 +32,13 @@ _USE_MPI = True
 
 # check if the optional inference packages are installed
 try:
+    import asdf
     import blackjax  # for the HMC/MCMC sampling
     import tqdm  # for the progress bar
     from blackjax.diagnostics import (effective_sample_size,
                                       potential_scale_reduction)
 except ImportError:
+    asdf = None
     blackjax = None
     tqdm = None
     _USE_BLACKJAX = False

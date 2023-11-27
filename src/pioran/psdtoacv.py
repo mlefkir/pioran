@@ -322,7 +322,7 @@ class PSDToACV(eqx.Module):
 
     def build_DRWCelerite_model_cel(
         self, amplitudes: jax.Array, frequencies: jax.Array
-    ) -> terms.Term:
+    )  :#-> terms.Term:
         """Build the semi-separable DRW+Celerite model in celerite from the amplitudes and frequencies.
 
         The amplitudes
