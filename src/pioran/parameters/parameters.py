@@ -159,11 +159,12 @@ class ParametersModel:
             component = 1
         if name in self.names:
             warnings.warn(
-                f"Parameter {name} already exists, the parameter should be accessed with the index."
+                f"Parameter {name} already exists, the parameter will not be added"
             )
-        self._pars.append(
-            Parameter(name, value, free, ID, hyperparameter, component, relation)
-        )
+        else:
+            self._pars.append(
+                Parameter(name, value, free, ID, hyperparameter, component, relation)
+            )
 
     @property
     def names(self) -> list[str]:

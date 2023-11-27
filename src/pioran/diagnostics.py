@@ -1,5 +1,6 @@
 import os
 import sys
+from copy import deepcopy
 
 import jax
 import jax.numpy as jnp
@@ -90,19 +91,20 @@ class Visualisations:
             if self.process.use_legacy_celerite:
                 self.process_legacy = self.process
             else:
+                psd = deepcopy(self.process.model.PSD)
                 self.process_legacy = GaussianProcess(
-                    process.model.PSD,
+                    psd,
                     process.observation_indexes,
                     process.observation_values,
                     process.observation_errors,
-                    S_low=process.S_low,
-                    S_high=process.S_high,
-                    method=process.method,
-                    estimate_variance=process.estimate_variance,
+                    S_low=process.model.S_low,
+                    S_high=process.model.S_high,
+                    method=process.model.method,
+                    estimate_variance=process.model.estimate_variance,
                     estimate_mean=process.estimate_mean,
                     log_transform=process.log_transform,
                     scale_errors=process.scale_errors,
-                    n_components=process.n_components,
+                    n_components=process.model.n_components,
                     use_tinygp=False,
                     use_celerite=True,
                     use_legacy_celerite=True,
