@@ -262,7 +262,7 @@ class PSDToACV(eqx.Module):
 
     def build_SHO_model_legacy_cel(
         self, amplitudes: jax.Array, frequencies: jax.Array
-    ) -> terms.Term:
+    ) :#-> terms.Term:
         """Build the semi-separable SHO model in celerite from the amplitudes and frequencies.
 
         Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes.
@@ -293,7 +293,7 @@ class PSDToACV(eqx.Module):
 
     def build_SHO_model_cel(
         self, amplitudes: jax.Array, frequencies: jax.Array
-    ) -> terms.Term:
+    ) :#-> terms.Term:
         """Build the semi-separable SHO model in celerite from the amplitudes and frequencies.
 
         Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes.

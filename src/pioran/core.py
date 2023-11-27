@@ -91,7 +91,7 @@ class GaussianProcess(eqx.Module):
     propagate_errors: bool = True
     """Propagate the errors on the observed data."""
     use_celerite: bool = False
-    """Use celerite2 jax as a backend to model the autocovariance function and compute the log marginal likelihood."""
+    """Use celerite2-jax as a backend to model the autocovariance function and compute the log marginal likelihood."""
     use_legacy_celerite: bool = False
     """Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood."""
     def __init__(
