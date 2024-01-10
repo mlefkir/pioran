@@ -4,6 +4,7 @@ import multiprocessing
 import os
 from functools import partial
 
+import optax
 import arviz as az
 import jax
 import jax.numpy as jnp
@@ -23,7 +24,7 @@ from .utils import (get_samples_psd, progress_bar_factory,
 from .utils.mcmc_visualisations import (from_samples_to_inference_data,
                                         plot_diagnostics_sampling)
 
-inference_methods = ["ultranest", "blackjax_nuts"]
+inference_methods = ["ultranest", "blackjax_nuts","blackjax_DYHMC"]
 """List of inference methods implemented."""
 
 _USE_BLACKJAX = True
@@ -154,7 +155,7 @@ class Inference:
             self.method = method
 
             # check if the required packages are installed
-            if method == "blackjax_nuts" and not _USE_BLACKJAX:
+            if (method == "blackjax_nuts" or method == "blackjax_DYHMC") and not _USE_BLACKJAX:
                 raise ImportError(
                     "blackjax and/or asdf not installed. Please install them to use blackjax."
                 )
@@ -519,7 +520,6 @@ class Inference:
                         for i in range(af["info"]["num_chains"])
                     ]
                 )
-
             else:
                 print("\n>>>>>> Sampling the posterior distribution.")
                 samples, log_prob = self.blackjax_NUTS(
@@ -548,11 +548,210 @@ class Inference:
                 "log_prob": log_prob,
                 "inferencedata": dataset,
             }
+        elif self.method == "blackjax_DYHMC":
+            if os.path.isfile(f"{self.log_dir}/chains.asdf"):
+                print(
+                    "The sampling results file already exists. Loading the previous results."
+                )
+                af = asdf.open(f"{self.log_dir}/chains.asdf")
+                # check that warmup and sampling parameters are the same
+                loaded_info = af["info"]
+                assert (
+                    loaded_info["sampler"] == "DYHMC"
+                ), f"The sampler saved ({loaded_info['sampler']}) is different from the one given ('NUTS')."
+                assert (
+                    loaded_info["package"] == "blackjax"
+                ), f"The package saved ({loaded_info['package']}) is different from the one given ('blackjax')."
+                assert (
+                    loaded_info["num_warmup"] == n_warmup_steps
+                ), f"The number of warmup steps saved ({loaded_info['num_warmup']}) is different from the one given ({n_warmup_steps})."
+                assert (
+                    loaded_info["num_samples"] == n_samples
+                ), f"The number of samples saved ({loaded_info['num_samples']}) is different from the one given ({n_samples})."
+                assert (
+                    loaded_info["num_chains"] == n_chains
+                ), f"The number of chains saved ({loaded_info['num_chains']}) is different from the one given ({n_chains})."
+
+                samples = np.array(
+                    [
+                        af["samples"][f"chain_{i}"]
+                        for i in range(af["info"]["num_chains"])
+                    ]
+                )
+                log_prob = np.array(
+                    [
+                        af["log_prob"][f"chain_{i}"]
+                        for i in range(af["info"]["num_chains"])
+                    ]
+                )
+            else:
+                print("\n>>>>>> Sampling the posterior distribution.")
+                samples, log_prob = self.blackjax_DYHMC(
+                    rng_key=rng_key,
+                    initial_position=self.process.model.parameters.free_values,
+                    log_likelihood=log_likelihood,
+                    log_prior=self.priors,
+                    num_warmup_steps=n_warmup_steps,
+                    num_samples=n_samples,
+                    num_chains=n_chains
+                )
         else:
-            raise NotImplementedError("Only ultranest is implemented for now.")
+            raise NotImplementedError(f"Only {inference_methods} is implemented for now.")
 
         print(self.process)
         return results
+    def blackjax_DYHMC(
+        self,
+        rng_key: jax.random.PRNGKey,
+        initial_position: jax.Array,
+        log_likelihood: callable,
+        log_prior: callable,
+        num_warmup_steps: int = 1_000,
+        num_samples: int = 1_000,
+        num_chains: int = 1,
+        step_size: float = 1e-2,
+        learning_rate: float = 1e-2,
+    ):
+        """Sample the posterior distribution using the NUTS sampler from blackjax.
+
+        Wrapper around the NUTS sampler from blackjax to sample the posterior distribution.
+        This function also performs the warmup via window adaptation.
+
+        Parameters
+        ----------
+        rng_key : :obj:`jax.random.PRNGKey`
+            Random key for the random number generator.
+        initial_position : :obj:`jax.Array`
+            Initial position of the chains.
+        log_likelihood : :obj:`function`
+            Function to compute the log-likelihood.
+        log_prior : :obj:`function`
+            Function to compute the log-prior.
+        num_warmup_steps : :obj:`int`, optional
+            Number of warmup steps, by default 1_000
+        num_samples : :obj:`int`, optional
+            Number of samples to take from the posterior distribution, by default 1_000
+        num_chains : :obj:`int`, optional
+            Number of chains, by default 1
+
+        Returns
+        -------
+        samples : :obj:`jax.Array`
+            Samples from the posterior distribution. It has shape (num_chains, num_params, num_samples).
+        log_prob : :obj:`jax.Array`
+            Log-probability of the samples.
+        """
+
+        log_posterior = jax.jit(lambda x: log_likelihood(x) + log_prior(x))
+
+        # set the initial positions of the chains
+        initial_positions = jnp.array(initial_position) * jnp.ones(
+            (num_chains, self.n_pars)
+        )
+        # warmup loop
+        keys_adapt, inference_key = jax.random.split(rng_key, 2)
+
+
+        warmup = blackjax.chees_adaptation(log_posterior, num_chains=num_chains, target_acceptance_rate=0.75)
+    
+        (state, parameters), warmup_info = warmup.run(
+            keys_adapt,
+            initial_positions,
+            step_size=step_size,
+            optim=optax.adamw(learning_rate=learning_rate),
+            num_steps=num_warmup_steps
+        )
+
+        steps_size = parameters["step_size"].block_until_ready()
+        parameters["inverse_mass_matrix"] = np.array(parameters["inverse_mass_matrix"])
+        parameters["step_size"] = np.array(parameters["step_size"])
+
+        # save the warmup state
+        warmup = {
+            "parameters": parameters,
+            "state.position": np.array(state.position),
+            "state.logdensity": np.array(state.logdensity),
+            "state.logdensity_grad": np.array(state.logdensity_grad),
+        }
+
+        print(f"\n>>>>>> Warmup done. Steps size: {steps_size}")
+
+        print(f"\n>>>>>> Sampling the posterior distribution.{warmup}")
+        print(f"\n>>>>>> Sampling the posterior distribution.{warmup_info}")
+        print(f"\n>>>>>> Sampling the posterior distribution.{state}")
+        
+        # inference loop
+        # @partial(jax.jit, static_argnums=(3, 4))
+        # def inference_loop(rng_key, parameters, initial_state, num_samples, num_chains):
+        #     kernel = blackjax.dynamic_hmc(log_posterior, **parameters).step
+
+        #     @jax.jit
+        #     # @progress_bar_factory(num_samples, num_chains)
+        #     def one_step(carry, iter_num):
+        #         state, rng_key = carry
+        #         key = rng_key[iter_num]
+
+        #         state, _ = kernel(key, state)
+        #         return (state, rng_key), state
+
+        #     keys = jax.random.split(rng_key, num_samples)
+
+        #     carry = (initial_state, keys)
+        #     _, states = jax.lax.scan(one_step, carry, jnp.arange(num_samples))
+        #     return states
+
+        # # split the random keys for the chains
+        # keys = jax.random.split(rng_key, num_chains)
+        # # pmap the inference loop
+        # inference_loop_multiple_chains = jax.pmap(
+        #     inference_loop,
+        #     in_axes=(0, 0, 0, None, None),
+        #     static_broadcasted_argnums=(3, 4),
+        # )
+        # run the inference loop
+        # states = inference_loop_multiple_chains(
+        #     keys, parameters, state, num_samples, num_chains
+        # )
+        # get the samples and the log-probability
+        
+        chain_keys = jax.random.split(inference_key, num_chains)
+        kernel = blackjax.dynamic_hmc(log_posterior, **parameters)
+
+        states_f, states, infos = jax.vmap(
+        lambda key, state: blackjax.util.run_inference_algorithm(key, state, kernel, num_samples)
+        )(chain_keys, state)
+
+        samples = states.position.block_until_ready()
+        log_prob = states.logdensity.block_until_ready()
+        log_density_grad = states.logdensity_grad.block_until_ready()
+        print(f"\n>>>>>> Sampling the posterior distribution.{samples}")
+        print(f"\n>>>>>> Sampling the posterior distribution.{log_prob}")
+        print(f"\n>>>>>> Sampling the posterior distribution.{log_density_grad}")
+        # save the sampling results
+        info = {
+            "sampler": "DYHMC",
+            "package": "blackjax",
+            "package_version": blackjax.__version__,
+            "n_params": self.n_pars,
+            "num_samples": num_samples,
+            "num_warmup": num_warmup_steps,
+            "num_chains": num_chains,
+            "ESS": np.array(effective_sample_size(samples.T)),
+            "Rhat-split": np.array(potential_scale_reduction(samples.T)),
+        }
+        print(f"\n>>>>>> Sampling the posterior distribution.{info}")
+        samples = jnp.transpose(samples, axes=(0, 2, 1))
+
+        save_sampling_results(
+            info=info,
+            warmup=warmup,
+            samples=samples,
+            log_prob=log_prob,
+            log_densitygrad=log_density_grad,
+            filename=f"{self.log_dir}/chains",
+        )
+
+        return samples, log_prob
 
     def blackjax_NUTS(
         self,
@@ -604,8 +803,8 @@ class Inference:
         keys_adapt = jax.random.split(rng_key, num_chains)
 
         warmup = blackjax.window_adaptation(
-            blackjax.nuts, log_posterior, progress_bar=True, num_chains=num_chains
-        )
+            blackjax.nuts, log_posterior, progress_bar=True)#, num_chains=num_chains
+    
         warmup_run = partial(warmup.run, num_steps=num_warmup_steps)
         (state, parameters), _ = jax.pmap(warmup_run, in_axes=(0, 0))(
             keys_adapt, initial_positions
