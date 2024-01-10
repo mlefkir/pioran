@@ -168,7 +168,8 @@ class GaussianProcess(eqx.Module):
                 n_components=n_components,
                 estimate_variance=self.estimate_variance,
                 init_variance=jnp.var(observation_values, ddof=1),
-                use_celerite=self.use_celerite,use_legacy_celerite=self.use_legacy_celerite,
+                use_celerite=self.use_celerite,
+                use_legacy_celerite=self.use_legacy_celerite,
             )
             # self.model.print_info()
         else:

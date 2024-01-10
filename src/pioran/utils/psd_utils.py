@@ -117,7 +117,7 @@ def get_psd_approx_samples(
 
     psd_acvf.parameters.set_free_values(params_samples)
     if psd_acvf.method == "SHO":
-        a, f_c = psd_acvf.get_SHO_coefs()
+        a, f_c = psd_acvf.get_approx_coefs()
         psd_SHO = SHO_power_spectrum(f, a[..., None], f_c[..., None]).sum(axis=0)
         psd_model = psd_acvf.PSD.calculate(f)
         psd_model /= psd_model[..., 0, None]
