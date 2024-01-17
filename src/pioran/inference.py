@@ -85,6 +85,8 @@ class Inference:
         Run the prior predictive checks, by default True
     log_dir : :obj:`str`, optional
         Directory to save the results of the inference, by default 'log_dir'
+    title_plots : :obj:`bool`, optional
+        Plot the title of the figures, by default True
 
     Raises
     ------
@@ -117,6 +119,7 @@ class Inference:
         seed_check=0,
         run_checks=True,
         log_dir="log_dir",
+        title_plots=True
     ):
         r"""Constructor method for the Inference class."""
 
@@ -178,7 +181,7 @@ class Inference:
                     print(
                         f"\n>>>>>> The PSD model is a {self.process.model.method} decomposition, checking the approximation."
                     )
-                    self.check_approximation(n_samples_checks, seed_check)
+                    self.check_approximation(n_samples_checks, seed_check,title=title_plots)
 
         if _USE_MPI:
             comm.Barrier()
@@ -348,6 +351,7 @@ class Inference:
         plot_diagnostics: bool = True,
         plot_violins: bool = True,
         plot_quantiles: bool = True,
+        title:bool= True
     ):
         """Check the approximation of the PSD with the kernel decomposition.
 
@@ -370,6 +374,8 @@ class Inference:
             Plot the quantiles of the residuals and the ratios, by default True
         plot_prior_samples : :obj:`bool`, optional
             Plot the prior samples, by default True
+        title : :obj:`bool`, optional
+            Plot the title of the figure, by default True
 
         Returns
         -------
@@ -399,13 +405,13 @@ class Inference:
                 res=residuals,
                 ratio=ratio,
                 f_min=self.process.model.f_min_obs,
-                f_max=self.process.model.f_max_obs,
+                f_max=self.process.model.f_max_obs
             )
             fig.savefig(f"{self.plot_dir}/diagnostics_psd_approx.pdf")
             figs.append(fig)
 
         if plot_violins:
-            fig, _ = violin_plots_psd_approx(res=residuals, ratio=ratio)
+            fig, _ = violin_plots_psd_approx(res=residuals, ratio=ratio,title=title)
             fig.savefig(f"{self.plot_dir}/violin_plots_psd_approx.pdf")
             figs.append(fig)
 
@@ -416,6 +422,7 @@ class Inference:
                 f=freqs,
                 f_min=self.process.model.f_min_obs,
                 f_max=self.process.model.f_max_obs,
+                title=title
             )
             fig.savefig(f"{self.plot_dir}/quantiles_psd_approx.pdf")
             figs.append(fig)

@@ -544,10 +544,12 @@ def diagnostics_psd_approx(f, res, ratio, f_min, f_max):
     """
     fig, ax = plt.subplots(2, 1, figsize=(8, 6))
     ax[0].plot(f, jnp.mean(res, axis=0), label="mean")
+    ax[0].axhline(0, c="g", ls=":")
     ax[0].update({"xscale": "log", "ylabel": "Residuals"})  # ,'yscale':'log'})
     ax[1].plot(f, jnp.mean(ratio, axis=0), label="mean")
     ax[1].update({"xlabel": "Frequency", "xscale": "log", "ylabel": "Ratio"})
     ax[1].sharex(ax[0])
+    ax[1].axhline(1, c="g", ls=":")
     ax[0].axvline(f_min, color="k", ls="-.", label=r"$f_\mathrm{min}$")
     ax[1].axvline(f_min, color="k", ls="-.", label=r"$f_\mathrm{min}$")
     ax[0].axvline(f_max, color="k", ls=":", label=r"$f_\mathrm{max}$")
@@ -565,7 +567,7 @@ def diagnostics_psd_approx(f, res, ratio, f_min, f_max):
     return fig, ax
 
 
-def violin_plots_psd_approx(res, ratio):
+def violin_plots_psd_approx(res, ratio, title=True):
     """Plot the violin plots of the residuals and the ratios of the PSD approximation.
 
     Parameters
@@ -574,6 +576,8 @@ def violin_plots_psd_approx(res, ratio):
         Residuals of the PSD approximation.
     ratio : :obj:`jax.Array`
         Ratios of the PSD approximation.
+    title : :obj:`bool`, optional
+        Title of the plot, by default True
 
     Returns
     -------
@@ -624,14 +628,16 @@ def violin_plots_psd_approx(res, ratio):
 
     axins.violinplot([mean_ratio, median_ratio], vert=True, showmeans=True)
     fig.align_ylabels()
-    fig.suptitle(
-        "Distribution of the meta-(mean,max,median,min) of\n residuals and ratios for the PSD approximation"
-    )
+    if title:
+        fig.suptitle(
+            "Distribution of the meta-(mean,max,median,min) of\n residuals and ratios for the PSD approximation"
+        )
+
     fig.tight_layout()
     return fig, ax
 
 
-def residuals_quantiles(residuals, ratio, f, f_min, f_max):
+def residuals_quantiles(residuals, ratio, f, f_min, f_max, title=True):
     """Plot the quantiles of the residuals and the ratios of the PSD approximation as a function of frequency.
 
     Parameters
@@ -646,7 +652,8 @@ def residuals_quantiles(residuals, ratio, f, f_min, f_max):
         Minimum observed frequency.
     f_max : :obj:`float`
         Maximum observed frequency.
-
+    title : :obj:`bool`, optional
+        Title of the plot, by default True
 
     Returns
     -------
@@ -660,11 +667,12 @@ def residuals_quantiles(residuals, ratio, f, f_min, f_max):
         residuals, jnp.array([1, 5, 16, 50, 84, 95, 99]), axis=0
     )
 
-    fig, ax = plt.subplots(2, 1, figsize=(9.5, 8))
+    fig, ax = plt.subplots(2, 1, figsize=(8, 7))
     ax[0].fill_between(f, low_5, high_95, alpha=0.2, label="5% and 95% percentiles")
     ax[0].fill_between(f, low_16, high_84, alpha=0.4, label="16% and 84% percentiles")
     ax[0].plot(f, med, label="Median")
     ax[0].update({"xlabel": "Frequency", "ylabel": "Residuals", "xscale": "log"})
+    ax[0].axhline(0, c="g", ls=":")
 
     low_1, low_5, low_16, med, high_84, high_95, high_99 = jnp.percentile(
         ratio, jnp.array([1, 5, 16, 50, 84, 95, 99]), axis=0
@@ -679,6 +687,7 @@ def residuals_quantiles(residuals, ratio, f, f_min, f_max):
     ax[1].axvline(f_min, color="k", ls="-.", label=r"$f_\mathrm{min}$")
     ax[0].axvline(f_max, color="k", ls=":", label=r"$f_\mathrm{max}$")
     ax[1].axvline(f_max, color="k", ls=":", label=r"$f_\mathrm{max}$")
+    ax[1].axhline(1, c="g", ls=":")
 
     ax[1].legend(
         bbox_to_anchor=(0.95, -0.0),
@@ -688,7 +697,8 @@ def residuals_quantiles(residuals, ratio, f, f_min, f_max):
         bbox_transform=fig.transFigure,
     )
     fig.align_ylabels()
-    fig.suptitle("Quantiles of residuals and ratios for the PSD approximation")
+    if title:
+        fig.suptitle("Quantiles of residuals and ratios for the PSD approximation")
     fig.tight_layout()
     return fig, ax
 
