@@ -107,7 +107,7 @@ class PSDToACV(eqx.Module):
     spectral_matrix: jax.Array | None = None
     """Matrix of the SHO kernels."""
     use_celerite: bool = False
-    """Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood."""
+    """Use celerite2-jax as a backend to model the autocovariance function and compute the log marginal likelihood."""
     use_legacy_celerite: bool = False
     """Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood."""
 
@@ -262,7 +262,7 @@ class PSDToACV(eqx.Module):
 
     def build_SHO_model_legacy_cel(
         self, amplitudes: jax.Array, frequencies: jax.Array
-    ) :#-> terms.Term:
+    ):  # -> terms.Term:
         """Build the semi-separable SHO model in celerite from the amplitudes and frequencies.
 
         Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes.
@@ -293,7 +293,7 @@ class PSDToACV(eqx.Module):
 
     def build_SHO_model_cel(
         self, amplitudes: jax.Array, frequencies: jax.Array
-    ) :#-> terms.Term:
+    ):  # -> terms.Term:
         """Build the semi-separable SHO model in celerite from the amplitudes and frequencies.
 
         Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes.
@@ -322,7 +322,7 @@ class PSDToACV(eqx.Module):
 
     def build_DRWCelerite_model_cel(
         self, amplitudes: jax.Array, frequencies: jax.Array
-    )  :#-> terms.Term:
+    ):  # -> terms.Term:
         """Build the semi-separable DRW+Celerite model in celerite from the amplitudes and frequencies.
 
         The amplitudes

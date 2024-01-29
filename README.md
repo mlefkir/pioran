@@ -38,6 +38,7 @@ from pioran.diagnostics import Visualisations
 from mpi4py import MPI
 
 comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
 
 filename = "lightcurve.txt"
 log_dir = "results"
