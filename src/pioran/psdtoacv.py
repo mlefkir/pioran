@@ -407,7 +407,7 @@ class PSDToACV(eqx.Module):
                     kernel = self.build_SHO_model_cel(a * f, f)
             else:
                 kernel = self.build_SHO_model_tinygp(a * f, f)
-        elif self.method == "DRWSHO":
+        elif self.method == "DRWCelerite":
             if self.use_celerite:
                 if self.use_legacy_celerite:
                     raise NotImplementedError("Not implemented for legacy celerite")
@@ -436,7 +436,7 @@ class PSDToACV(eqx.Module):
                         )
                         * kernel
                     )
-                elif self.method == "DRWSHO":
+                elif self.method == "DRWCelerite":
                     if self.use_legacy_celerite:
                         raise NotImplementedError("Not implemented for legacy celerite")
                     return (
@@ -450,7 +450,7 @@ class PSDToACV(eqx.Module):
 
                 else:
                     raise NotImplementedError(
-                        "The estimation of the variance is implemented for SHO and DRWSHO only"
+                        "The estimation of the variance is implemented for SHO and DRWCelerite only"
                     )
 
             return kernel * (self.parameters["var"].value / jnp.sum(a * f))

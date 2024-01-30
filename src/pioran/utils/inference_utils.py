@@ -21,12 +21,12 @@ def save_sampling_results(info:dict,
     
     This file contains the following data:
     - info: a dictionary containing the information about the run, namely:
-        - num_params: the number of parameters
-        - num_samples: the number of samples
-        - num_warmup: the number of warmup samples
-        - num_chains: the number of chains
-        - ESS: the effective sample size
-        - Rhat-split: the split Rhat statistic
+    - num_params: the number of parameters
+    - num_samples: the number of samples
+    - num_warmup: the number of warmup samples
+    - num_chains: the number of chains
+    - ESS: the effective sample size
+    - Rhat-split: the split Rhat statistic
     - warmup: a numpy array containing the warmup samples
     - samples: a numpy array containing the samples
     - log_prob: a numpy array containing the log probabilities of the samples

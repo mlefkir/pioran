@@ -35,7 +35,7 @@ def SHO_power_spectrum(f: jax.Array, A: float, f0: float) -> jax.Array:
 def DRWCelerite_power_spectrum(f: jax.Array, A: float, f0: float) -> jax.Array:
     r"""Power spectrum of the DRW+Celerite component.
 
-    .. math:: :label: sho_power_spectrum
+    .. math:: :label: drwcel_power_spectrum
 
        \mathcal{P}(f) = \dfrac{A}{1 + (f/f_0)^6}.
 
