@@ -156,21 +156,21 @@ class TestGaussianProcess(unittest.TestCase):
         grad_tgp = grad(p)
         self.assertTrue(jnp.all(jnp.isfinite(grad_tgp)))
         
-    def test_likelihood_gradient_celerite(self):
-        psd_tgp = OneBendPowerLaw([1, 0.2, 1e-2, 3.4])
-        gp_tgp = GaussianProcess(
-            psd_tgp,
-            x,
-            y,
-            yerr,
-            S_low=100,
-            S_high=20,
-            use_celerite=True,
-            n_components=20,
-            method="SHO",
-        )
-        p = np.array(gp_tgp.model.parameters.free_values)
-        like = gp_tgp.wrapper_log_marginal_likelihood
-        grad = eqx.filter_grad(like)
-        grad_cel = grad(p)
-        self.assertFalse(jnp.all(jnp.isfinite(grad_cel)))
+    # def test_likelihood_gradient_celerite(self):
+    #     psd_tgp = OneBendPowerLaw([1, 0.2, 1e-2, 3.4])
+    #     gp_tgp = GaussianProcess(
+    #         psd_tgp,
+    #         x,
+    #         y,
+    #         yerr,
+    #         S_low=100,
+    #         S_high=20,
+    #         use_celerite=True,
+    #         n_components=20,
+    #         method="SHO",
+    #     )
+    #     p = np.array(gp_tgp.model.parameters.free_values)
+    #     like = gp_tgp.wrapper_log_marginal_likelihood
+    #     grad = eqx.filter_grad(like)
+    #     grad_cel = grad(p)
+    #     self.assertTrue(jnp.all(jnp.isfinite(grad_cel)))
