@@ -35,7 +35,7 @@ doc = [
         'sphinx_copybutton',
         'sphinxcontrib.tikz',
         'furo',
-        'autoapi',
+        'sphinx-autoapi',
         'sphinxcontrib-tikz',
         'sphinx_design',
         "sphinx_codeautolink",
