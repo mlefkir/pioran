@@ -12,7 +12,7 @@ except ImportError:
     terms = None
     legacy_terms = None
 
-from tinygp.kernels.quasisep import SHO as SHO_term
+from tinygp.kernels import quasisep
 
 from .parameters import ParametersModel
 from .psd_base import PowerSpectralDensity
@@ -319,20 +319,22 @@ class PSDToACV(eqx.Module):
                 sigma=1, Q=1 / jnp.sqrt(2), w0=2 * jnp.pi * frequencies[j]
             )
         return kernel
-
+    
     def build_DRWCelerite_model_cel(
         self, amplitudes: jax.Array, frequencies: jax.Array
     ):  # -> terms.Term:
         """Build the semi-separable DRW+Celerite model in celerite from the amplitudes and frequencies.
-
+        
+        Uses the celerite2.jax implementation.
+        
         The amplitudes
 
         Parameters
         ----------
         amplitudes : :obj:`jax.Array`
-            Amplitudes of the SHO kernels.
+            Amplitudes of the DRW+Celerite kernels.
         frequencies : :obj:`jax.Array`
-            Frequencies of the SHO kernels.
+            Frequencies of the DRW+Celerite kernels.
 
         Returns
         -------
@@ -349,6 +351,41 @@ class PSDToACV(eqx.Module):
         )
         for j in range(1, self.n_components):
             kernel += terms.RealTerm(a=a[j], c=w_j[j]) + terms.ComplexTerm(
+                a=a[j], b=b[j], c=c[j], d=d[j]
+            )
+        return kernel
+
+    def build_DRWCelerite_model_tinygp(
+        self, amplitudes: jax.Array, frequencies: jax.Array
+    ):  # -> terms.Term:
+        """Build the semi-separable DRW+Celerite model in celerite from the amplitudes and frequencies.
+
+        Uses the tinygp implementation.
+
+        The amplitudes
+
+        Parameters
+        ----------
+        amplitudes : :obj:`jax.Array`
+            Amplitudes of the DRW+Celerite kernels.
+        frequencies : :obj:`jax.Array`
+            Frequencies of the DRW+Celerite kernels.
+
+        Returns
+        -------
+        :obj:`term.Term`
+            Constructed SHO kernel.
+        """
+        w_j = 2 * jnp.pi * frequencies
+        a = amplitudes * w_j / 6
+        b = jnp.sqrt(3) * w_j * amplitudes / 6
+        c = w_j / 2
+        d = w_j * jnp.sqrt(3) / 2
+        kernel = quasisep.Exp(a=a[0], c=w_j[0]) + quasisep.Celerite(
+            a=a[0], b=b[0], c=c[0], d=d[0]
+        )
+        for j in range(1, self.n_components):
+            kernel += quasisep.Exp(a=a[j], c=w_j[j]) + quasisep.Celerite(
                 a=a[j], b=b[j], c=c[j], d=d[j]
             )
         return kernel
@@ -374,11 +411,11 @@ class PSDToACV(eqx.Module):
             Constructed SHO kernel.
         """
 
-        kernel = amplitudes[0] * SHO_term(
+        kernel = amplitudes[0] * quasisep.SHO(
             quality=1 / jnp.sqrt(2), omega=2 * jnp.pi * frequencies[0]
         )
         for j in range(1, self.n_components):
-            kernel += amplitudes[j] * SHO_term(
+            kernel += amplitudes[j] * quasisep.SHO(
                 quality=1 / jnp.sqrt(2), omega=2 * jnp.pi * frequencies[j]
             )
         return kernel
