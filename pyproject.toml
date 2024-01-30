@@ -18,9 +18,7 @@ where = ["src"]
 [project.optional-dependencies]
 ultranest = ["ultranest"]
 blackjax = ["blackjax", "asdf","optax"]
-celerite2 = [
-        "celerite2[jax] @ git+https://github.com/exoplanet-dev/celerite2.git@main",
-]
+celerite2 = ["celerite2[jax]"]
 test = [
         "pioran[ultranest]",
         "pioran[blackjax]",
