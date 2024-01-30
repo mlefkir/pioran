@@ -37,7 +37,6 @@ class Visualisations:
         The filename prefix for the output plots.
     n_frequencies : :obj:`int`, optional
         The number of frequencies at which to evaluate the PSDs, by default 2500.
-
     """
 
     process: GaussianProcess | CARMAProcess
@@ -337,10 +336,8 @@ class Visualisations:
             Plot the posterior predictive ACVFs, by default True
         **kwargs
             Additional keyword arguments.
-            frequencies : jnp.ndarray, optional
-                The frequencies at which to evaluate the PSDs of CARMA process, by default self.frequencies
-            plot_lombscargle : bool, optional
-                Plot the Lomb-Scargle periodogram, by default False
+            frequencies : jnp.ndarray, optional The frequencies at which to evaluate the PSDs of CARMA process, by default self.frequencies
+            plot_lombscargle : bool, optional Plot the Lomb-Scargle periodogram, by default False
         """
         if isinstance(self.process, CARMAProcess):
             if self.process.p > 1:

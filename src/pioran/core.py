@@ -43,10 +43,10 @@ class GaussianProcess(eqx.Module):
     method : :obj:`str`, optional
         Method to compute the covariance function from the power spectral density, by default 'FFT'.
         Possible values are:
-            - 'FFT': use the FFT to compute the autocovariance function.
-            - 'NuFFT': use the non-uniform FFT to compute the autocovariance function.
-            - 'SHO': approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function.
-            - 'DRWCelerite': approximate the power spectrum as a sum of DRW+Celerite basis functions to compute the autocovariance function.
+        - 'FFT': use the FFT to compute the autocovariance function.
+        - 'NuFFT': use the non-uniform FFT to compute the autocovariance function.
+        - 'SHO': approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function.
+        - 'DRWCelerite': approximate the power spectrum as a sum of DRW+Celerite basis functions to compute the autocovariance function.
     use_tinygp : :obj:`bool`, optional
         Use tinygp to compute the log marginal likelihood, by default False. Should only be used when the power spectrum model
         is expressed as a sum of quasi-separable kernels, i.e. method is not 'FFT' or 'NuFFT'.

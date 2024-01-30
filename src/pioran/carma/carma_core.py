@@ -26,16 +26,11 @@ class CARMAProcess(eqx.Module):
         Errors of the observations, if None, the errors are set to sqrt(eps).
     kwargs : :obj:`dict`
         Additional arguments to pass to the CARMA model.
-        - AR_quad : :obj:`jax.Array`
-            Quadratic coefficients of the AR polynomial.
-        - beta : :obj:`jax.Array`
-            Coefficients of the MA polynomial.
-        - use_beta : :obj:`bool`
-            If True, uses the beta coefficients otherwise uses the quadratic coefficients of the MA polynomial.
-        - scale_errors : :obj:`bool`
-            If True, scales the errors by a factor nu.
-        - estimate_mean : :obj:`bool`
-            If True, estimates the mean of the process.
+        AR_quad : :obj:`jax.Array` Quadratic coefficients of the AR polynomial.
+        beta : :obj:`jax.Array` Coefficients of the MA polynomial.
+        use_beta : :obj:`bool` If True, uses the beta coefficients otherwise uses the quadratic coefficients of the MA polynomial.
+        scale_errors : :obj:`bool` If True, scales the errors by a factor nu.
+        estimate_mean : :obj:`bool` If True, estimates the mean of the process.
 
     Attributes
     ----------

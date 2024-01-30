@@ -147,7 +147,7 @@ class KalmanFilter(eqx.Module):
         It is called using the :func:`jax.lax.scan` function. This function calls the :meth:`Predict` and :meth:`Update` methods.      
         The one-step log-likelihood is computed using the following equation:
         
-        .. math:: :label: onesteploglike
+        .. math:: :label: onesteploglikeCAR1
         
             \log p(\boldsymbol{Z}_k|\boldsymbol{Z}_{1:k-1}) = -\frac{1}{2} \log |{S}_k| - \frac{1}{2} \boldsymbol{Y}_k^\mathrm{T} {S}_k^{-1} \boldsymbol{Y}_k 
         
