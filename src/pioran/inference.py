@@ -4,7 +4,6 @@ import multiprocessing
 import os
 from functools import partial
 
-import optax
 import arviz as az
 import jax
 import jax.numpy as jnp
@@ -34,6 +33,7 @@ _USE_MPI = True
 # check if the optional inference packages are installed
 try:
     import asdf
+    import optax
     import blackjax  # for the HMC/MCMC sampling
     import tqdm  # for the progress bar
     from blackjax.diagnostics import (effective_sample_size,
