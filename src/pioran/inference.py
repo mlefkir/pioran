@@ -1,6 +1,5 @@
 """Infer the (hyper)parameters of processes."""
 import json
-import multiprocessing
 import os
 from functools import partial
 
