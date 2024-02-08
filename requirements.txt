@@ -1,4 +1,5 @@
-jax
+jaxlib<=0.4.23
+jax<=0.4.23
 equinox
 tinygp
 numpy

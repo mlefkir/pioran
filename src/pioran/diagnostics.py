@@ -206,6 +206,7 @@ class Visualisations:
         fig.tight_layout()
         fig.savefig(f"{self.filename_prefix}_residuals.png", dpi=300)
 
+
         ## plot the posterior predictive checks for the timeseries
         realisations_percentiles = np.percentile(
             conditioned_realisations, [2.5, 16, 50, 84, 97.5], axis=1

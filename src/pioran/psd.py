@@ -92,6 +92,7 @@ class Gaussian(PowerSpectralDensity):
     free_parameters : :obj:`list` of :obj:`bool`, optional
         List of bool to indicate if the parameters are free or not. Default is `[True, True,True]`.
     """
+
     expression = "gaussian"
     """Expression of the power spectral density function."""
     parameters: ParametersModel
@@ -143,7 +144,7 @@ class OneBendPowerLaw(PowerSpectralDensity):
 
     .. math:: :label: onebendpowerlawpsd
 
-        \mathcal{P}(f) = A\times (f/f_1)^{\alpha_1} \frac{1}{1+(f/f_1)^{(\alpha_1-\alpha_2)}}.
+        \mathcal{P}(f) = A\times (f/f_1)^{-\alpha_1} \frac{1}{1+(f/f_1)^{(\alpha_2-\alpha_1)}}.
 
     with the amplitude :math:`A\ge 0`, the bend frequency :math:`f_1\ge 0` and the indices :math:`\alpha_1,\alpha_2`.
 
@@ -203,8 +204,8 @@ class OneBendPowerLaw(PowerSpectralDensity):
             self.parameters["index_2"].value,
             self.parameters["norm"].value,
         )
-        P = jnp.power(f / f_1, index_1) * jnp.power(
-            1 + jnp.power(f / f_1, index_1 - index_2), -1
+        P = jnp.power(f / f_1, -index_1) * jnp.power(
+            1 + jnp.power(f / f_1, index_2 - index_1), -1
         )
         return P * norm
 

@@ -56,9 +56,9 @@ gp = GaussianProcess(
     n_components=20,
     method="SHO")
 
-min_index_1, max_index_1 = -2, 0.25
+min_index_1, max_index_1 = -0.25, 2
 min_f_1, max_f_1 = gp.model.f0 * 10, gp.model.fN / 10
-min_index_2, max_index_2 = -3.9, -0.5
+min_index_2, max_index_2 = 0.5, 4
 log10_min_c = -7  # log10min value for const
 
 def priors(cube):
@@ -73,7 +73,7 @@ def priors(cube):
     params[5] = lognorm.ppf(cube[5], 1, loc=0, scale=3)  # mu
     return params
 
-inf = Inference(gp, priors, method="ultranest", run_checks=False, log_dir=log_dir)
+inf = Inference(gp, priors, method="ultranest", run_checks=True, log_dir=log_dir)
 res = inf.run()
 
 comm.Barrier()
@@ -83,4 +83,10 @@ if rank == 0:
     vis.plot_timeseries_diagnostics_old()
     vis.posterior_predictive_checks(samples,plot_PSD=True,plot_ACVF=False)
 
+```
+
+Then it is possible to use MPI to run the code in parallel. For example, using 4 cores:
+
+```bash
+mpiexec -np 4 python example.py
 ```
