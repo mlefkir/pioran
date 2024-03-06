@@ -34,7 +34,7 @@ doc = [
         'myst-nb',
         'sphinx_copybutton',
         'sphinxcontrib.tikz',
-        'furo',
+        'pydata_sphinx_theme',
         'sphinx-autoapi',
         'sphinxcontrib-tikz',
         'sphinx_design',
