@@ -1,0 +1,711 @@
+
+<!DOCTYPE html>
+
+<html data-content_root="../" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Modelling with a power spectral density — pioran</title>
+<script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+<!-- Loaded before other Sphinx assets -->
+<link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet"/>
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet"/>
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet"/>
+<link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" rel="preload" type="font/woff2"/>
+<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" rel="stylesheet" type="text/css"/>
+<link href="../_static/graphviz.css?v=eafc0fe6" rel="stylesheet" type="text/css"/>
+<link href="../_static/css/custom.css?v=ad57bd55" rel="stylesheet" type="text/css"/>
+<!-- Pre-loaded scripts that we'll load fully later -->
+<link as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" rel="preload"/>
+<link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" rel="preload"/>
+<script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../_static/doctools.js?v=888ff710"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=f281be69"></script>
+<script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+<script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/models_psd';</script>
+<link href="../_static/favico.ico" rel="icon"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="Simulations.html" rel="next" title="Simulating time series"/>
+<link href="models_acvf.html" rel="prev" title="Modelling with an autocovariance function"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="en" name="docsearch:language"/>
+</head>
+<body data-bs-root-margin="0px 0px -60%" data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-default-mode="" data-offset="180">
+<a class="skip-link" href="#main-content" id="pst-skip-link">Skip to main content</a>
+<div id="pst-scroll-pixel-helper"></div>
+<button class="btn rounded-pill" id="pst-back-to-top" type="button">
+<i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+<input class="sidebar-toggle" id="__primary" name="__primary" type="checkbox"/>
+<label class="overlay overlay-primary" for="__primary"></label>
+<input class="sidebar-toggle" id="__secondary" name="__secondary" type="checkbox"/>
+<label class="overlay overlay-secondary" for="__secondary"></label>
+<div class="search-button__wrapper">
+<div class="search-button__overlay"></div>
+<div class="search-button__search-container">
+<form action="../search.html" class="bd-search d-flex align-items-center" method="get">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input aria-label="Search the docs ..." autocapitalize="off" autocomplete="off" autocorrect="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." spellcheck="false" type="search"/>
+<span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+</div>
+<header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+<label class="sidebar-toggle primary-toggle" for="__primary">
+<span class="fa-solid fa-bars"></span>
+</label>
+<div class="col-lg-3 navbar-header-items__start">
+<div class="navbar-item">
+<a class="navbar-brand logo" href="../index.html">
+<img alt="pioran - Home" class="logo__image only-light" src="../_static/logo_borderbis.png"/>
+<script>document.write(`<img src="../_static/logo_borderbis.png" class="logo__image only-dark" alt="pioran - Home"/>`);</script>
+</a></div>
+</div>
+<div class="col-lg-9 navbar-header-items">
+<div class="me-auto navbar-header-items__center">
+<div class="navbar-item">
+<nav class="navbar-nav">
+<ul class="bd-navbar-elements navbar-nav">
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../userguide/User.html">
+                        User Guide
+                      </a>
+</li>
+<li class="nav-item current active">
+<a class="nav-link nav-internal" href="Tutorials.html">
+                        Tutorials
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../references/references.html">
+                        References
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../autoapi/index.html">
+                        API Reference
+                      </a>
+</li>
+</ul>
+</nav></div>
+</div>
+<div class="navbar-header-items__end">
+<div class="navbar-item navbar-persistent--container">
+<script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+</div>
+<div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+</div>
+</div>
+<div class="navbar-persistent--mobile">
+<script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+</div>
+<label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+<span class="fa-solid fa-outdent"></span>
+</label>
+</div>
+</header>
+<div class="bd-container">
+<div class="bd-container__inner bd-page-width">
+<div class="bd-sidebar-primary bd-sidebar">
+<div class="sidebar-header-items sidebar-primary__section">
+<div class="sidebar-header-items__center">
+<div class="navbar-item">
+<nav class="navbar-nav">
+<ul class="bd-navbar-elements navbar-nav">
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../userguide/User.html">
+                        User Guide
+                      </a>
+</li>
+<li class="nav-item current active">
+<a class="nav-link nav-internal" href="Tutorials.html">
+                        Tutorials
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../references/references.html">
+                        References
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../autoapi/index.html">
+                        API Reference
+                      </a>
+</li>
+</ul>
+</nav></div>
+</div>
+<div class="sidebar-header-items__end">
+<div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+</div>
+</div>
+<div class="sidebar-primary-items__start sidebar-primary__section">
+<div class="sidebar-primary-item">
+<nav aria-label="Section Navigation" class="bd-docs-nav bd-links">
+<p aria-level="1" class="bd-links__title" role="heading">Section Navigation</p>
+<div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="Modelling.html">Modelling</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="models_acvf.html">Modelling with an autocovariance function</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Modelling with a power spectral density</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="Simulations.html">Simulating time series</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="simulations_tk.html">Timmer and Koenig’s method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulations_acv.html">Gaussian process method</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+</div>
+<div class="sidebar-primary-items__end sidebar-primary__section">
+</div>
+<div id="rtd-footer-container"></div>
+</div>
+<main class="bd-main" id="main-content">
+<div class="bd-content">
+<div class="bd-article-container">
+<div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+<div class="header-article-items__start">
+<div class="header-article-item">
+<nav aria-label="Breadcrumb">
+<ul class="bd-breadcrumbs">
+<li class="breadcrumb-item breadcrumb-home">
+<a aria-label="Home" class="nav-link" href="../index.html">
+<i class="fa-solid fa-home"></i>
+</a>
+</li>
+<li class="breadcrumb-item"><a class="nav-link" href="Tutorials.html">Tutorials</a></li>
+<li class="breadcrumb-item"><a class="nav-link" href="Modelling.html">Modelling</a></li>
+<li aria-current="page" class="breadcrumb-item active">Modelling...</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+</div>
+<div id="searchbox"></div>
+<article class="bd-article">
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://jax.readthedocs.io/en/latest/jax.numpy.html#module-jax.numpy" title="jax.numpy"><span class="nn">jax.numpy</span></a> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://matplotlib.org/stable/api/pyplot_summary.html#module-matplotlib.pyplot" title="matplotlib.pyplot"><span class="nn">matplotlib.pyplot</span></a> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<section class="tex2jax_ignore mathjax_ignore" id="modelling-with-a-power-spectral-density">
+<h1>Modelling with a power spectral density<a class="headerlink" href="#modelling-with-a-power-spectral-density" title="Link to this heading">#</a></h1>
+<p>The power spectral density function of the time series is represented by the object <a class="reference internal" href="../autoapi/pioran/psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code></a>. More details about this class and the implemented models can be found <a class="reference internal" href="../autoapi/pioran/psd/index.html#module-pioran.psd" title="pioran.psd"><code class="xref py py-class docutils literal notranslate"><span class="pre">psd</span></code></a>. We will describe how to use, combine and create models for the power spectral density function in the following sections.</p>
+<section id="a-first-model">
+<h2>A first model<a class="headerlink" href="#a-first-model" title="Link to this heading">#</a></h2>
+<p>We show how to use the models implemented in <a class="reference internal" href="../autoapi/pioran/psd/index.html#module-pioran.psd" title="pioran.psd"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pioran.psd</span></code></a> to compute the power spectrum at given frequencies. We first define an instance of the chosen class. In this example, we create instances of the classes <a class="reference internal" href="../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian" title="pioran.psd.Lorentzian"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lorentzian</span></code></a> and <a class="reference internal" href="../autoapi/pioran/psd/index.html#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gaussian</span></code></a>.</p>
+<p>The values of the parameters of the models are given as a list of floats, during instantiation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#module-pioran.psd" title="pioran.psd"><span class="nn">pioran.psd</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian" title="pioran.psd.Lorentzian"><span class="n">Lorentzian</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><span class="n">Gaussian</span></a>
+
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian" title="pioran.psd.Lorentzian"><span class="n">Lore</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian" title="pioran.psd.Lorentzian"><span class="n">Lorentzian</span></a><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><span class="n">Gauss</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><span class="n">Gaussian</span></a><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code> object has a field <code class="docutils literal notranslate"><span class="pre">parameters</span></code> which an object of the class <a class="reference internal" href="../autoapi/pioran/parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParametersModel</span></code></a> storing for the parameters of the model. We can inspect the values of the parameters of the model by printing the <code class="docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code> object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Lore</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Power spectrum: lorentzian
+Number of parameters: 3
+============================================================================
+CID  ID   Name            Value          Status    Linked    Type            
+1    1    position        0              Free      No        Hyper-parameter 
+1    2    amplitude       1              Free      No        Hyper-parameter 
+1    3    halfwidth       0.5            Free      No        Hyper-parameter 
+
+Number of free parameters : 3
+</pre></div>
+</div>
+</div>
+</div>
+<p>If we want to change the values of the parameters of the model, we can use the method <code class="docutils literal notranslate"><span class="pre">set_free_values</span></code> on the attribute<code class="docutils literal notranslate"><span class="pre">PowerSpectralDensity.parameters</span></code>. The method takes as input a list of floats, which are the values of the free parameters of the model. Currently, it is not possible to change the values of the fixed parameters of the model after instantiation. To do so, we need to create a new instance of the model and set the parameters as free or fixed using the keyword argument <code class="docutils literal notranslate"><span class="pre">free_parameters</span></code>. More details about the class <a class="reference internal" href="../autoapi/pioran/parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParametersModel</span></code></a> can be found in the API.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Lore</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">set_free_values</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Lore</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Power spectrum: lorentzian
+Number of parameters: 3
+============================================================================
+CID  ID   Name            Value          Status    Linked    Type            
+1    1    position        0.9            Free      No        Hyper-parameter 
+1    2    amplitude       2.2            Free      No        Hyper-parameter 
+1    3    halfwidth       1.5            Free      No        Hyper-parameter 
+
+Number of free parameters : 3
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can evaluate the PSD at given frequencies by calling the method <code class="docutils literal notranslate"><span class="pre">calculate</span></code> of the <code class="docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code> object. The method <code class="docutils literal notranslate"><span class="pre">calculate</span></code> takes as input a list of floats representing the frequencies at which the PSD is evaluated. The method returns a list of floats representing the values of the PSD at the given frequencies.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Gauss</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Gaussian"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Lore</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Lorentzian"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$f$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{PSD.calculate}</span><span class="s1">(f)$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/e422b4f13b6b3af7671278041ab0c51ccaca0542669b7b8b1d820ad59c50ca7a.png" src="../_images/e422b4f13b6b3af7671278041ab0c51ccaca0542669b7b8b1d820ad59c50ca7a.png"/>
+</div>
+</div>
+</section>
+<section id="combining-psd-models">
+<h2>Combining PSD models<a class="headerlink" href="#combining-psd-models" title="Link to this heading">#</a></h2>
+<p>In this section, we show how to combine power spectral density functions via arithmetic operations.</p>
+<p>In this example we create instances of the classes <a class="reference internal" href="../autoapi/pioran/psd/index.html#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gaussian</span></code></a> and <a class="reference internal" href="../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian" title="pioran.psd.Lorentzian"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lorentzian</span></code></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#module-pioran.psd" title="pioran.psd"><span class="nn">pioran.psd</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian" title="pioran.psd.Lorentzian"><span class="n">Lorentzian</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><span class="n">Gaussian</span></a>
+
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian" title="pioran.psd.Lorentzian"><span class="n">Lore</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian" title="pioran.psd.Lorentzian"><span class="n">Lorentzian</span></a><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><span class="n">Gauss</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><span class="n">Gaussian</span></a><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><span class="n">Gauss2</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd/index.html#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><span class="n">Gaussian</span></a><span class="p">([</span><span class="mi">6</span><span class="p">,</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="sum-of-psd-functions">
+<h3>Sum of PSD functions<a class="headerlink" href="#sum-of-psd-functions" title="Link to this heading">#</a></h3>
+<p>We can create a model which is the sum of the three components by using the <code class="docutils literal notranslate"><span class="pre">+</span></code> operator. The result is a new instance of the class <a class="reference internal" href="../autoapi/pioran/psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code></a>. We can inspect the parameters of the model by printing the object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Model</span> <span class="o">=</span> <span class="n">Lore</span> <span class="o">+</span> <span class="n">Gauss</span> <span class="o">+</span> <span class="n">Gauss2</span>
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Power spectrum: lorentzian + gaussian + gaussian
+Number of parameters: 9
+============================================================================
+CID  ID   Name            Value          Status    Linked    Type            
+1    1    position        3              Free      No        Hyper-parameter 
+1    2    amplitude       1              Free      No        Hyper-parameter 
+1    3    halfwidth       1.5            Free      No        Hyper-parameter 
+2    4    position        0              Free      No        Hyper-parameter 
+2    5    amplitude       1.2            Free      No        Hyper-parameter 
+2    6    sigma           0.5            Free      No        Hyper-parameter 
+3    7    position        6              Free      No        Hyper-parameter 
+3    8    amplitude       1.4            Free      No        Hyper-parameter 
+3    9    sigma           2.5            Free      No        Hyper-parameter 
+
+Number of free parameters : 9
+</pre></div>
+</div>
+</div>
+</div>
+<p>Because several parameters have identical names it is necessary to use the indices of the parameters to access them. <code class="docutils literal notranslate"><span class="pre">CID</span></code> gives the component index and <code class="docutils literal notranslate"><span class="pre">ID</span></code> gives the parameter index in the whole model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Model</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2    5    amplitude       1.2            Free      No        Hyper-parameter 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Model</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Sum of the three"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Gauss</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Gaussian"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Lore</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Lorentzian"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Gauss2</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Gaussian2"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$f$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{PSD.calculate}</span><span class="s1">(f)$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/65f94504b947cee83e4ad9595188aefcb6430c78d53b5bd6256369ce49a9b705.png" src="../_images/65f94504b947cee83e4ad9595188aefcb6430c78d53b5bd6256369ce49a9b705.png"/>
+</div>
+</div>
+</section>
+<section id="product-of-psd-functions">
+<h3>Product of PSD functions<a class="headerlink" href="#product-of-psd-functions" title="Link to this heading">#</a></h3>
+<p>We can create a model which is a product of PSD functions by using the <code class="docutils literal notranslate"><span class="pre">*</span></code> operator. The result is a new instance of the class <a class="reference internal" href="../autoapi/pioran/psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code></a>. We show an example with the product of the two first components plus the third component.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Lore</span> <span class="o">=</span> <span class="n">Lorentzian</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<span class="n">Gauss</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">])</span>
+<span class="n">Gauss2</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">])</span>
+
+<span class="n">Model</span> <span class="o">=</span> <span class="n">Lore</span> <span class="o">+</span> <span class="n">Gauss</span> <span class="o">*</span> <span class="n">Gauss2</span>
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Power spectrum: lorentzian + gaussian * gaussian
+Number of parameters: 9
+============================================================================
+CID  ID   Name            Value          Status    Linked    Type            
+1    1    position        3              Free      No        Hyper-parameter 
+1    2    amplitude       1              Free      No        Hyper-parameter 
+1    3    halfwidth       1.5            Free      No        Hyper-parameter 
+2    4    position        0              Free      No        Hyper-parameter 
+2    5    amplitude       3.2            Free      No        Hyper-parameter 
+2    6    sigma           3.5            Free      No        Hyper-parameter 
+3    7    position        2              Free      No        Hyper-parameter 
+3    8    amplitude       1.4            Free      No        Hyper-parameter 
+3    9    sigma           2.5            Free      No        Hyper-parameter 
+
+Number of free parameters : 9
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Model</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Lore + Gauss * Gauss2"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Gauss</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Gaussian"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Lore</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Lorentzian"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Gauss2</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Gaussian2"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$f$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{PSD.calculate}</span><span class="s1">(f)$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/eb290e7a56fe2d01047d6d32f896eb54d14cdf78a09164803275fedd9f60fe5f.png" src="../_images/eb290e7a56fe2d01047d6d32f896eb54d14cdf78a09164803275fedd9f60fe5f.png"/>
+</div>
+</div>
+</section>
+</section>
+<section id="conversion-to-an-autocovariance-function">
+<h2>Conversion to an autocovariance function<a class="headerlink" href="#conversion-to-an-autocovariance-function" title="Link to this heading">#</a></h2>
+<p>To use PSD models which have no analytical expression for the autocovariance function we have to compute the Fourier Transform of the PSD. This is done using the class <a class="reference internal" href="../autoapi/pioran/psdtoacv/index.html#pioran.psdtoacv.PSDToACV" title="pioran.psdtoacv.PSDToACV"><code class="xref py py-class docutils literal notranslate"><span class="pre">PSDToACV</span></code></a>. The class takes as input a <code class="docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code> object and computes the Fourier Transform of the PSD. The class has a method <code class="docutils literal notranslate"><span class="pre">calculate</span></code> which takes as input a list of floats representing the time lags at which the autocovariance function is evaluated. The method returns a list of floats representing the values of the autocovariance function at the given time lags.</p>
+<p>We first define a PSD model, here a Lorentzian. We then create an instance of the class <a class="reference internal" href="../autoapi/pioran/psdtoacv/index.html#pioran.psdtoacv.PSDToACV" title="pioran.psdtoacv.PSDToACV"><code class="xref py py-class docutils literal notranslate"><span class="pre">PSDToACV</span></code></a>, four other values are necessary to do so. The total duration of the time series <span class="math notranslate nohighlight">\(T\)</span>, <span class="math notranslate nohighlight">\(\Delta T\)</span> the minimal time step between two consecutive points in the time series, <span class="math notranslate nohighlight">\(S_\mathrm{low}\)</span> and <span class="math notranslate nohighlight">\(S_\mathrm{high}\)</span> two factors to extend the grid of frequencies used to compute the Fourier Transform.</p>
+<p>The extended grid of frequencies is then given by <span class="math notranslate nohighlight">\(f_0 = f_\mathrm{min}/S_\mathrm{low} = \Delta f\)</span> to <span class="math notranslate nohighlight">\(f_N = f_\mathrm{max}S_\mathrm{high}=N \Delta f\)</span>, where <span class="math notranslate nohighlight">\(f_\mathrm{min}=1/T\)</span> and <span class="math notranslate nohighlight">\(f_\mathrm{max}=1/2\Delta T\)</span>. More details about these two factors can be found in the Notebook <a class="reference internal" href="../references/On_the_fft.html"><span class="std std-doc">on the FFT</span></a>.</p>
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">[thick]
+
+\draw (0,2pt) -- + (0,-2pt) node[below=1mm] {0};
+\draw (.5,2pt) -- + (0,-2pt) node[below=1mm] {$f_0$};
+\draw (3.5,5pt) -- + (0,-5pt) node[below=1mm] {$f_\mathrm{min}$};
+\draw (10.,5pt) -- + (0,-5pt) node[below=1mm] {$f_\mathrm{max}$};
+\draw (14,5pt) -- + (0,-5pt) node[below=1mm] {$f_\mathrm{N}$};
+\draw[thick] (0,0) -- node[below=7mm] {Frequency $f$} + (15,0);
+\foreach \x in {0,0.5,...,14.}
+   \draw (\x cm,3pt) -- (\x cm,-3pt) node[anchor=north] {};</span>)</p>
+<p>!pdflatex command cannot be run</p>
+</aside>
+</section></section></article></div><div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/index.html#module-pioran" title="pioran"><span class="nn">pioran</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psdtoacv/index.html#pioran.psdtoacv.PSDToACV" title="pioran.psdtoacv.PSDToACV"><span class="n">PSDToACV</span></a>
+
+<span class="n">Lore</span> <span class="o">=</span> <span class="n">Lorentzian</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">.5</span><span class="p">])</span>
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/psdtoacv/index.html#pioran.psdtoacv.PSDToACV" title="pioran.psdtoacv.PSDToACV"><span class="n">P2A</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psdtoacv/index.html#pioran.psdtoacv.PSDToACV" title="pioran.psdtoacv.PSDToACV"><span class="n">PSDToACV</span></a><span class="p">(</span><span class="n">PSD</span><span class="o">=</span><span class="n">Lore</span><span class="p">,</span> <span class="n">S_low</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">S_high</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"FFT"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can evaluate the autocovariance of the time series at given time lags by calling the method <code class="docutils literal notranslate"><span class="pre">calculate</span></code> of the <code class="docutils literal notranslate"><span class="pre">PSDToACV</span></code> object. The method <code class="docutils literal notranslate"><span class="pre">calculate</span></code> takes as input a list of floats representing the time lags at which the autocovariance function is evaluated. The method returns a list of floats representing the values of the autocovariance function at the given time lags.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">P2A</span><span class="o">.</span><span class="n">frequencies</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">acv</span> <span class="o">=</span> <span class="n">P2A</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We show the original PSD and the autocovariance function computed from the PSD.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Lore</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Lorentzian"</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$f$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{PSD.calculate}</span><span class="s1">(f)$'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">acv</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"ACV"</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tau$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{ACV.calculate}</span><span class="s1">(\tau)$'</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">align_ylabels</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/06f6934469b002e2d4a37b2ab7756341b69fd64d7d4800a1ff2d62b5e8353f33.png" src="../_images/06f6934469b002e2d4a37b2ab7756341b69fd64d7d4800a1ff2d62b5e8353f33.png"/>
+</div>
+</div>
+
+<section id="writing-a-new-model">
+<h2>Writing a new model<a class="headerlink" href="#writing-a-new-model" title="Link to this heading">#</a></h2>
+<p>Here we show how to write a PSD new model, which can be used like any models we have shown above.</p>
+<section id="creating-the-class-and-the-constructor">
+<h3>Creating the class and the constructor<a class="headerlink" href="#creating-the-class-and-the-constructor" title="Link to this heading">#</a></h3>
+<p>We write a new class <code class="docutils literal notranslate"><span class="pre">MyPSD</span></code>, which inherits from <code class="docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code>. It is important to specify the attributes <code class="docutils literal notranslate"><span class="pre">parameters</span></code> and <code class="docutils literal notranslate"><span class="pre">expression</span></code> at the class level since <code class="docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code> inherits from <a class="reference external" href="https://docs.kidger.site/equinox/api/module/module/#equinox.Module" title="(in Equinox v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></a>. <code class="docutils literal notranslate"><span class="pre">parameters</span></code> is an object of the class <a class="reference internal" href="../autoapi/pioran/parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParametersModel</span></code></a> which is a container for the parameters of the model. The constructor <code class="docutils literal notranslate"><span class="pre">__init__</span></code> must be defined as in the example and the names of the parameters are given in the <code class="docutils literal notranslate"><span class="pre">param_names</span></code> list.</p>
+</section>
+<section id="the-calculate-method">
+<h3>The <code class="docutils literal notranslate"><span class="pre">calculate</span></code> method<a class="headerlink" href="#the-calculate-method" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">calculate</span></code> method must be defined and it must return the PSD function evaluated at the frequencies <code class="docutils literal notranslate"><span class="pre">f</span></code>. When writing the expression of the PSD function, the values of parameters of the model can be accessed using the attribute <code class="docutils literal notranslate"><span class="pre">self.parameters['name'].value</span></code> where <code class="docutils literal notranslate"><span class="pre">name</span></code> is the name of the parameter.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://jax.readthedocs.io/en/latest/jax.numpy.html#module-jax.numpy" title="jax.numpy"><span class="nn">jax.numpy</span></a> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">from</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/index.html#module-pioran" title="pioran"><span class="nn">pioran</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><span class="n">PowerSpectralDensity</span></a>
+<span class="kn">from</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/parameters/index.html#module-pioran.parameters" title="pioran.parameters"><span class="nn">pioran.parameters</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/parameters/parameters/index.html#pioran.parameters.parameters.ParametersModel" title="pioran.parameters.parameters.ParametersModel"><span class="n">ParametersModel</span></a>
+
+
+<span class="k">class</span> <span class="nc">MyPSD</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="../autoapi/pioran/psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><span class="n">PowerSpectralDensity</span></a><span class="p">):</span>
+    <a class="sphinx-codeautolink-a" href="../autoapi/pioran/parameters/parameters/index.html#pioran.parameters.parameters.ParametersModel" title="pioran.parameters.parameters.ParametersModel"><span class="n">parameters</span></a><span class="p">:</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/parameters/parameters/index.html#pioran.parameters.parameters.ParametersModel" title="pioran.parameters.parameters.ParametersModel"><span class="n">ParametersModel</span></a>
+    <span class="n">expression</span> <span class="o">=</span> <span class="s1">'my_psd'</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters_values</span><span class="p">,</span> <span class="n">free_parameters</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span><span class="kc">True</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">"""Constructor of the power spectrum inherited </span>
+<span class="sd">        from the PowerSpectralDensity class.</span>
+<span class="sd">        """</span>
+        <span class="k">assert</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#len" title="len"><span class="nb">len</span></a><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">'The number of parameters must be 3'</span>
+        <span class="c1"># initialise the parameters and check</span>
+        <span class="n">PowerSpectralDensity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_values</span><span class="o">=</span><span class="n">parameters_values</span><span class="p">,</span> <span class="n">param_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'amplitude'</span><span class="p">,</span> <span class="s1">'freq'</span><span class="p">,</span><span class="s1">'power'</span><span class="p">],</span> <span class="n">free_parameters</span><span class="o">=</span><span class="n">free_parameters</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Calculate the power spectrum at the given frequencies."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s1">'amplitude'</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>  <span class="o">/</span>  <span class="p">(</span> <span class="mi">1</span><span class="o">+</span><span class="n">f</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s1">'freq'</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s1">'power'</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can use the newly defined model as any other models we have shown above:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">P</span> <span class="o">=</span> <span class="n">MyPSD</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span><span class="mf">3.4</span><span class="p">])</span>
+<span class="n">frequencies</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">PSD</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">frequencies</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">PSD</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$f$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{PSD.calculate}</span><span class="s1">(f)$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/b2252bb7c0dcdea53f0c2e52661a999382ed5b3ab60921c92c7d219fc1ef37be.png" src="../_images/b2252bb7c0dcdea53f0c2e52661a999382ed5b3ab60921c92c7d219fc1ef37be.png"/>
+</div>
+</div>
+</section>
+</section>
+
+
+<footer class="prev-next-footer">
+<div class="prev-next-area">
+<a class="left-prev" href="models_acvf.html" title="previous page">
+<i class="fa-solid fa-angle-left"></i>
+<div class="prev-next-info">
+<p class="prev-next-subtitle">previous</p>
+<p class="prev-next-title">Modelling with an autocovariance function</p>
+</div>
+</a>
+<a class="right-next" href="Simulations.html" title="next page">
+<div class="prev-next-info">
+<p class="prev-next-subtitle">next</p>
+<p class="prev-next-title">Simulating time series</p>
+</div>
+<i class="fa-solid fa-angle-right"></i>
+</a>
+</div>
+</footer>
+</div>
+<div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+<div class="sidebar-secondary-item">
+<div class="page-toc tocsection onthispage" id="pst-page-navigation-heading-2">
+<i class="fa-solid fa-list"></i> On this page
+  </div>
+<nav aria-labelledby="pst-page-navigation-heading-2" class="bd-toc-nav page-toc">
+<ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-first-model">A first model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#combining-psd-models">Combining PSD models</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sum-of-psd-functions">Sum of PSD functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#product-of-psd-functions">Product of PSD functions</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-to-an-autocovariance-function">Conversion to an autocovariance function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-a-new-model">Writing a new model</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-the-class-and-the-constructor">Creating the class and the constructor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-calculate-method">The <code class="docutils literal notranslate"><span class="pre">calculate</span></code> method</a></li>
+</ul>
+</li>
+</ul>
+</nav></div>
+<div class="sidebar-secondary-item">
+<div class="tocsection sourcelink">
+<a href="../_sources/tutorials/models_psd.ipynb.txt">
+<i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+</div>
+</div></div>
+</main></div>
+<footer class="bd-footer-content">
+</footer>
+
+</div>
+
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
+<script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+<footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+<div class="footer-items__start">
+<div class="footer-item">
+<p class="copyright">
+    
+      © Copyright 2023, Mehdy Lefkir.
+      <br/>
+</p>
+</div>
+<div class="footer-item">
+<p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+</p>
+</div>
+</div>
+<div class="footer-items__end">
+<div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+</div>
+</div>
+</footer>
+</body>
+</html>

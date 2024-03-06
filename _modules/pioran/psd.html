@@ -1,0 +1,949 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pioran.psd &#8212; pioran</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=ad57bd55" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pioran/psd';</script>
+    <link rel="icon" href="../../_static/favico.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo_borderbis.png" class="logo__image only-light" alt="pioran - Home"/>
+    <script>document.write(`<img src="../../_static/logo_borderbis.png" class="logo__image only-dark" alt="pioran - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../userguide/User.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/Tutorials.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../references/references.html">
+                        References
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../autoapi/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../userguide/User.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/Tutorials.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../references/references.html">
+                        References
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../autoapi/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../pioran.html" class="nav-link">pioran</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">pioran.psd</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pioran.psd</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+
+<span class="kn">from</span> <span class="nn">.parameters</span> <span class="kn">import</span> <span class="n">ParametersModel</span>
+<span class="kn">from</span> <span class="nn">.psd_base</span> <span class="kn">import</span> <span class="n">PowerSpectralDensity</span>
+
+
+<div class="viewcode-block" id="Lorentzian">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian">[docs]</a>
+<span class="k">class</span> <span class="nc">Lorentzian</span><span class="p">(</span><span class="n">PowerSpectralDensity</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lorentzian power spectral density.</span>
+
+<span class="sd">    .. math:: :label: lorentzianpsd</span>
+
+<span class="sd">       \mathcal{P}(f) = \dfrac{A}{\gamma^2 +4\pi^2 (f-f_0)^2}.</span>
+
+<span class="sd">    with the amplitude :math:`A\ge 0`, the position :math:`f_0\ge 0` and the halfwidth :math:`\gamma&gt;0`.</span>
+
+<span class="sd">    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object.</span>
+<span class="sd">    The values of the parameters can be accessed using the `parameters` attribute via three keys: &#39;`position`&#39;, &#39;`amplitude`&#39; and &#39;`halfwidth`&#39;.</span>
+
+<span class="sd">    The power spectral density function is evaluated on an array of frequencies :math:`f` using the `calculate` method.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_values : :obj:`list` of :obj:`float`</span>
+<span class="sd">        Values of the parameters of the power spectral density function. [position, amplitude, halfwidth]</span>
+<span class="sd">    free_parameters: :obj:`list` of :obj:`bool`, optional</span>
+<span class="sd">        List of bool to indicate if the parameters are free or not. Default is `[True, True,True]`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Lorentzian.parameters">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian.parameters">[docs]</a>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersModel</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Lorentzian.expression">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian.expression">[docs]</a>
+    <span class="n">expression</span> <span class="o">=</span> <span class="s2">&quot;lorentzian&quot;</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expression of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Lorentzian.analytical">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian.analytical">[docs]</a>
+    <span class="n">analytical</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If True, the power spectral density function is analytical, otherwise it is not.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">parameters_values</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">free_parameters</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="p">),</span> <span class="s2">&quot;The number of parameters for the lorentzian PSD must be 3&quot;</span>
+        <span class="c1"># initialise the parameters and check</span>
+        <span class="n">PowerSpectralDensity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">param_values</span><span class="o">=</span><span class="n">parameters_values</span><span class="p">,</span>
+            <span class="n">param_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">,</span> <span class="s2">&quot;amplitude&quot;</span><span class="p">,</span> <span class="s2">&quot;halfwidth&quot;</span><span class="p">],</span>
+            <span class="n">free_parameters</span><span class="o">=</span><span class="n">free_parameters</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Lorentzian.calculate">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Lorentzian.calculate">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the power spectral density.</span>
+
+<span class="sd">        The expression is given by Equation :math:numref:`lorentzianpsd`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f : :obj:`jax.Array`</span>
+<span class="sd">            Array of frequencies.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Power spectral density function evaluated on the array of frequencies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;amplitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;halfwidth&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Gaussian">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Gaussian">[docs]</a>
+<span class="k">class</span> <span class="nc">Gaussian</span><span class="p">(</span><span class="n">PowerSpectralDensity</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gaussian power spectral density.</span>
+
+<span class="sd">    .. math:: :label: gaussianpsd</span>
+
+<span class="sd">       \mathcal{P}(f) = \dfrac{A}{\sqrt{2\pi}\sigma} \exp\left(-\dfrac{\left(f-f_0\right)^2}{2\sigma^2} \right).</span>
+
+<span class="sd">    with the amplitude :math:`A\ge 0`, the position :math:`f_0\ge 0` and the standard-deviation &#39;`sigma`&#39; :math:`\sigma&gt;0`.</span>
+
+<span class="sd">    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object.</span>
+<span class="sd">    The values of the parameters can be accessed using the `parameters` attribute via three keys: &#39;`position`&#39;, &#39;`amplitude`&#39; and &#39;`sigma`&#39;</span>
+
+<span class="sd">    The power spectral density function is evaluated on an array of frequencies :math:`f` using the `calculate` method.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_values : :obj:`list` of :obj:`float`</span>
+<span class="sd">        Values of the parameters of the power spectral density function.</span>
+<span class="sd">    free_parameters : :obj:`list` of :obj:`bool`, optional</span>
+<span class="sd">        List of bool to indicate if the parameters are free or not. Default is `[True, True,True]`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Gaussian.expression">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Gaussian.expression">[docs]</a>
+    <span class="n">expression</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expression of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Gaussian.parameters">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Gaussian.parameters">[docs]</a>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersModel</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expression of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Gaussian.analytical">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Gaussian.analytical">[docs]</a>
+    <span class="n">analytical</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If True, the power spectral density function is analytical, otherwise it is not.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters_values</span><span class="p">,</span> <span class="n">free_parameters</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]):</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;The number of parameters for the power spectral density function &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">expression</span><span class="si">}</span><span class="s1">&quot; must be 3&#39;</span>
+        <span class="c1"># initialise the parameters and check</span>
+        <span class="n">PowerSpectralDensity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">param_values</span><span class="o">=</span><span class="n">parameters_values</span><span class="p">,</span>
+            <span class="n">param_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">,</span> <span class="s2">&quot;amplitude&quot;</span><span class="p">,</span> <span class="s2">&quot;sigma&quot;</span><span class="p">],</span>
+            <span class="n">free_parameters</span><span class="o">=</span><span class="n">free_parameters</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Gaussian.calculate">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Gaussian.calculate">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the power spectral density.</span>
+
+<span class="sd">        The expression is given by Equation :math:numref:`gaussianpsd`</span>
+<span class="sd">        with the variance :math:`A\ge 0`, the position :math:`f_0\ge 0` and the standard-deviation :math:`\sigma&gt;0`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f : :obj:`jax.Array`</span>
+<span class="sd">            Array of frequencies.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Power spectral density function evaluated on the array of frequencies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;amplitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="o">/</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;sigma&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                <span class="o">-</span><span class="mf">0.5</span>
+                <span class="o">*</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;sigma&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OneBendPowerLaw">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.OneBendPowerLaw">[docs]</a>
+<span class="k">class</span> <span class="nc">OneBendPowerLaw</span><span class="p">(</span><span class="n">PowerSpectralDensity</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;One-bend power-law power spectral density.</span>
+
+<span class="sd">    .. math:: :label: onebendpowerlawpsd</span>
+
+<span class="sd">        \mathcal{P}(f) = A\times (f/f_1)^{-\alpha_1} \frac{1}{1+(f/f_1)^{(\alpha_2-\alpha_1)}}.</span>
+
+<span class="sd">    with the amplitude :math:`A\ge 0`, the bend frequency :math:`f_1\ge 0` and the indices :math:`\alpha_1,\alpha_2`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_values : :obj:`list` of :obj:`float`</span>
+<span class="sd">        Values of the parameters of the power spectral density function.</span>
+<span class="sd">        In order: [norm, index_1, freq_1, index_2]</span>
+<span class="sd">    free_parameters : :obj:`list` of :obj:`bool`, optional</span>
+<span class="sd">        List of bool to indicate if the parameters are free or not. Default is `[False, True, True,True]`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="OneBendPowerLaw.expression">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.OneBendPowerLaw.expression">[docs]</a>
+    <span class="n">expression</span> <span class="o">=</span> <span class="s2">&quot;onebend-powerlaw&quot;</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expression of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OneBendPowerLaw.parameters">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.OneBendPowerLaw.parameters">[docs]</a>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersModel</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OneBendPowerLaw.analytical">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.OneBendPowerLaw.analytical">[docs]</a>
+    <span class="n">analytical</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If True, the power spectral density function is analytical, otherwise it is not.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters_values</span><span class="p">,</span> <span class="n">free_parameters</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]):</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The number of parameters for onebend-powerlaw must be 4, not </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">free_parameters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The number of free parameters for onebend-powerlaw must be 4, not </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">free_parameters</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># initialise the parameters and check</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;norm&quot;</span><span class="p">,</span> <span class="s2">&quot;index_1&quot;</span><span class="p">,</span> <span class="s2">&quot;freq_1&quot;</span><span class="p">,</span> <span class="s2">&quot;index_2&quot;</span><span class="p">]</span>
+
+        <span class="n">PowerSpectralDensity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">param_values</span><span class="o">=</span><span class="n">parameters_values</span><span class="p">,</span>
+            <span class="n">param_names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
+            <span class="n">free_parameters</span><span class="o">=</span><span class="n">free_parameters</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="OneBendPowerLaw.calculate">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.OneBendPowerLaw.calculate">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the power spectral density.</span>
+
+<span class="sd">        The expression is given by Equation :math:numref:`onebendpowerlawpsd`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f : :obj:`jax.Array`</span>
+<span class="sd">            Array of frequencies.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Power spectral density function evaluated on the array of frequencies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">index_1</span><span class="p">,</span> <span class="n">f_1</span><span class="p">,</span> <span class="n">index_2</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;index_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;freq_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;index_2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;norm&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">f</span> <span class="o">/</span> <span class="n">f_1</span><span class="p">,</span> <span class="o">-</span><span class="n">index_1</span><span class="p">)</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span>
+            <span class="mi">1</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">f</span> <span class="o">/</span> <span class="n">f_1</span><span class="p">,</span> <span class="n">index_2</span> <span class="o">-</span> <span class="n">index_1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">P</span> <span class="o">*</span> <span class="n">norm</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OneBendPowerLawBis">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.OneBendPowerLawBis">[docs]</a>
+<span class="k">class</span> <span class="nc">OneBendPowerLawBis</span><span class="p">(</span><span class="n">PowerSpectralDensity</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Other one-bend power-law power spectral density.</span>
+
+<span class="sd">    .. math:: :label: onebendpowerlawpsd_bis</span>
+
+<span class="sd">        \mathcal{P}(f) = A\times (f/f_1)^{-\alpha_1} \frac{1}{1+(f/f_1)^{(\alpha_1+\Delta\alpha)}}.</span>
+
+<span class="sd">    with the amplitude :math:`A\ge 0`, the bend frequency :math:`f_1\ge 0` and the indices :math:`\alpha_1,\Delta\alpha`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_values : :obj:`list` of :obj:`float`</span>
+<span class="sd">        Values of the parameters of the power spectral density function.</span>
+<span class="sd">        In order: [norm, alpha, f_b, delta_alpha]</span>
+<span class="sd">    free_parameters : :obj:`list` of :obj:`bool`, optional</span>
+<span class="sd">        List of bool to indicate if the parameters are free or not. Default is `[False, True, True,True]`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="OneBendPowerLawBis.expression">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.OneBendPowerLawBis.expression">[docs]</a>
+    <span class="n">expression</span> <span class="o">=</span> <span class="s2">&quot;onebend-powerlaw&quot;</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expression of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OneBendPowerLawBis.parameters">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.OneBendPowerLawBis.parameters">[docs]</a>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersModel</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OneBendPowerLawBis.analytical">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.OneBendPowerLawBis.analytical">[docs]</a>
+    <span class="n">analytical</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If True, the power spectral density function is analytical, otherwise it is not.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters_values</span><span class="p">,</span> <span class="n">free_parameters</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]):</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The number of parameters for onebend-powerlaw must be 4, not </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">free_parameters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The number of free parameters for onebend-powerlaw must be 4, not </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">free_parameters</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># initialise the parameters and check</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;norm&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">&quot;f_b&quot;</span><span class="p">,</span> <span class="s2">&quot;delta_alpha&quot;</span><span class="p">]</span>
+
+        <span class="n">PowerSpectralDensity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">param_values</span><span class="o">=</span><span class="n">parameters_values</span><span class="p">,</span>
+            <span class="n">param_names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
+            <span class="n">free_parameters</span><span class="o">=</span><span class="n">free_parameters</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="OneBendPowerLawBis.calculate">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.OneBendPowerLawBis.calculate">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the power spectral density.</span>
+
+<span class="sd">        The expression is given by Equation :math:numref:`onebendpowerlawpsd_bis`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f : :obj:`jax.Array`</span>
+<span class="sd">            Array of frequencies.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Power spectral density function evaluated on the array of frequencies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">f_b</span><span class="p">,</span> <span class="n">delta_alpha</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;f_b&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;delta_alpha&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;norm&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">f</span> <span class="o">/</span> <span class="n">f_b</span><span class="p">,</span> <span class="o">-</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span>
+            <span class="mi">1</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">f</span> <span class="o">/</span> <span class="n">f_b</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">delta_alpha</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">P</span> <span class="o">*</span> <span class="n">norm</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Matern32PSD">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Matern32PSD">[docs]</a>
+<span class="k">class</span> <span class="nc">Matern32PSD</span><span class="p">(</span><span class="n">PowerSpectralDensity</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Power spectral density of the Matern 3/2 covariance function.</span>
+
+<span class="sd">    .. math:: :label: matern32psd</span>
+
+<span class="sd">       \mathcal{P}(f) = \dfrac{A}{\gamma^3}\dfrac{12\sqrt{3}}{{(3/\gamma^2 +4\pi^2 f^2)}^2}.</span>
+
+<span class="sd">    with the amplitude :math:`A\ge 0` and the scale :math:`\gamma&gt;0`.</span>
+
+<span class="sd">    The parameters are stored in the `parameters` attribute which is a :class:`~pioran.parameters.ParametersModel` object.</span>
+<span class="sd">    The values of the parameters can be accessed using the `parameters` attribute via three keys: &#39;`position`&#39; and &#39;`scale`&#39;</span>
+
+<span class="sd">    The power spectral density function is evaluated on an array of frequencies :math:`f` using the `calculate` method.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_values : :obj:`list of float`</span>
+<span class="sd">        Values of the parameters of the power spectral density function.</span>
+<span class="sd">    free_parameters : :obj:`list` of :obj:`bool`, optional</span>
+<span class="sd">        List of bool to indicate if the parameters are free or not. Default is `[True,True]`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Matern32PSD.parameters">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Matern32PSD.parameters">[docs]</a>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersModel</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Matern32PSD.expression">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Matern32PSD.expression">[docs]</a>
+    <span class="n">expression</span> <span class="o">=</span> <span class="s2">&quot;matern32psd&quot;</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expression of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Matern32PSD.analytical">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Matern32PSD.analytical">[docs]</a>
+    <span class="n">analytical</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If True, the power spectral density function is analytical, otherwise it is not.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters_values</span><span class="p">,</span> <span class="n">free_parameters</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]):</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The number of parameters for the Matern3/2 PSD must be 2, not </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">free_parameters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The number of free parameters for the Matern3/2 PSD must be 2, not </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">free_parameters</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># initialise the parameters and check</span>
+        <span class="n">PowerSpectralDensity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">param_values</span><span class="o">=</span><span class="n">parameters_values</span><span class="p">,</span>
+            <span class="n">param_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">],</span>
+            <span class="n">free_parameters</span><span class="o">=</span><span class="n">free_parameters</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Matern32PSD.calculate">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.Matern32PSD.calculate">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the power spectral density.</span>
+
+<span class="sd">        The expression is given by Equation :math:numref:`matern32psd`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f : :obj:`jax.Array`</span>
+<span class="sd">            Array of frequencies.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Power spectral density function evaluated on the array of frequencies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;amplitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="o">*</span> <span class="mi">12</span>
+            <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">**</span> <span class="mi">3</span>
+            <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TwoBendPowerLaw">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.TwoBendPowerLaw">[docs]</a>
+<span class="k">class</span> <span class="nc">TwoBendPowerLaw</span><span class="p">(</span><span class="n">PowerSpectralDensity</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Two-bend power-law power spectral density.</span>
+
+<span class="sd">    .. math:: :label: twobendpowerlawpsd</span>
+
+<span class="sd">        \mathcal{P}(f) = A\times (f/f_1)^{-\alpha_1} \frac{1}{1+(f/f_1)^{(\alpha_2-\alpha_1)}} \frac{1}{1+(f/f_2)^{(\alpha_3-\alpha_2)}}</span>
+
+<span class="sd">    with the amplitude :math:`A\ge 0`, the bend frequencies :math:`f_1\ge 0`,:math:`f_2\ge f_1` and the indices :math:`\alpha_1,\alpha_2,\alpha_3`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_values : :obj:`list` of :obj:`float`</span>
+<span class="sd">        Values of the parameters of the power spectral density function.</span>
+<span class="sd">        In order: [norm, index_1, freq_1, index_2]</span>
+<span class="sd">    free_parameters : :obj:`list` of :obj:`bool`, optional</span>
+<span class="sd">        List of bool to indicate if the parameters are free or not. Default is `[False, True, True,True]`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TwoBendPowerLaw.expression">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.TwoBendPowerLaw.expression">[docs]</a>
+    <span class="n">expression</span> <span class="o">=</span> <span class="s2">&quot;twobend-powerlaw&quot;</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expression of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TwoBendPowerLaw.parameters">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.TwoBendPowerLaw.parameters">[docs]</a>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersModel</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of the power spectral density function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TwoBendPowerLaw.analytical">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.TwoBendPowerLaw.analytical">[docs]</a>
+    <span class="n">analytical</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If True, the power spectral density function is analytical, otherwise it is not.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">parameters_values</span><span class="p">,</span> <span class="n">free_parameters</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The number of parameters for onebend-powerlaw must be 6, not </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">parameters_values</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">free_parameters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The number of free parameters for onebend-powerlaw must be 6, not </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">free_parameters</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># initialise the parameters and check</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;norm&quot;</span><span class="p">,</span> <span class="s2">&quot;index_1&quot;</span><span class="p">,</span> <span class="s2">&quot;freq_1&quot;</span><span class="p">,</span> <span class="s2">&quot;index_2&quot;</span><span class="p">,</span> <span class="s2">&quot;freq_2&quot;</span><span class="p">,</span> <span class="s2">&quot;index_3&quot;</span><span class="p">]</span>
+
+        <span class="n">PowerSpectralDensity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">param_values</span><span class="o">=</span><span class="n">parameters_values</span><span class="p">,</span>
+            <span class="n">param_names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
+            <span class="n">free_parameters</span><span class="o">=</span><span class="n">free_parameters</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="TwoBendPowerLaw.calculate">
+<a class="viewcode-back" href="../../autoapi/pioran/psd/index.html#pioran.psd.TwoBendPowerLaw.calculate">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the power spectral density.</span>
+
+<span class="sd">        The expression is given by Equation :math:numref:`twobendpowerlawpsd`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f : :obj:`jax.Array`</span>
+<span class="sd">            Array of frequencies.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Power spectral density function evaluated on the array of frequencies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">index_1</span><span class="p">,</span> <span class="n">f_1</span><span class="p">,</span> <span class="n">index_2</span><span class="p">,</span> <span class="n">f_2</span><span class="p">,</span> <span class="n">index_3</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;index_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;freq_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;index_2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;freq_2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;index_3&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;norm&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">f</span> <span class="o">/</span> <span class="n">f_1</span><span class="p">,</span> <span class="o">-</span><span class="n">index_1</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">f</span> <span class="o">/</span> <span class="n">f_1</span><span class="p">,</span> <span class="n">index_2</span> <span class="o">-</span> <span class="n">index_1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">f</span> <span class="o">/</span> <span class="n">f_2</span><span class="p">,</span> <span class="n">index_3</span> <span class="o">-</span> <span class="n">index_2</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">P</span> <span class="o">*</span> <span class="n">norm</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Mehdy Lefkir.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

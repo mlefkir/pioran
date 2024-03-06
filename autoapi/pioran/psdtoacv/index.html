@@ -1,0 +1,1184 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>psdtoacv &#8212; pioran</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=ad57bd55" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/pioran/psdtoacv/index';</script>
+    <link rel="icon" href="../../../_static/favico.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="simulate" href="../simulate/index.html" />
+    <link rel="prev" title="psd_base" href="../psd_base/index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/logo_borderbis.png" class="logo__image only-light" alt="pioran - Home"/>
+    <script>document.write(`<img src="../../../_static/logo_borderbis.png" class="logo__image only-dark" alt="pioran - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../userguide/User.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../tutorials/Tutorials.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../references/references.html">
+                        References
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../userguide/User.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../tutorials/Tutorials.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../references/references.html">
+                        References
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">pioran</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../carma/index.html">carma</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../carma/carma_acvf/index.html">carma_acvf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../carma/carma_core/index.html">carma_core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../carma/carma_model/index.html">carma_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../carma/carma_utils/index.html">carma_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../carma/kalman/index.html">kalman</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../parameters/index.html">parameters</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../parameters/parameter_base/index.html">parameter_base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../parameters/parameters/index.html">parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../utils/index.html">utils</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../utils/ICCF/index.html">ICCF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/gp_utils/index.html">gp_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/inference_utils/index.html">inference_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/mcmc_visualisations/index.html">mcmc_visualisations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/psd_utils/index.html">psd_utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../acvf/index.html">acvf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../acvf_base/index.html">acvf_base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/index.html">core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diagnostics/index.html">diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../inference/index.html">inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plots/index.html">plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../priors/index.html">priors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../psd/index.html">psd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../psd_base/index.html">psd_base</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">psdtoacv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../simulate/index.html">simulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tools/index.html">tools</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">API Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">pioran</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">psdtoacv</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-pioran.psdtoacv">
+<span id="psdtoacv"></span><h1>psdtoacv<a class="headerlink" href="#module-pioran.psdtoacv" title="Link to this heading">#</a></h1>
+<p>Convert a power spectral density to an autocovariance function via the inverse Fourier transform methods or kernel decomposition.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<table class="summarytable table" id="id1">
+<caption><span class="caption-text">Classes</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV" title="pioran.psdtoacv.PSDToACV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PSDToACV</span></code></a></p></td>
+<td><p>Represents the tranformation of a power spectral density to an autocovariance function.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="summarytable table" id="id2">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id2" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.terms" title="pioran.psdtoacv.terms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">terms</span></code></a></p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.nufft2" title="pioran.psdtoacv.nufft2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nufft2</span></code></a></p></td>
+<td><p>-</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pioran.psdtoacv.</span></span><span class="sig-name descname"><span class="pre">PSDToACV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PSD</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><span class="pre">pioran.psd_base.PowerSpectralDensity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_low</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_high</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimate_variance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_variance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_celerite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_legacy_celerite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.kidger.site/equinox/api/module/module/#equinox.Module" title="(in Equinox v0.0.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">equinox.Module</span></code></a></p>
+<p>Represents the tranformation of a power spectral density to an autocovariance function.</p>
+<p>Computes the autocovariance function from a power spectral density using the several methods.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>PSD</strong><span class="classifier"><a class="reference internal" href="../psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code></a></span></dt><dd><p>Power spectral density object.</p>
+</dd>
+<dt><strong>S_low</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Lower bound of the frequency grid.</p>
+</dd>
+<dt><strong>S_high</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Upper bound of the frequency grid.</p>
+</dd>
+<dt><strong>T</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Duration of the time series.</p>
+</dd>
+<dt><strong>dt</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Minimum sampling duration of the time series.</p>
+</dd>
+<dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Method used to compute the autocovariance function. Can be ‘FFT’ if the inverse Fourier transform is used or ‘NuFFT’
+for the non uniform Fourier transform. The ‘SHO’ method will approximate the power spectral density into a sum of SHO functions.</p>
+</dd>
+<dt><strong>n_components</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of components used to approximate the power spectral density using the ‘SHO’ method.</p>
+</dd>
+<dt><strong>estimate_variance</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>If True, the amplitude of the autocovariance function is estimated. Default is True.</p>
+</dd>
+<dt><strong>init_variance</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>Initial value of the variance. Default is 1.0.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>TypeError</dt><dd><p>If PSD is not a <a class="reference internal" href="../psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerSpectralDensity</span></code></a> object.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If S_low is smaller than 2., if method is not in the allowed methods or if n_components is smaller than 1.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Overview</p>
+<table class="summarytable table" id="id3">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id3" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.PSD" title="pioran.psdtoacv.PSDToACV.PSD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PSD</span></code></a></p></td>
+<td><p>Power spectral density object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.ACVF" title="pioran.psdtoacv.PSDToACV.ACVF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ACVF</span></code></a></p></td>
+<td><p>Autocovariance function as sum of SHO kernels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.parameters" title="pioran.psdtoacv.PSDToACV.parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameters</span></code></a></p></td>
+<td><p>Parameters of the power spectral density.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.method" title="pioran.psdtoacv.PSDToACV.method"><code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code></a></p></td>
+<td><p>Method to compute the covariance function from the power spectral density, by default ‘FFT’.Possible values are:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.f_max_obs" title="pioran.psdtoacv.PSDToACV.f_max_obs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f_max_obs</span></code></a></p></td>
+<td><p>Maximum observed frequency, i.e. the Nyquist frequency.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.f_min_obs" title="pioran.psdtoacv.PSDToACV.f_min_obs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f_min_obs</span></code></a></p></td>
+<td><p>Minimum observed frequency.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.f0" title="pioran.psdtoacv.PSDToACV.f0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f0</span></code></a></p></td>
+<td><p>Lower bound of the frequency grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.S_low" title="pioran.psdtoacv.PSDToACV.S_low"><code class="xref py py-obj docutils literal notranslate"><span class="pre">S_low</span></code></a></p></td>
+<td><p>Scale for the lower bound of the frequency grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.S_high" title="pioran.psdtoacv.PSDToACV.S_high"><code class="xref py py-obj docutils literal notranslate"><span class="pre">S_high</span></code></a></p></td>
+<td><p>Scale for the upper bound of the frequency grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.fN" title="pioran.psdtoacv.PSDToACV.fN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fN</span></code></a></p></td>
+<td><p>Upper bound of the frequency grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.estimate_variance" title="pioran.psdtoacv.PSDToACV.estimate_variance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_variance</span></code></a></p></td>
+<td><p>If True, the amplitude of the autocovariance function is estimated.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.n_freq_grid" title="pioran.psdtoacv.PSDToACV.n_freq_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n_freq_grid</span></code></a></p></td>
+<td><p>Number of points in the frequency grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.frequencies" title="pioran.psdtoacv.PSDToACV.frequencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frequencies</span></code></a></p></td>
+<td><p>Frequency grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.tau" title="pioran.psdtoacv.PSDToACV.tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tau</span></code></a></p></td>
+<td><p>Time lag grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.dtau" title="pioran.psdtoacv.PSDToACV.dtau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtau</span></code></a></p></td>
+<td><p>Time lag step.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.n_components" title="pioran.psdtoacv.PSDToACV.n_components"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n_components</span></code></a></p></td>
+<td><p>Number of components used to approximate the power spectral density using the ‘SHO’ method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.spectral_points" title="pioran.psdtoacv.PSDToACV.spectral_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral_points</span></code></a></p></td>
+<td><p>Frequencies of the SHO kernels.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.spectral_matrix" title="pioran.psdtoacv.PSDToACV.spectral_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral_matrix</span></code></a></p></td>
+<td><p>Matrix of the SHO kernels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.use_celerite" title="pioran.psdtoacv.PSDToACV.use_celerite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_celerite</span></code></a></p></td>
+<td><p>Use celerite2-jax as a backend to model the autocovariance function and compute the log marginal likelihood.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.use_legacy_celerite" title="pioran.psdtoacv.PSDToACV.use_legacy_celerite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_legacy_celerite</span></code></a></p></td>
+<td><p>Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="summarytable table" id="id4">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id4" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.decompose_model" title="pioran.psdtoacv.PSDToACV.decompose_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose_model</span></code></a>(psd_normalised)</p></td>
+<td><p>Decompose the PSD model into a sum of basis functions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.get_approx_coefs" title="pioran.psdtoacv.PSDToACV.get_approx_coefs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_approx_coefs</span></code></a>()</p></td>
+<td><p>Get the amplitudes and frequencies of the basis functions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.build_SHO_model_legacy_cel" title="pioran.psdtoacv.PSDToACV.build_SHO_model_legacy_cel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_SHO_model_legacy_cel</span></code></a>(amplitudes, frequencies)</p></td>
+<td><p>Build the semi-separable SHO model in celerite from the amplitudes and frequencies.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.build_SHO_model_cel" title="pioran.psdtoacv.PSDToACV.build_SHO_model_cel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_SHO_model_cel</span></code></a>(amplitudes, frequencies)</p></td>
+<td><p>Build the semi-separable SHO model in celerite from the amplitudes and frequencies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.build_DRWCelerite_model_cel" title="pioran.psdtoacv.PSDToACV.build_DRWCelerite_model_cel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_DRWCelerite_model_cel</span></code></a>(amplitudes, frequencies)</p></td>
+<td><p>Build the semi-separable DRW+Celerite model in celerite from the amplitudes and frequencies.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.build_SHO_model_tinygp" title="pioran.psdtoacv.PSDToACV.build_SHO_model_tinygp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_SHO_model_tinygp</span></code></a>(amplitudes, frequencies)</p></td>
+<td><p>Build the semi-separable SHO model in tinygp from the amplitudes and frequencies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.calculate" title="pioran.psdtoacv.PSDToACV.calculate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate</span></code></a>(t, with_ACVF_factor)</p></td>
+<td><p>Calculate the autocovariance function from the power spectral density.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.get_acvf_byNuFFT" title="pioran.psdtoacv.PSDToACV.get_acvf_byNuFFT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_acvf_byNuFFT</span></code></a>(psd, t)</p></td>
+<td><p>Compute the autocovariance function from the power spectral density using the non uniform Fourier transform.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.get_acvf_byFFT" title="pioran.psdtoacv.PSDToACV.get_acvf_byFFT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_acvf_byFFT</span></code></a>(psd)</p></td>
+<td><p>Compute the autocovariance function from the power spectral density using the inverse Fourier transform.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.interpolation" title="pioran.psdtoacv.PSDToACV.interpolation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolation</span></code></a>(t, acvf)</p></td>
+<td><p>Interpolate the autocovariance function at the points t.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.get_cov_matrix" title="pioran.psdtoacv.PSDToACV.get_cov_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cov_matrix</span></code></a>(xq, xp)</p></td>
+<td><p>Compute the covariance matrix between two arrays xq, xp.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.__str__" title="pioran.psdtoacv.PSDToACV.__str__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__str__</span></code></a>()</p></td>
+<td><p>String representation of the PSDToACV object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psdtoacv.PSDToACV.__repr__" title="pioran.psdtoacv.PSDToACV.__repr__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__repr__</span></code></a>()</p></td>
+<td><p>Representation of the PSDToACV object.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Members</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.PSD">
+<span class="sig-name descname"><span class="pre">PSD</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><span class="pre">pioran.psd_base.PowerSpectralDensity</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.PSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.PSD" title="Link to this definition">#</a></dt>
+<dd><p>Power spectral density object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.ACVF">
+<span class="sig-name descname"><span class="pre">ACVF</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://tinygp.readthedocs.io/en/latest/api/summary/tinygp.kernels.quasisep.SHO.html#tinygp.kernels.quasisep.SHO" title="(in tinygp v0.3.1.dev2+g8fdae30)"><span class="pre">tinygp.kernels.quasisep.SHO</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.ACVF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.ACVF" title="Link to this definition">#</a></dt>
+<dd><p>Autocovariance function as sum of SHO kernels.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><span class="pre">pioran.parameters.ParametersModel</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Parameters of the power spectral density.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.method">
+<span class="sig-name descname"><span class="pre">method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.method"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.method" title="Link to this definition">#</a></dt>
+<dd><p>Method to compute the covariance function from the power spectral density, by default ‘FFT’.Possible values are:
+- ‘FFT’: use the FFT to compute the autocovariance function.
+- ‘NuFFT’: use the non-uniform FFT to compute the autocovariance function.
+- ‘SHO’: approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function.
+- ‘DRWCelerite’ : approximate the power spectrum as a sum of DRW+Celerite basis functions to compute the autocovariance function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.f_max_obs">
+<span class="sig-name descname"><span class="pre">f_max_obs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.f_max_obs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.f_max_obs" title="Link to this definition">#</a></dt>
+<dd><p>Maximum observed frequency, i.e. the Nyquist frequency.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.f_min_obs">
+<span class="sig-name descname"><span class="pre">f_min_obs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.f_min_obs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.f_min_obs" title="Link to this definition">#</a></dt>
+<dd><p>Minimum observed frequency.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.f0">
+<span class="sig-name descname"><span class="pre">f0</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.f0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.f0" title="Link to this definition">#</a></dt>
+<dd><p>Lower bound of the frequency grid.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.S_low">
+<span class="sig-name descname"><span class="pre">S_low</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.S_low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.S_low" title="Link to this definition">#</a></dt>
+<dd><p>Scale for the lower bound of the frequency grid.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.S_high">
+<span class="sig-name descname"><span class="pre">S_high</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.S_high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.S_high" title="Link to this definition">#</a></dt>
+<dd><p>Scale for the upper bound of the frequency grid.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.fN">
+<span class="sig-name descname"><span class="pre">fN</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.fN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.fN" title="Link to this definition">#</a></dt>
+<dd><p>Upper bound of the frequency grid.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.estimate_variance">
+<span class="sig-name descname"><span class="pre">estimate_variance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.estimate_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.estimate_variance" title="Link to this definition">#</a></dt>
+<dd><p>If True, the amplitude of the autocovariance function is estimated.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.n_freq_grid">
+<span class="sig-name descname"><span class="pre">n_freq_grid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.n_freq_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.n_freq_grid" title="Link to this definition">#</a></dt>
+<dd><p>Number of points in the frequency grid.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.frequencies">
+<span class="sig-name descname"><span class="pre">frequencies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.frequencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.frequencies" title="Link to this definition">#</a></dt>
+<dd><p>Frequency grid.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.tau">
+<span class="sig-name descname"><span class="pre">tau</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.tau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.tau" title="Link to this definition">#</a></dt>
+<dd><p>Time lag grid.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.dtau">
+<span class="sig-name descname"><span class="pre">dtau</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.dtau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.dtau" title="Link to this definition">#</a></dt>
+<dd><p>Time lag step.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.n_components">
+<span class="sig-name descname"><span class="pre">n_components</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.n_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.n_components" title="Link to this definition">#</a></dt>
+<dd><p>Number of components used to approximate the power spectral density using the ‘SHO’ method.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.spectral_points">
+<span class="sig-name descname"><span class="pre">spectral_points</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.spectral_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.spectral_points" title="Link to this definition">#</a></dt>
+<dd><p>Frequencies of the SHO kernels.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.spectral_matrix">
+<span class="sig-name descname"><span class="pre">spectral_matrix</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.spectral_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.spectral_matrix" title="Link to this definition">#</a></dt>
+<dd><p>Matrix of the SHO kernels.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.use_celerite">
+<span class="sig-name descname"><span class="pre">use_celerite</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.use_celerite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.use_celerite" title="Link to this definition">#</a></dt>
+<dd><p>Use celerite2-jax as a backend to model the autocovariance function and compute the log marginal likelihood.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.use_legacy_celerite">
+<span class="sig-name descname"><span class="pre">use_legacy_celerite</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.use_legacy_celerite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.use_legacy_celerite" title="Link to this definition">#</a></dt>
+<dd><p>Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.decompose_model">
+<span class="sig-name descname"><span class="pre">decompose_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psd_normalised</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.decompose_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.decompose_model" title="Link to this definition">#</a></dt>
+<dd><p>Decompose the PSD model into a sum of basis functions.</p>
+<p>Assuming that the PSD model can be written as a sum of <span class="math notranslate nohighlight">\(J\)</span> , this method
+solve the linear system to find the amplitude <span class="math notranslate nohighlight">\(a_j\)</span> of each kernel.</p>
+<div class="math notranslate nohighlight" id="equation-sho-power-spectrum">
+<span class="eqno">(1)<a class="headerlink" href="#equation-sho-power-spectrum" title="Link to this equation">#</a></span>\[\]</div>
+<p>boldsymbol{y} = B boldsymbol{a}</p>
+<p>with <span class="math notranslate nohighlight">\(\boldsymbol{y}=\begin{bmatrix}1 &amp; \mathcal{P}(f_1)/\mathcal{P}(f_0) &amp; \cdots &amp; \mathcal{P}(f_J)/\mathcal{P}(f_0) \end{bmatrix}^\mathrm{T}\)</span>
+the normalised power spectral density vector, <span class="math notranslate nohighlight">\(B\)</span> the spectral matrix associated to the linear system and <span class="math notranslate nohighlight">\(\boldsymbol{a}\)</span> the amplitudes of the functions.</p>
+<div class="math notranslate nohighlight" id="equation-sho-spectral-matrix">
+<span class="eqno">(2)<a class="headerlink" href="#equation-sho-spectral-matrix" title="Link to this equation">#</a></span>\[\]</div>
+<p>B_{ij} = dfrac{1}{1 + left(dfrac{f_i}{f_j}right)^4}</p>
+<div class="math notranslate nohighlight" id="equation-drwcel-spectral-matrix">
+<span class="eqno">(3)<a class="headerlink" href="#equation-drwcel-spectral-matrix" title="Link to this equation">#</a></span>\[\]</div>
+<p>B_{ij} = dfrac{1}{1 + left(dfrac{f_i}{f_j}right)^6}</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>psd_normalised</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Normalised power spectral density by the first value.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Amplitudes of the functions.</p>
+</dd>
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Frequencies of the function.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.get_approx_coefs">
+<span class="sig-name descname"><span class="pre">get_approx_coefs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.get_approx_coefs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.get_approx_coefs" title="Link to this definition">#</a></dt>
+<dd><p>Get the amplitudes and frequencies of the basis functions.</p>
+<p>Estimate the amplitudes and frequencies of the basis functions by solving the linear system.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>amplitudes</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Amplitudes of the SHO kernels.</p>
+</dd>
+<dt><strong>frequencies</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Frequencies of the SHO kernels.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.build_SHO_model_legacy_cel">
+<span class="sig-name descname"><span class="pre">build_SHO_model_legacy_cel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitudes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequencies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.build_SHO_model_legacy_cel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.build_SHO_model_legacy_cel" title="Link to this definition">#</a></dt>
+<dd><p>Build the semi-separable SHO model in celerite from the amplitudes and frequencies.</p>
+<p>Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes.
+The amplitudes are modelled as a DRW model with c=0.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>amplitudes</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Amplitudes of the SHO kernels.</p>
+</dd>
+<dt><strong>frequencies</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Frequencies of the SHO kernels.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">term.Term</span></code></dt><dd><p>Constructed SHO kernel.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.build_SHO_model_cel">
+<span class="sig-name descname"><span class="pre">build_SHO_model_cel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitudes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequencies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.build_SHO_model_cel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.build_SHO_model_cel" title="Link to this definition">#</a></dt>
+<dd><p>Build the semi-separable SHO model in celerite from the amplitudes and frequencies.</p>
+<p>Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes.
+The amplitudes are modelled as a DRW model with c=0.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>amplitudes</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Amplitudes of the SHO kernels.</p>
+</dd>
+<dt><strong>frequencies</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Frequencies of the SHO kernels.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">term.Term</span></code></dt><dd><p>Constructed SHO kernel.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.build_DRWCelerite_model_cel">
+<span class="sig-name descname"><span class="pre">build_DRWCelerite_model_cel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitudes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequencies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.build_DRWCelerite_model_cel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.build_DRWCelerite_model_cel" title="Link to this definition">#</a></dt>
+<dd><p>Build the semi-separable DRW+Celerite model in celerite from the amplitudes and frequencies.</p>
+<p>The amplitudes</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>amplitudes</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Amplitudes of the SHO kernels.</p>
+</dd>
+<dt><strong>frequencies</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Frequencies of the SHO kernels.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">term.Term</span></code></dt><dd><p>Constructed SHO kernel.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.build_SHO_model_tinygp">
+<span class="sig-name descname"><span class="pre">build_SHO_model_tinygp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitudes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequencies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://tinygp.readthedocs.io/en/latest/api/summary/tinygp.kernels.quasisep.SHO.html#tinygp.kernels.quasisep.SHO" title="(in tinygp v0.3.1.dev2+g8fdae30)"><span class="pre">tinygp.kernels.quasisep.SHO</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.build_SHO_model_tinygp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.build_SHO_model_tinygp" title="Link to this definition">#</a></dt>
+<dd><p>Build the semi-separable SHO model in tinygp from the amplitudes and frequencies.</p>
+<p>Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes,
+which is not possible with the SHO kernel implementation in tinygp.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>amplitudes</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Amplitudes of the SHO kernels.</p>
+</dd>
+<dt><strong>frequencies</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Frequencies of the SHO kernels.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://tinygp.readthedocs.io/en/latest/api/summary/tinygp.kernels.quasisep.SHO.html#tinygp.kernels.quasisep.SHO" title="(in tinygp v0.3.1.dev2+g8fdae30)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tinygp.kernels.quasisep.SHO</span></code></a></dt><dd><p>Constructed SHO kernel.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_ACVF_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.calculate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.calculate" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the autocovariance function from the power spectral density.</p>
+<p>The autocovariance function is computed by the inverse Fourier transform by
+calling the method get_acvf_byFFT. The autocovariance function is then interpolated
+using the method interpolation.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>t</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Time lags where the autocovariance function is computed.</p>
+</dd>
+<dt><strong>with_ACVF_factor</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>If True, the autocovariance function is multiplied by the factor <span class="math notranslate nohighlight">\(\mathcal{R}(0)\)</span>. Default is False.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Autocovariance values at the time lags t.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NotImplementedError</dt><dd><p>If the method is not implemented.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.get_acvf_byNuFFT">
+<span class="sig-name descname"><span class="pre">get_acvf_byNuFFT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.get_acvf_byNuFFT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.get_acvf_byNuFFT" title="Link to this definition">#</a></dt>
+<dd><p>Compute the autocovariance function from the power spectral density using the non uniform Fourier transform.</p>
+<p>This function uses the jax_finufft package to compute the non uniform Fourier transform with the nufft2 function.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>psd</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Power spectral density values.</p>
+</dd>
+<dt><strong>t</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Time lags where the autocovariance function is computed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Autocovariance values at the time lags t.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.get_acvf_byFFT">
+<span class="sig-name descname"><span class="pre">get_acvf_byFFT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.get_acvf_byFFT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.get_acvf_byFFT" title="Link to this definition">#</a></dt>
+<dd><p>Compute the autocovariance function from the power spectral density using the inverse Fourier transform.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>psd</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Power spectral density.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Autocovariance function.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.interpolation">
+<span class="sig-name descname"><span class="pre">interpolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">acvf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.interpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.interpolation" title="Link to this definition">#</a></dt>
+<dd><p>Interpolate the autocovariance function at the points t.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>t</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Points where the autocovariance function is computed.</p>
+</dd>
+<dt><strong>acvf</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Autocovariance values at the points tau.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Autocovariance function at the points t.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.get_cov_matrix">
+<span class="sig-name descname"><span class="pre">get_cov_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.get_cov_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.get_cov_matrix" title="Link to this definition">#</a></dt>
+<dd><p>Compute the covariance matrix between two arrays xq, xp.</p>
+<p>The term (xq-xp) is computed using the <a class="reference internal" href="../utils/index.html#pioran.utils.EuclideanDistance" title="pioran.utils.EuclideanDistance"><code class="xref py py-func docutils literal notranslate"><span class="pre">EuclideanDistance()</span></code></a> function from the utils module.
+If the method used is ‘NuFFT’ and if the two arrays have the same shape, the covariance matrix is computed only on the unique values of the distance matrix
+using the <code class="xref py py-func docutils literal notranslate"><span class="pre">decompose_triangular_matrix()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">reconstruct_triangular_matrix()</span></code> functions from the utils module.
+Otherwise, the covariance matrix is computed on the full distance matrix.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>xq</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>First array.</p>
+</dd>
+<dt><strong>xp</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Second array.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Covariance matrix.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NotImplementedError</dt><dd><p>If the method is not implemented.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.__str__" title="Link to this definition">#</a></dt>
+<dd><p>String representation of the PSDToACV object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a></dt><dd><p>String representation of the PSDToACV object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psdtoacv.PSDToACV.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#PSDToACV.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.PSDToACV.__repr__" title="Link to this definition">#</a></dt>
+<dd><p>Representation of the PSDToACV object.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">#</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="pioran.psdtoacv.terms">
+<span class="sig-prename descclassname"><span class="pre">pioran.psdtoacv.</span></span><span class="sig-name descname"><span class="pre">terms</span></span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#terms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.terms" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pioran.psdtoacv.nufft2">
+<span class="sig-prename descclassname"><span class="pre">pioran.psdtoacv.</span></span><span class="sig-name descname"><span class="pre">nufft2</span></span><a class="reference internal" href="../../../_modules/pioran/psdtoacv.html#nufft2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psdtoacv.nufft2" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../psd_base/index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">psd_base</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../simulate/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">simulate</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV"><code class="docutils literal notranslate"><span class="pre">PSDToACV</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.PSD"><code class="docutils literal notranslate"><span class="pre">PSDToACV.PSD</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.ACVF"><code class="docutils literal notranslate"><span class="pre">PSDToACV.ACVF</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.parameters"><code class="docutils literal notranslate"><span class="pre">PSDToACV.parameters</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.method"><code class="docutils literal notranslate"><span class="pre">PSDToACV.method</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.f_max_obs"><code class="docutils literal notranslate"><span class="pre">PSDToACV.f_max_obs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.f_min_obs"><code class="docutils literal notranslate"><span class="pre">PSDToACV.f_min_obs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.f0"><code class="docutils literal notranslate"><span class="pre">PSDToACV.f0</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.S_low"><code class="docutils literal notranslate"><span class="pre">PSDToACV.S_low</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.S_high"><code class="docutils literal notranslate"><span class="pre">PSDToACV.S_high</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.fN"><code class="docutils literal notranslate"><span class="pre">PSDToACV.fN</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.estimate_variance"><code class="docutils literal notranslate"><span class="pre">PSDToACV.estimate_variance</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.n_freq_grid"><code class="docutils literal notranslate"><span class="pre">PSDToACV.n_freq_grid</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.frequencies"><code class="docutils literal notranslate"><span class="pre">PSDToACV.frequencies</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.tau"><code class="docutils literal notranslate"><span class="pre">PSDToACV.tau</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.dtau"><code class="docutils literal notranslate"><span class="pre">PSDToACV.dtau</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.n_components"><code class="docutils literal notranslate"><span class="pre">PSDToACV.n_components</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.spectral_points"><code class="docutils literal notranslate"><span class="pre">PSDToACV.spectral_points</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.spectral_matrix"><code class="docutils literal notranslate"><span class="pre">PSDToACV.spectral_matrix</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.use_celerite"><code class="docutils literal notranslate"><span class="pre">PSDToACV.use_celerite</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.use_legacy_celerite"><code class="docutils literal notranslate"><span class="pre">PSDToACV.use_legacy_celerite</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.decompose_model"><code class="docutils literal notranslate"><span class="pre">PSDToACV.decompose_model()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.get_approx_coefs"><code class="docutils literal notranslate"><span class="pre">PSDToACV.get_approx_coefs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.build_SHO_model_legacy_cel"><code class="docutils literal notranslate"><span class="pre">PSDToACV.build_SHO_model_legacy_cel()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.build_SHO_model_cel"><code class="docutils literal notranslate"><span class="pre">PSDToACV.build_SHO_model_cel()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.build_DRWCelerite_model_cel"><code class="docutils literal notranslate"><span class="pre">PSDToACV.build_DRWCelerite_model_cel()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.build_SHO_model_tinygp"><code class="docutils literal notranslate"><span class="pre">PSDToACV.build_SHO_model_tinygp()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.calculate"><code class="docutils literal notranslate"><span class="pre">PSDToACV.calculate()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.get_acvf_byNuFFT"><code class="docutils literal notranslate"><span class="pre">PSDToACV.get_acvf_byNuFFT()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.get_acvf_byFFT"><code class="docutils literal notranslate"><span class="pre">PSDToACV.get_acvf_byFFT()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.interpolation"><code class="docutils literal notranslate"><span class="pre">PSDToACV.interpolation()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.get_cov_matrix"><code class="docutils literal notranslate"><span class="pre">PSDToACV.get_cov_matrix()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.__str__"><code class="docutils literal notranslate"><span class="pre">PSDToACV.__str__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.PSDToACV.__repr__"><code class="docutils literal notranslate"><span class="pre">PSDToACV.__repr__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#attributes">Attributes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.terms"><code class="docutils literal notranslate"><span class="pre">terms</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psdtoacv.nufft2"><code class="docutils literal notranslate"><span class="pre">nufft2</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../_sources/autoapi/pioran/psdtoacv/index.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Mehdy Lefkir.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

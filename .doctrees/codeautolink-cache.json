@@ -1,0 +1,2470 @@
+{
+  "autoapi/index": [],
+  "autoapi/pioran/acvf/index": [],
+  "autoapi/pioran/acvf_base/index": [],
+  "autoapi/pioran/carma/carma_acvf/index": [],
+  "autoapi/pioran/carma/carma_core/index": [],
+  "autoapi/pioran/carma/carma_model/index": [],
+  "autoapi/pioran/carma/carma_utils/index": [],
+  "autoapi/pioran/carma/index": [],
+  "autoapi/pioran/carma/kalman/index": [],
+  "autoapi/pioran/core/index": [],
+  "autoapi/pioran/diagnostics/index": [],
+  "autoapi/pioran/index": [],
+  "autoapi/pioran/inference/index": [],
+  "autoapi/pioran/parameters/index": [],
+  "autoapi/pioran/parameters/parameter_base/index": [],
+  "autoapi/pioran/parameters/parameters/index": [],
+  "autoapi/pioran/plots/index": [],
+  "autoapi/pioran/priors/index": [],
+  "autoapi/pioran/psd/index": [],
+  "autoapi/pioran/psd_base/index": [],
+  "autoapi/pioran/psdtoacv/index": [],
+  "autoapi/pioran/simulate/index": [],
+  "autoapi/pioran/tools/index": [],
+  "autoapi/pioran/utils/ICCF/index": [],
+  "autoapi/pioran/utils/gp_utils/index": [],
+  "autoapi/pioran/utils/index": [],
+  "autoapi/pioran/utils/inference_utils/index": [],
+  "autoapi/pioran/utils/mcmc_visualisations/index": [],
+  "autoapi/pioran/utils/psd_utils/index": [],
+  "index": [],
+  "references/On_the_fft": [
+    {
+      "source": "import numpy as np\nimport matplotlib.pyplot as plt\nplt.style.use(\"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle\")",
+      "names": [
+        {
+          "import_components": [
+            "numpy"
+          ],
+          "code_str": "numpy",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "numpy"
+        },
+        {
+          "import_components": [
+            "matplotlib",
+            "pyplot"
+          ],
+          "code_str": "matplotlib.pyplot",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "matplotlib.pyplot"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": null,
+        "headings": []
+      },
+      "doc_lineno": 10002
+    },
+    {
+      "source": "def SqExpo_ACV(t, A, sigma):\n    return A * np.exp( -2 * np.pi**2 * sigma**2 * t**2 )\n\ndef SqExpo_PSD(f, A, sigma):\n    return A / (np.sqrt(2*np.pi) * sigma ) * np.exp( - 0.5 * f**2 / sigma**2 )",
+      "names": [],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "squared-exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Squared exponential ACVF"
+        ]
+      },
+      "doc_lineno": 80002
+    },
+    {
+      "source": "f0 = 1e-4 # min frequency \ndf = f0 \nfN = 5. # max frequency\n# grid of frequencies, from 0 to fend-df with step size df\nf = np.arange(0,fN,df)\n# number of points in the psd including the zeroth freq\nN = len(f)\n# define the parameters of the psd\nA , sigma = 1 , 1.e-1\n\nP = SqExpo_PSD(f,A,sigma)",
+      "names": [
+        {
+          "import_components": [
+            "len"
+          ],
+          "code_str": "len",
+          "lineno": 7,
+          "end_lineno": 7,
+          "context": "none",
+          "resolved_location": "len"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "squared-exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Squared exponential ACVF"
+        ]
+      },
+      "doc_lineno": 100002
+    },
+    {
+      "source": "fig,ax = plt.subplots(1,1,figsize=(7,4.5))\nax.plot(f,P,'.')\nax.set_xlabel(r'$f$')\nax.set_ylabel('Power spectral density')\nax.loglog()\nax.set_title(\"Squared exponential\")\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "squared-exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Squared exponential ACVF"
+        ]
+      },
+      "doc_lineno": 110002
+    },
+    {
+      "source": "tmax = 0.5 / df \ndt = 1/df/(N-1)/2\n\nt = np.arange(0,tmax+dt,dt)\n\nR_theo = SqExpo_ACV(t,A,sigma) # theoretical inverse FT of the lorentzian\n\n# compute the IFFT, with a normalisation factor 1/M, M=2*(len(y)-1)\nR_dift = np.fft.irfft(P) \nassert (R_dift[1:N-1]-np.flip(R_dift[N:])<np.finfo(float).eps).all(), \"The IRFFT did not return a mirrored ACV\"\nR_num = R_dift[:N]/dt",
+      "names": [
+        {
+          "import_components": [
+            "float"
+          ],
+          "code_str": "float",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "none",
+          "resolved_location": "float"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "squared-exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Squared exponential ACVF"
+        ]
+      },
+      "doc_lineno": 130002
+    },
+    {
+      "source": "fig,ax = plt.subplots(1,2,figsize=(9,4.5))\nax[0].plot(t,R_theo,label='Analytical')#,marker='s')\nax[0].plot( t, R_num,label='Numerical',marker='o')\n\nax[0].legend()\nax[0].set_xlim(-1e-5,10 )\nax[0].set_xlabel(r\"$\\tau$\")\nax[0].set_ylabel(r\"Autocovariance function\")\nax[1].plot(t,np.abs(R_theo-R_num),label='|Error|')#,marker='s')\n\nax[1].set_xlabel(r\"$\\tau$\")\nax[1].set_ylabel(r\"Absolute difference\")\nfig.suptitle(\"Inverse Fourier transform of the Squared exponential PSD\")\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "squared-exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Squared exponential ACVF"
+        ]
+      },
+      "doc_lineno": 150002
+    },
+    {
+      "source": "print(f\"P(0)           : {P[0]:1.5e}\")\nprint(f'Sum of ACV     : {np.trapz(R_num)*dt*2:1.5e}')\nprint(f'Sum of ACVtheo : {np.trapz(R_theo)*dt*2:1.5e}')\nprint(f\"------Error----: {np.abs(np.trapz(R_num)*2*dt-P[0]):1.5e}\\n\")\n\nprint(f'Sum of PSD     : {np.trapz(P)*df*2:1.3e}')\nprint(f'ACVtheo[0]     : {(R_theo[0]):1.3e}')\nprint(f'ACV[0]         : {R_num[0]:1.3e}')\nprint(f\"-----Error-----: {np.abs(np.trapz(P)*2*df-R_num[0]):1.3e}\\n\")",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 7,
+          "end_lineno": 7,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 8,
+          "end_lineno": 8,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 9,
+          "end_lineno": 9,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "squared-exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Squared exponential ACVF"
+        ]
+      },
+      "doc_lineno": 170002
+    },
+    {
+      "source": "def Expo_PSD(f, A, gamma):\n    return A / ( (4*np.pi**2 * f**2 + gamma**2) )\ndef Expo_ACV(t, A, gamma):\n    return 0.5* A / gamma * np.exp( - gamma * t )",
+      "names": [],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Exponential ACVF"
+        ]
+      },
+      "doc_lineno": 190002
+    },
+    {
+      "source": "f0 = 1e-3\ndf = f0 \nfN = 1. # max frequency\nf = np.arange(0,fN,df)\nN = len(f)\nA , sigma = 1 , 1e-1\nP = Expo_PSD(f,A,sigma)",
+      "names": [
+        {
+          "import_components": [
+            "len"
+          ],
+          "code_str": "len",
+          "lineno": 5,
+          "end_lineno": 5,
+          "context": "none",
+          "resolved_location": "len"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Exponential ACVF"
+        ]
+      },
+      "doc_lineno": 200002
+    },
+    {
+      "source": "fig,ax = plt.subplots(1,1,figsize=(7,4.5))\nax.plot(f,P,'.')\nax.set_xlabel(r'$f$')\nax.set_ylabel('Power spectral density')\nax.loglog()\nax.set_title(\"Lorentzian PSD\")\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Exponential ACVF"
+        ]
+      },
+      "doc_lineno": 220002
+    },
+    {
+      "source": "tmax = 0.5 / df \ndt = 1/df/(N-1)/2\n\nt = np.arange(0,tmax+dt,dt)\n\nR_theo = Expo_ACV(t,A,sigma)\n\n# compute the IFFT, with a normalisation factor 1/M, M=2*(len(y)-1)\nR_dift = np.fft.irfft(P) \n# assert (R_dift[1:N-1]-np.flip(R_dift[N:])<np.finfo(float).eps).all(), \"The IRFFT did not return a mirrored ACV\"\nR_num = R_dift[:N]/dt",
+      "names": [],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Exponential ACVF"
+        ]
+      },
+      "doc_lineno": 230002
+    },
+    {
+      "source": "fig,ax = plt.subplots(1,2,figsize=(9,4.5))\nax[0].plot(t,R_theo,label='Analytical')\nax[0].plot( t, R_num,label='Numerical',marker='o')\n\nax[0].legend()\nax[0].set_xlim(-1e-5,60 )\nax[0].set_xlabel(r\"$\\tau$\")\nax[0].set_ylabel(r\"Autocovariance function\")\nax[1].plot(t,np.abs(R_theo-R_num),label='|Error|')#,marker='s')\n\nax[1].set_xlabel(r\"$\\tau$\")\nax[1].set_ylabel(\"Absolute difference\")\nax[1].set_xlim(-1e-5,20 )\n\nfig.suptitle(\"Inverse Fourier transform of the Lorentzian PSD\")\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Exponential ACVF"
+        ]
+      },
+      "doc_lineno": 250002
+    },
+    {
+      "source": "print(f\"P(0)           : {P[0]:1.5e}\")\nprint(f'Sum of ACV     : {np.trapz(R_num)*dt*2:1.5e}')\nprint(f'Sum of ACVtheo : {np.trapz(R_theo)*dt*2:1.5e}')\nprint(f\"------Error----: {np.abs(np.trapz(R_num)*2*dt-P[0]):1.5e}\\n\")\n\nprint(f'Sum of PSD     : {np.trapz(P)*df*2:1.3e}')\nprint(f'ACVtheo[0]     : {(R_theo[0]):1.3e}')\nprint(f'ACV[0]         : {R_num[0]:1.3e}')\nprint(f\"-----Error-----: {np.abs(np.trapz(P)*2*df-R_num[0]):1.3e}\\n\")",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 7,
+          "end_lineno": 7,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 8,
+          "end_lineno": 8,
+          "context": "none",
+          "resolved_location": "print"
+        },
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 9,
+          "end_lineno": 9,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "exponential-acvf",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Arbitrary grid of frequencies",
+          "Exponential ACVF"
+        ]
+      },
+      "doc_lineno": 260002
+    },
+    {
+      "source": "T = 400\ndT = 1\nf_min = 1/T\nf_max = .5/dT",
+      "names": [],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "extending-the-grid-of-frequencies",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Extending the grid of frequencies"
+        ]
+      },
+      "doc_lineno": 300002
+    },
+    {
+      "source": "S_low = 2\nS_high = 10\n\nf0 = f_min/S_low\ndf = f0\nfN = f_max*S_high # max frequency\n# grid of frequencies, from 0 to fend-df with step size df\nf = np.arange(0,fN,f0)\n# number of points in the psd including the zeroth freq\nN = len(f)\n# define the parameters of the psd\nA , sigma = 1 , 1e-1\n\nP = Expo_PSD(f,A,sigma)\n\nfig,ax = plt.subplots(1,1,figsize=(7,4.5))\nax.plot(f,P,'.')\nax.set_xlabel(r'$f$')\nax.set_ylabel('Power spectral density')\nax.loglog()\nax.set_title(\"Extended frequency grid with $S_\\mathrm{low}=%i$ and $S_\\mathrm{high}=%i$\"%(S_low,S_high))\nax.axvline(f_min,ls='--',color='C1',label=r'$f_\\mathrm{min}$')\nax.axvline(f_max,ls='-.',color='C3',label=r'$f_\\mathrm{max}$')\nax.legend()\nfig.tight_layout()",
+      "names": [
+        {
+          "import_components": [
+            "len"
+          ],
+          "code_str": "len",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "none",
+          "resolved_location": "len"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "extending-the-high-frequencies",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Extending the grid of frequencies",
+          "Extending the high frequencies"
+        ]
+      },
+      "doc_lineno": 330002
+    },
+    {
+      "source": "fig,ax = plt.subplots(1,1,figsize=(9,7.5))\n\nfor i,S_high in enumerate([2,5,10,50,100]):\n\n    f0 = f_min/S_low\n    df = f0\n    fN = f_max*S_high # max frequency\n    # grid of frequencies, from 0 to fend-df with step size df\n    f = np.arange(0,fN,f0)\n    # number of points in the psd including the zeroth freq\n    N = len(f)\n    # define the parameters of the psd\n    A , sigma = 1 , 1e-1\n\n    P = Expo_PSD(f,A,sigma)\n    \n    if N%2==0:\n        N+=1\n    tmax = 0.5 / df \n    dt = 1 / df / (N-1) / 2\n    t = np.arange(0,tmax+dt,dt)\n\n    R_theo = Expo_ACV(t,A,sigma)\n\n    # compute the IFFT, with a normalisation factor 1/M, M=2*(len(y)-1)\n    R_dift = np.fft.irfft(P) \n    # assert (R_dift[1:N-1]-np.flip(R_dift[N:])<np.finfo(float).eps).all(), \"The IRFFT did not return a mirrored ACV\"\n    R_num = R_dift[:N]/dt\n\n    ax.plot(t,np.abs(R_theo-R_num),label=f'$S_\\mathrm{{high}}={{{S_high}}}$',alpha=0.8)#,marker='s')\n    ax.set_xlabel(r\"$\\tau$\")\n    ax.set_ylabel(r\"Absolute difference\")\n    ax.set_yscale('log')\n    ax.set_ylim(1e-14,1)\n\n    if i==0 : \n        axins = ax.inset_axes([0.4, 0.5, 0.55, 0.4])\n    axins.plot(t,np.abs(R_theo-R_num),label=f'$S_\\mathrm{{high}}={{{S_high}}}$',alpha=0.8)#,marker='s')\n    # subregion of the original image\n    x1, x2, y1, y2 = -0.5, 10, 1e-5, .5e-1\n    axins.set_xlim(x1, x2)\n    axins.set_ylim(y1, y2)\n    axins.set_yscale('log')\n\n        \n    ax.indicate_inset_zoom(axins, edgecolor=\"grey\")\n    ax.legend(bbox_to_anchor=(0.5, -0.06), loc=\"lower center\",\n                bbox_transform=fig.transFigure, ncol=3)\n    \nfig.suptitle(\"Absolute difference between analytical and numerical ACVF\")\nfig.tight_layout()",
+      "names": [
+        {
+          "import_components": [
+            "enumerate"
+          ],
+          "code_str": "enumerate",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "enumerate"
+        },
+        {
+          "import_components": [
+            "len"
+          ],
+          "code_str": "len",
+          "lineno": 11,
+          "end_lineno": 11,
+          "context": "none",
+          "resolved_location": "len"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "extending-the-high-frequencies",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Extending the grid of frequencies",
+          "Extending the high frequencies"
+        ]
+      },
+      "doc_lineno": 350002
+    },
+    {
+      "source": "S_low = 2\nS_high = 10\n\nf0 = f_min/S_low\ndf = f0\nfN = f_max*S_high # max frequency\n# grid of frequencies, from 0 to fend-df with step size df\nf = np.arange(0,fN,f0)\n# number of points in the psd including the zeroth freq\nN = len(f)\n# define the parameters of the psd\nA , sigma = 1 , 1e-1\n\nP = Expo_PSD(f,A,sigma)\n\nfig,ax = plt.subplots(1,2,figsize=(12.5,5),gridspec_kw={'width_ratios': [1, 1.5]})\nax[0].plot(f,P,'.')\nax[0].set_xlabel(r'$f$')\nax[0].set_ylabel('Power spectral density')\nax[0].loglog()\n# ax[0].set_title(\"PSD with $S_\\mathrm{low}=%i$ and $S_\\mathrm{high}=%i$\"%(S_low,S_high))\nax[0].set_title(\"Power spectrum\",pad=10)\nax[0].axvline(f_min,ls='--',color='C1',label=r'$f_\\mathrm{min}$ (with $S_\\mathrm{low}=%i$)'%S_low)\nax[0].axvline(f_max,ls='-.',color='C3',label=r'$f_\\mathrm{max}$ (with $S_\\mathrm{high}=%i$)'%S_high)\n# ax[0].legend(loc='lower left')\nax[0].legend(bbox_to_anchor=(0.22, -0.09), loc=\"lower center\",\n                bbox_transform=fig.transFigure)\n# fig.tight_layout()\nfor i,S_high in enumerate([2,5,10,50,100]):\n\n    f0 = f_min/S_low\n    df = f0\n    fN = f_max*S_high # max frequency\n    # grid of frequencies, from 0 to fend-df with step size df\n    f = np.arange(0,fN,f0)\n    # number of points in the psd including the zeroth freq\n    N = len(f)\n    # define the parameters of the psd\n    A , sigma = 1 , 1e-1\n\n    P = Expo_PSD(f,A,sigma)\n    \n    if N%2==0:\n        N+=1\n    tmax = 0.5 / df \n    dt = 1 / df / (N-1) / 2\n    t = np.arange(0,tmax+dt,dt)\n\n    R_theo = Expo_ACV(t,A,sigma)\n\n    # compute the IFFT, with a normalisation factor 1/M, M=2*(len(y)-1)\n    R_dift = np.fft.irfft(P) \n    # assert (R_dift[1:N-1]-np.flip(R_dift[N:])<np.finfo(float).eps).all(), \"The IRFFT did not return a mirrored ACV\"\n    R_num = R_dift[:N]/dt\n\n    ax[1].plot(t,np.abs(R_theo-R_num),label=f'$S_\\mathrm{{high}}={{{S_high}}}$',alpha=0.8)#,marker='s')\n    ax[1].set_xlabel(r\"$\\tau$\")\n    ax[1].set_ylabel(r\"Absolute difference\")\n    ax[1].set_yscale('log')\n    ax[1].set_ylim(1e-14,1)\n\n    if i==0 : \n        axins = ax[1].inset_axes([0.4, 0.6, 0.55, 0.4])\n    axins.plot(t,np.abs(R_theo-R_num),label=f'$S_\\mathrm{{high}}={{{S_high}}}$',alpha=0.8)#,marker='s')\n    # subregion of the original image\n    x1, x2, y1, y2 = -0.5, 10, 1e-5, .5e-1\n    axins.set_xlim(x1, x2)\n    axins.set_ylim(y1, y2)\n    axins.set_yscale('log')\n\n        \n    ax[1].indicate_inset_zoom(axins, edgecolor=\"grey\")\n    ax[1].legend(bbox_to_anchor=(0.7, -0.09), loc=\"lower center\",\n                bbox_transform=fig.transFigure, ncol=3)\n    ax[1].set_title(\"Absolute difference between analytical and numerical ACVF\",pad=10)\nfig.tight_layout()\nfig.savefig('FFT_ACVF_expo.pdf',bbox_inches='tight')",
+      "names": [
+        {
+          "import_components": [
+            "len"
+          ],
+          "code_str": "len",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "none",
+          "resolved_location": "len"
+        },
+        {
+          "import_components": [
+            "enumerate"
+          ],
+          "code_str": "enumerate",
+          "lineno": 29,
+          "end_lineno": 29,
+          "context": "none",
+          "resolved_location": "enumerate"
+        },
+        {
+          "import_components": [
+            "len"
+          ],
+          "code_str": "len",
+          "lineno": 37,
+          "end_lineno": 37,
+          "context": "none",
+          "resolved_location": "len"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "extending-the-high-frequencies",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Extending the grid of frequencies",
+          "Extending the high frequencies"
+        ]
+      },
+      "doc_lineno": 360002
+    },
+    {
+      "source": "S_low = 10\nS_high = 1\n\nf0 = f_min/S_low\ndf = f0\nfN = f_max*S_high # max frequency\n# grid of frequencies, from 0 to fend-df with step size df\nf = np.arange(0,fN,f0)\n# number of points in the psd including the zeroth freq\nN = len(f)\n# define the parameters of the psd\nA , sigma = 1 , 1e-1\n\nP = Expo_PSD(f,A,sigma)\n\nfig,ax = plt.subplots(1,1,figsize=(7,4.5))\nax.plot(f,P,'.')\nax.set_xlabel(r'$f$')\nax.set_ylabel('Power spectral density')\nax.loglog()\nax.set_title(\"Extended frequency grid with $S_\\mathrm{low}=%i$ and $S_\\mathrm{high}=%i$\"%(S_low,S_high))\nax.axvline(f_min,ls='--',color='C1',label=r'$f_\\mathrm{min}$')\nax.axvline(f_max,ls='-.',color='C3',label=r'$f_\\mathrm{max}$')\nax.legend()\nfig.tight_layout()",
+      "names": [
+        {
+          "import_components": [
+            "len"
+          ],
+          "code_str": "len",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "none",
+          "resolved_location": "len"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "extending-the-low-frequencies",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Extending the grid of frequencies",
+          "Extending the low frequencies"
+        ]
+      },
+      "doc_lineno": 390002
+    },
+    {
+      "source": "fig,ax = plt.subplots(1,1,figsize=(9,5.5))\n\nfor i,S_low in enumerate([2,5,10,50,100]):\n\n    f0 = f_min/S_low\n    df = f0\n    fN = f_max*S_high # max frequency\n    # grid of frequencies, from 0 to fend-df with step size df\n    f = np.arange(0,fN,f0)\n    # number of points in the psd including the zeroth freq\n    N = len(f)\n    # define the parameters of the psd\n    A , sigma = 1 , 1e-1\n\n    P = Expo_PSD(f,A,sigma)\n    \n    if N%2==0:\n        N+=1\n    tmax = 0.5 / df \n    dt = 1 / df / (N-1) / 2\n    t = np.arange(0,tmax+dt,dt)\n\n    R_theo = Expo_ACV(t,A,sigma)\n\n    # compute the IFFT, with a normalisation factor 1/M, M=2*(len(y)-1)\n    R_dift = np.fft.irfft(P) \n    # assert (R_dift[1:N-1]-np.flip(R_dift[N:])<np.finfo(float).eps).all(), \"The IRFFT did not return a mirrored ACV\"\n    R_num = R_dift[:N]/dt\n\n    ax.plot(t,np.abs(R_theo-R_num),label=f'$S_\\mathrm{{low}}={{{S_low}}}$',alpha=0.8)#,marker='s')\n    ax.set_xlabel(r\"$\\tau$\")\n    ax.set_ylabel(r\"Absolute difference\")\n    ax.set_yscale('log')\n    ax.set_xlim(-1,T)\n    ax.set_ylim(1e-7,.5)\n\n    if i==0 : \n        axins = ax.inset_axes([0.4, 0.45, 0.55, 0.5])\n    axins.plot(t,np.abs(R_theo-R_num),label=f'$S_\\mathrm{{low}}={{{S_low}}}$',alpha=0.8)#,marker='s')\n    # subregion of the original image\n    x1, x2, y1, y2 = -0.5, 25, 1e-6, .5\n    axins.set_xlim(x1, x2)\n    axins.set_ylim(y1, y2)\n    axins.set_yscale('log')\n\n    ax.indicate_inset_zoom(axins, edgecolor=\"grey\")\n    ax.legend(bbox_to_anchor=(0.5, -0.06), loc=\"lower center\",\n                bbox_transform=fig.transFigure, ncol=3)\n    \nfig.suptitle(\"Absolute difference between analytical and numerical ACVF\")\nfig.tight_layout()",
+      "names": [
+        {
+          "import_components": [
+            "enumerate"
+          ],
+          "code_str": "enumerate",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "enumerate"
+        },
+        {
+          "import_components": [
+            "len"
+          ],
+          "code_str": "len",
+          "lineno": 11,
+          "end_lineno": 11,
+          "context": "none",
+          "resolved_location": "len"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_fft",
+        "ref_id": "extending-the-low-frequencies",
+        "headings": [
+          "On the Fast Fourier Transform to compute the autocovariance",
+          "Extending the grid of frequencies",
+          "Extending the low frequencies"
+        ]
+      },
+      "doc_lineno": 410002
+    }
+  ],
+  "references/On_the_interpolation": [
+    {
+      "source": "import numpy as np\nimport matplotlib.pyplot as plt\nplt.style.use(\"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle\")",
+      "names": [
+        {
+          "import_components": [
+            "numpy"
+          ],
+          "code_str": "numpy",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "numpy"
+        },
+        {
+          "import_components": [
+            "matplotlib",
+            "pyplot"
+          ],
+          "code_str": "matplotlib.pyplot",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "matplotlib.pyplot"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_interpolation",
+        "ref_id": null,
+        "headings": []
+      },
+      "doc_lineno": 10002
+    }
+  ],
+  "references/On_the_nufft": [
+    {
+      "source": "import numpy as np\nimport matplotlib.pyplot as plt\nplt.style.use(\"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle\")",
+      "names": [
+        {
+          "import_components": [
+            "numpy"
+          ],
+          "code_str": "numpy",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "numpy"
+        },
+        {
+          "import_components": [
+            "matplotlib",
+            "pyplot"
+          ],
+          "code_str": "matplotlib.pyplot",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "matplotlib.pyplot"
+        }
+      ],
+      "example": {
+        "document": "references/On_the_nufft",
+        "ref_id": null,
+        "headings": []
+      },
+      "doc_lineno": 10002
+    }
+  ],
+  "references/On_the_sample_variance": [],
+  "references/references": [],
+  "tutorials/Modelling": [],
+  "tutorials/Simulations": [],
+  "tutorials/Tutorials": [],
+  "tutorials/models_acvf": [
+    {
+      "source": "import jax.numpy as jnp\nimport matplotlib.pyplot as plt\nplt.style.use(\"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle\")",
+      "names": [
+        {
+          "import_components": [
+            "jax",
+            "numpy"
+          ],
+          "code_str": "jax.numpy",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "jax.numpy"
+        },
+        {
+          "import_components": [
+            "matplotlib",
+            "pyplot"
+          ],
+          "code_str": "matplotlib.pyplot",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "matplotlib.pyplot"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": null,
+        "headings": []
+      },
+      "doc_lineno": 10002
+    },
+    {
+      "source": "from pioran.acvf import Exponential, Matern32\n\nExpo = Exponential([1, 0.5])\nMat32 = Matern32([1.2, 0.5])",
+      "names": [
+        {
+          "import_components": [
+            "pioran",
+            "acvf"
+          ],
+          "code_str": "pioran.acvf",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_from",
+          "resolved_location": "pioran.acvf"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Exponential"
+          ],
+          "code_str": "Exponential",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.acvf.Exponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Matern32"
+          ],
+          "code_str": "Matern32",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.acvf.Matern32"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Exponential"
+          ],
+          "code_str": "Exponential",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Exponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Exponential",
+            "()"
+          ],
+          "code_str": "Expo",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Exponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Matern32"
+          ],
+          "code_str": "Matern32",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Matern32"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Matern32",
+            "()"
+          ],
+          "code_str": "Mat32",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Matern32"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "a-first-model",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "A first model"
+        ]
+      },
+      "doc_lineno": 50002
+    },
+    {
+      "source": "print(Mat32)",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "a-first-model",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "A first model"
+        ]
+      },
+      "doc_lineno": 70002
+    },
+    {
+      "source": "Mat32.parameters.set_free_values([2.2, 1.5])\nprint(Mat32)",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "a-first-model",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "A first model"
+        ]
+      },
+      "doc_lineno": 90002
+    },
+    {
+      "source": "t = jnp.linspace(0, 10, 1000)\n\nfig, ax = plt.subplots(1, 1, figsize=(7, 4))\nax.plot(t, Expo.calculate(t), label=\"Exponential\")\nax.plot(t, Mat32.calculate(t), label=\"Matern 3/2\")\nax.set_xlabel(r'$\\tau$')\nax.set_ylabel(r'$\\tt{Cov.calculate}(\\tau)$')\nax.legend()\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "a-first-model",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "A first model"
+        ]
+      },
+      "doc_lineno": 110002
+    },
+    {
+      "source": "K_Mat32 = Mat32.get_cov_matrix(t.reshape(-1, 1), t.reshape(-1, 1))\nK_expo = Expo.get_cov_matrix(t.reshape(-1, 1), t.reshape(-1, 1))",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "a-first-model",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "A first model"
+        ]
+      },
+      "doc_lineno": 130002
+    },
+    {
+      "source": "fig, ax = plt.subplots(1, 2, figsize=(7, 4))\n\nax[0].imshow(K_Mat32)\nax[0].set_xlabel(r'$\\tt{i}$')\nax[0].set_ylabel(r'$\\tt{j}$')\nax[0].set_title(r'$\\tt{Matern32}$')\n\nax[1].imshow(K_expo)\nax[1].set_xlabel(r'$\\tt{i}$')\nax[1].set_ylabel(r'$\\tt{j}$')\nax[1].set_title(r'$\\tt{Exponential}$')\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "a-first-model",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "A first model"
+        ]
+      },
+      "doc_lineno": 140002
+    },
+    {
+      "source": "from pioran.acvf import Exponential, Matern32, SquaredExponential\n\nExpo = Exponential([1.68, 0.75])\nMat32 = Matern32([.33, 1.5])\nSqExpo = SquaredExponential([1.45, 0.5])",
+      "names": [
+        {
+          "import_components": [
+            "pioran",
+            "acvf"
+          ],
+          "code_str": "pioran.acvf",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_from",
+          "resolved_location": "pioran.acvf"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Exponential"
+          ],
+          "code_str": "Exponential",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.acvf.Exponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Matern32"
+          ],
+          "code_str": "Matern32",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.acvf.Matern32"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "SquaredExponential"
+          ],
+          "code_str": "SquaredExponential",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.acvf.SquaredExponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Exponential"
+          ],
+          "code_str": "Exponential",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Exponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Exponential",
+            "()"
+          ],
+          "code_str": "Expo",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Exponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Matern32"
+          ],
+          "code_str": "Matern32",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Matern32"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Matern32",
+            "()"
+          ],
+          "code_str": "Mat32",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Matern32"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "SquaredExponential"
+          ],
+          "code_str": "SquaredExponential",
+          "lineno": 5,
+          "end_lineno": 5,
+          "context": "none",
+          "resolved_location": "pioran.acvf.SquaredExponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "SquaredExponential",
+            "()"
+          ],
+          "code_str": "SqExpo",
+          "lineno": 5,
+          "end_lineno": 5,
+          "context": "none",
+          "resolved_location": "pioran.acvf.SquaredExponential"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "combining-autocovariance-functions",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "Combining autocovariance functions"
+        ]
+      },
+      "doc_lineno": 170002
+    },
+    {
+      "source": "Model = Expo + Mat32 + SqExpo\nprint(Model)",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "sum-of-autocovariance-functions",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "Combining autocovariance functions",
+          "Sum of autocovariance functions"
+        ]
+      },
+      "doc_lineno": 200002
+    },
+    {
+      "source": "print(Model.parameters[5])",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "sum-of-autocovariance-functions",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "Combining autocovariance functions",
+          "Sum of autocovariance functions"
+        ]
+      },
+      "doc_lineno": 220002
+    },
+    {
+      "source": "Model.parameters.set_free_values([13.68, 0.975, 0.339, 1.95, 1.345, 3.5])\nprint(Model)",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "sum-of-autocovariance-functions",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "Combining autocovariance functions",
+          "Sum of autocovariance functions"
+        ]
+      },
+      "doc_lineno": 240002
+    },
+    {
+      "source": "t = jnp.linspace(0, 10, 1000)\n\nfig, ax = plt.subplots(1, 1, figsize=(7, 4))\n\nax.plot(t, Expo.calculate(t), label=\"Exponential\", lw=2,ls=\"--\")\nax.plot(t, Mat32.calculate(t), label=\"Matern 3/2\", lw=2,ls=\"--\")\nax.plot(t, SqExpo.calculate(t), label=\"Squared Exponential\", lw=2,ls=\"--\")\nax.plot(t, Model.calculate(t), label=\"Sum of the three\")\nax.set_xlabel(r'$\\tau$')\nax.set_ylabel(r'$\\tt{Cov.calculate}(\\tau)$')\nax.legend()\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "sum-of-autocovariance-functions",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "Combining autocovariance functions",
+          "Sum of autocovariance functions"
+        ]
+      },
+      "doc_lineno": 250002
+    },
+    {
+      "source": "Expo = Exponential([1.68, 0.75])\nMat32 = Matern32([.33, 1.5])\nSqExpo = SquaredExponential([.45, 0.5])\n\nModel = Expo * Mat32+ SqExpo\nprint(Model)",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "product-of-autocovariance-functions",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "Combining autocovariance functions",
+          "Product of autocovariance functions"
+        ]
+      },
+      "doc_lineno": 280002
+    },
+    {
+      "source": "t = jnp.linspace(0, 10, 1000)\n\nfig, ax = plt.subplots(1, 1, figsize=(7, 4))\n\nax.plot(t, Expo.calculate(t), label=\"Exponential\", lw=2,ls=\"--\")\nax.plot(t, Mat32.calculate(t), label=\"Matern 3/2\", lw=2,ls=\"--\")\nax.plot(t, SqExpo.calculate(t), label=\"Squared Exponential\", lw=2,ls=\"--\")\nax.plot(t, Model.calculate(t), label=\"Expo * Matern 3/2 + Sq Expo\")\nax.set_xlabel(r'$\\tau$')\nax.set_ylabel(r'$\\tt{Cov.calculate}(\\tau)$')\nax.legend()\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "product-of-autocovariance-functions",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "Combining autocovariance functions",
+          "Product of autocovariance functions"
+        ]
+      },
+      "doc_lineno": 290002
+    },
+    {
+      "source": "import jax.numpy as jnp\nfrom pioran import CovarianceFunction\nfrom pioran.parameters import ParametersModel\n\nclass MyAutocovariance(CovarianceFunction):\n    parameters: ParametersModel\n    expression = 'name of the model'\n\n    def __init__(self, param_values, free_parameters=[True, True, True]):\n        \"\"\"Constructor of the covariance function inherited \n        from the CovarianceFunction class.\n        \"\"\"\n        assert len(param_values) == 3, 'The number of parameters must be 3'\n        CovarianceFunction.__init__(self, param_values=param_values, \n        param_names=['variance', 'length','period'], free_parameters=free_parameters)\n    \n    def calculate(self,t):\n        \"\"\"Returns the autocovariance function evaluated at t.\n        \"\"\"\n        return  self.parameters['variance'].value *jnp.exp(- jnp.abs(t) * self.parameters['length'].value)*jnp.cos(2*jnp.pi*t / self.parameters['period'].value)",
+      "names": [
+        {
+          "import_components": [
+            "jax",
+            "numpy"
+          ],
+          "code_str": "jax.numpy",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "jax.numpy"
+        },
+        {
+          "import_components": [
+            "pioran"
+          ],
+          "code_str": "pioran",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_from",
+          "resolved_location": "pioran"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "CovarianceFunction"
+          ],
+          "code_str": "CovarianceFunction",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "pioran.acvf_base.CovarianceFunction"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "parameters"
+          ],
+          "code_str": "pioran.parameters",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "import_from",
+          "resolved_location": "pioran.parameters"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "parameters",
+            "ParametersModel"
+          ],
+          "code_str": "ParametersModel",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "import_target",
+          "resolved_location": "pioran.parameters.parameters.ParametersModel"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "CovarianceFunction"
+          ],
+          "code_str": "CovarianceFunction",
+          "lineno": 5,
+          "end_lineno": 5,
+          "context": "none",
+          "resolved_location": "pioran.acvf_base.CovarianceFunction"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "parameters",
+            "ParametersModel"
+          ],
+          "code_str": "ParametersModel",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "none",
+          "resolved_location": "pioran.parameters.parameters.ParametersModel"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "parameters",
+            "ParametersModel",
+            "()"
+          ],
+          "code_str": "parameters",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "none",
+          "resolved_location": "pioran.parameters.parameters.ParametersModel"
+        },
+        {
+          "import_components": [
+            "len"
+          ],
+          "code_str": "len",
+          "lineno": 13,
+          "end_lineno": 13,
+          "context": "none",
+          "resolved_location": "len"
+        },
+        {
+          "import_components": [
+            "jax",
+            "numpy",
+            "abs"
+          ],
+          "code_str": "jnp.abs",
+          "lineno": 20,
+          "end_lineno": 20,
+          "context": "none",
+          "resolved_location": "jax.numpy.abs"
+        },
+        {
+          "import_components": [
+            "jax",
+            "numpy",
+            "exp"
+          ],
+          "code_str": "jnp.exp",
+          "lineno": 20,
+          "end_lineno": 20,
+          "context": "none",
+          "resolved_location": "jax.numpy.exp"
+        },
+        {
+          "import_components": [
+            "jax",
+            "numpy",
+            "cos"
+          ],
+          "code_str": "jnp.cos",
+          "lineno": 20,
+          "end_lineno": 20,
+          "context": "none",
+          "resolved_location": "jax.numpy.cos"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "the-calculate-method",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "Writing a new model",
+          "The calculate method"
+        ]
+      },
+      "doc_lineno": 320002
+    },
+    {
+      "source": "Cov = MyAutocovariance([1., 0.5,.5])\ntaus = jnp.linspace(0, 10, 1000)\navc = Cov.calculate(taus)",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "the-calculate-method",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "Writing a new model",
+          "The calculate method"
+        ]
+      },
+      "doc_lineno": 340002
+    },
+    {
+      "source": "fig, ax = plt.subplots(1,1,figsize=(7,4))\nax.plot(taus, avc)\nax.set_xlabel(r'$\\tau$')\nax.set_ylabel(r'$\\tt{Cov.calculate}(\\tau)$')\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_acvf",
+        "ref_id": "the-calculate-method",
+        "headings": [
+          "Modelling with an autocovariance function",
+          "Writing a new model",
+          "The calculate method"
+        ]
+      },
+      "doc_lineno": 350002
+    }
+  ],
+  "tutorials/models_psd": [
+    {
+      "source": "import jax.numpy as jnp\nimport matplotlib.pyplot as plt\nplt.style.use(\"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle\")",
+      "names": [
+        {
+          "import_components": [
+            "jax",
+            "numpy"
+          ],
+          "code_str": "jax.numpy",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "jax.numpy"
+        },
+        {
+          "import_components": [
+            "matplotlib",
+            "pyplot"
+          ],
+          "code_str": "matplotlib.pyplot",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "matplotlib.pyplot"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": null,
+        "headings": []
+      },
+      "doc_lineno": 10002
+    },
+    {
+      "source": "from pioran.psd import Lorentzian, Gaussian\n\nLore = Lorentzian([0,1, 0.5])\nGauss = Gaussian([0,1.2, 0.5])",
+      "names": [
+        {
+          "import_components": [
+            "pioran",
+            "psd"
+          ],
+          "code_str": "pioran.psd",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_from",
+          "resolved_location": "pioran.psd"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian"
+          ],
+          "code_str": "Lorentzian",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Gaussian"
+          ],
+          "code_str": "Gaussian",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.psd.Gaussian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian"
+          ],
+          "code_str": "Lorentzian",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian",
+            "()"
+          ],
+          "code_str": "Lore",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Gaussian"
+          ],
+          "code_str": "Gaussian",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.psd.Gaussian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Gaussian",
+            "()"
+          ],
+          "code_str": "Gauss",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.psd.Gaussian"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "a-first-model",
+        "headings": [
+          "Modelling with a power spectral density",
+          "A first model"
+        ]
+      },
+      "doc_lineno": 50002
+    },
+    {
+      "source": "print(Lore)",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "a-first-model",
+        "headings": [
+          "Modelling with a power spectral density",
+          "A first model"
+        ]
+      },
+      "doc_lineno": 70002
+    },
+    {
+      "source": "Lore.parameters.set_free_values([0.9,2.2, 1.5])\nprint(Lore)",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "a-first-model",
+        "headings": [
+          "Modelling with a power spectral density",
+          "A first model"
+        ]
+      },
+      "doc_lineno": 90002
+    },
+    {
+      "source": "t = jnp.linspace(0, 10, 1000)\n\nfig, ax = plt.subplots(1, 1, figsize=(7, 4))\nax.plot(t, Gauss.calculate(t), label=\"Gaussian\")\nax.plot(t, Lore.calculate(t), label=\"Lorentzian\")\nax.set_xlabel(r'$f$')\nax.set_ylabel(r'$\\tt{PSD.calculate}(f)$')\nax.legend()\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "a-first-model",
+        "headings": [
+          "Modelling with a power spectral density",
+          "A first model"
+        ]
+      },
+      "doc_lineno": 110002
+    },
+    {
+      "source": "from pioran.psd import Lorentzian, Gaussian\n\nLore = Lorentzian([3,1, 1.5])\nGauss = Gaussian([0,1.2, 0.5])\nGauss2 = Gaussian([6,1.4, 2.5])",
+      "names": [
+        {
+          "import_components": [
+            "pioran",
+            "psd"
+          ],
+          "code_str": "pioran.psd",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_from",
+          "resolved_location": "pioran.psd"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian"
+          ],
+          "code_str": "Lorentzian",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Gaussian"
+          ],
+          "code_str": "Gaussian",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.psd.Gaussian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian"
+          ],
+          "code_str": "Lorentzian",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian",
+            "()"
+          ],
+          "code_str": "Lore",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "none",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Gaussian"
+          ],
+          "code_str": "Gaussian",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.psd.Gaussian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Gaussian",
+            "()"
+          ],
+          "code_str": "Gauss",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.psd.Gaussian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Gaussian"
+          ],
+          "code_str": "Gaussian",
+          "lineno": 5,
+          "end_lineno": 5,
+          "context": "none",
+          "resolved_location": "pioran.psd.Gaussian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Gaussian",
+            "()"
+          ],
+          "code_str": "Gauss2",
+          "lineno": 5,
+          "end_lineno": 5,
+          "context": "none",
+          "resolved_location": "pioran.psd.Gaussian"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "combining-psd-models",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Combining PSD models"
+        ]
+      },
+      "doc_lineno": 140002
+    },
+    {
+      "source": "Model = Lore + Gauss + Gauss2\nprint(Model)",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "sum-of-psd-functions",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Combining PSD models",
+          "Sum of PSD functions"
+        ]
+      },
+      "doc_lineno": 170002
+    },
+    {
+      "source": "print(Model.parameters[5])",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "sum-of-psd-functions",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Combining PSD models",
+          "Sum of PSD functions"
+        ]
+      },
+      "doc_lineno": 190002
+    },
+    {
+      "source": "t = jnp.linspace(0, 10, 1000)\n\nfig, ax = plt.subplots(1, 1, figsize=(7, 4))\n\nax.plot(t, Model.calculate(t), label=\"Sum of the three\")\nax.plot(t, Gauss.calculate(t), label=\"Gaussian\", lw=2,ls=\"--\")\nax.plot(t, Lore.calculate(t), label=\"Lorentzian\", lw=2,ls=\"--\")\nax.plot(t, Gauss2.calculate(t), label=\"Gaussian2\", lw=2,ls=\"--\")\nax.set_xlabel(r'$f$')\nax.set_ylabel(r'$\\tt{PSD.calculate}(f)$')\nax.legend()\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "sum-of-psd-functions",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Combining PSD models",
+          "Sum of PSD functions"
+        ]
+      },
+      "doc_lineno": 200002
+    },
+    {
+      "source": "Lore = Lorentzian([3,1, 1.5])\nGauss = Gaussian([0,3.2, 3.5])\nGauss2 = Gaussian([2,1.4, 2.5])\n\nModel = Lore + Gauss * Gauss2\nprint(Model)",
+      "names": [
+        {
+          "import_components": [
+            "print"
+          ],
+          "code_str": "print",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "none",
+          "resolved_location": "print"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "product-of-psd-functions",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Combining PSD models",
+          "Product of PSD functions"
+        ]
+      },
+      "doc_lineno": 230002
+    },
+    {
+      "source": "t = jnp.linspace(0, 10, 1000)\n\nfig, ax = plt.subplots(1, 1, figsize=(7, 4))\n\nax.plot(t, Model.calculate(t), label=\"Lore + Gauss * Gauss2\", lw=2)\nax.plot(t, Gauss.calculate(t), label=\"Gaussian\", lw=2,ls=\"--\")\nax.plot(t, Lore.calculate(t), label=\"Lorentzian\", lw=2,ls=\"--\")\nax.plot(t, Gauss2.calculate(t), label=\"Gaussian2\", lw=2,ls=\"--\")\nax.set_xlabel(r'$f$')\nax.set_ylabel(r'$\\tt{PSD.calculate}(f)$')\nax.legend()\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "product-of-psd-functions",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Combining PSD models",
+          "Product of PSD functions"
+        ]
+      },
+      "doc_lineno": 240002
+    },
+    {
+      "source": "from pioran import PSDToACV\n\nLore = Lorentzian([0, 1, .5])\nP2A = PSDToACV(PSD=Lore, S_low=10, S_high=10, T=100, dt=1, method=\"FFT\")",
+      "names": [
+        {
+          "import_components": [
+            "pioran"
+          ],
+          "code_str": "pioran",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_from",
+          "resolved_location": "pioran"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "PSDToACV"
+          ],
+          "code_str": "PSDToACV",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.psdtoacv.PSDToACV"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "PSDToACV"
+          ],
+          "code_str": "PSDToACV",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.psdtoacv.PSDToACV"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "PSDToACV",
+            "()"
+          ],
+          "code_str": "P2A",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.psdtoacv.PSDToACV"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "conversion-to-an-autocovariance-function",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Conversion to an autocovariance function"
+        ]
+      },
+      "doc_lineno": 280002
+    },
+    {
+      "source": "f = P2A.frequencies\nt = jnp.linspace(0, 100, 1000)\nacv = P2A.calculate(t)",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "conversion-to-an-autocovariance-function",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Conversion to an autocovariance function"
+        ]
+      },
+      "doc_lineno": 300002
+    },
+    {
+      "source": "fig, ax = plt.subplots(2, 1, figsize=(7, 7))\n\nax[0].loglog(f, Lore.calculate(f), label=\"Lorentzian\")\nax[0].set_xlabel(r'$f$')\nax[0].set_ylabel(r'$\\tt{PSD.calculate}(f)$')\n\nax[1].plot(t, acv, label=\"ACV\")\nax[1].set_xlabel(r'$\\tau$')\nax[1].set_ylabel(r'$\\tt{ACV.calculate}(\\tau)$')\n\nfig.align_ylabels()\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "conversion-to-an-autocovariance-function",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Conversion to an autocovariance function"
+        ]
+      },
+      "doc_lineno": 320002
+    },
+    {
+      "source": "import jax.numpy as jnp\nfrom pioran import PowerSpectralDensity\nfrom pioran.parameters import ParametersModel\n\n\nclass MyPSD(PowerSpectralDensity):\n    parameters: ParametersModel\n    expression = 'my_psd'\n    \n    def __init__(self, parameters_values, free_parameters=[True, True,True]):\n        \"\"\"Constructor of the power spectrum inherited \n        from the PowerSpectralDensity class.\n        \"\"\"\n        assert len(parameters_values) == 3, 'The number of parameters must be 3'\n        # initialise the parameters and check\n        PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=['amplitude', 'freq','power'], free_parameters=free_parameters)\n    \n    def calculate(self,f):\n        \"\"\"Calculate the power spectrum at the given frequencies.\"\"\"\n        return self.parameters['amplitude'].value  /  ( 1+f/self.parameters['freq'].value)**self.parameters['power'].value\n",
+      "names": [
+        {
+          "import_components": [
+            "jax",
+            "numpy"
+          ],
+          "code_str": "jax.numpy",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "jax.numpy"
+        },
+        {
+          "import_components": [
+            "pioran"
+          ],
+          "code_str": "pioran",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_from",
+          "resolved_location": "pioran"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "PowerSpectralDensity"
+          ],
+          "code_str": "PowerSpectralDensity",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "pioran.psd_base.PowerSpectralDensity"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "parameters"
+          ],
+          "code_str": "pioran.parameters",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "import_from",
+          "resolved_location": "pioran.parameters"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "parameters",
+            "ParametersModel"
+          ],
+          "code_str": "ParametersModel",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "import_target",
+          "resolved_location": "pioran.parameters.parameters.ParametersModel"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "PowerSpectralDensity"
+          ],
+          "code_str": "PowerSpectralDensity",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "none",
+          "resolved_location": "pioran.psd_base.PowerSpectralDensity"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "parameters",
+            "ParametersModel"
+          ],
+          "code_str": "ParametersModel",
+          "lineno": 7,
+          "end_lineno": 7,
+          "context": "none",
+          "resolved_location": "pioran.parameters.parameters.ParametersModel"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "parameters",
+            "ParametersModel",
+            "()"
+          ],
+          "code_str": "parameters",
+          "lineno": 7,
+          "end_lineno": 7,
+          "context": "none",
+          "resolved_location": "pioran.parameters.parameters.ParametersModel"
+        },
+        {
+          "import_components": [
+            "len"
+          ],
+          "code_str": "len",
+          "lineno": 14,
+          "end_lineno": 14,
+          "context": "none",
+          "resolved_location": "len"
+        }
+      ],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "the-calculate-method",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Writing a new model",
+          "The calculate method"
+        ]
+      },
+      "doc_lineno": 350002
+    },
+    {
+      "source": "P = MyPSD([1., 0.5,3.4])\nfrequencies = jnp.linspace(0, 5, 1000)\nPSD = P.calculate(frequencies)",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "the-calculate-method",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Writing a new model",
+          "The calculate method"
+        ]
+      },
+      "doc_lineno": 370002
+    },
+    {
+      "source": "fig, ax = plt.subplots(1,1,figsize=(7,4))\nax.plot(frequencies, PSD)\nax.set_xlabel(r'$f$')\nax.set_ylabel(r'$\\tt{PSD.calculate}(f)$')\nax.loglog()\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/models_psd",
+        "ref_id": "the-calculate-method",
+        "headings": [
+          "Modelling with a power spectral density",
+          "Writing a new model",
+          "The calculate method"
+        ]
+      },
+      "doc_lineno": 380002
+    }
+  ],
+  "tutorials/simulations_acv": [
+    {
+      "source": "import jax.numpy as jnp\nimport matplotlib.pyplot as plt\nplt.style.use(\"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle\")",
+      "names": [
+        {
+          "import_components": [
+            "jax",
+            "numpy"
+          ],
+          "code_str": "jax.numpy",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "jax.numpy"
+        },
+        {
+          "import_components": [
+            "matplotlib",
+            "pyplot"
+          ],
+          "code_str": "matplotlib.pyplot",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "matplotlib.pyplot"
+        }
+      ],
+      "example": {
+        "document": "tutorials/simulations_acv",
+        "ref_id": null,
+        "headings": []
+      },
+      "doc_lineno": 10002
+    },
+    {
+      "source": "from pioran import Simulations\nfrom pioran.acvf import Exponential\nfrom pioran.psd import Lorentzian\n\nacv_model = Exponential([1,1e-2])\npsd_model = Lorentzian([0.00,1,1e-2])\n\nduration = 400\ndt = 1.5\nSim = Simulations(T=duration,dt=dt,model=acv_model)\nSim_psd = Simulations(T=duration,dt=dt,model=psd_model,S_high=20,S_low=20)",
+      "names": [
+        {
+          "import_components": [
+            "pioran"
+          ],
+          "code_str": "pioran",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_from",
+          "resolved_location": "pioran"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "Simulations"
+          ],
+          "code_str": "Simulations",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.simulate.Simulations"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf"
+          ],
+          "code_str": "pioran.acvf",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_from",
+          "resolved_location": "pioran.acvf"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Exponential"
+          ],
+          "code_str": "Exponential",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "pioran.acvf.Exponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd"
+          ],
+          "code_str": "pioran.psd",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "import_from",
+          "resolved_location": "pioran.psd"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian"
+          ],
+          "code_str": "Lorentzian",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "import_target",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Exponential"
+          ],
+          "code_str": "Exponential",
+          "lineno": 5,
+          "end_lineno": 5,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Exponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Exponential",
+            "()"
+          ],
+          "code_str": "acv_model",
+          "lineno": 5,
+          "end_lineno": 5,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Exponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian"
+          ],
+          "code_str": "Lorentzian",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "none",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian",
+            "()"
+          ],
+          "code_str": "psd_model",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "none",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "acvf",
+            "Exponential",
+            "()"
+          ],
+          "code_str": "acv_model",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "none",
+          "resolved_location": "pioran.acvf.Exponential"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "Simulations"
+          ],
+          "code_str": "Simulations",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "none",
+          "resolved_location": "pioran.simulate.Simulations"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "Simulations",
+            "()"
+          ],
+          "code_str": "Sim",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "none",
+          "resolved_location": "pioran.simulate.Simulations"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian",
+            "()"
+          ],
+          "code_str": "psd_model",
+          "lineno": 11,
+          "end_lineno": 11,
+          "context": "none",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "Simulations"
+          ],
+          "code_str": "Simulations",
+          "lineno": 11,
+          "end_lineno": 11,
+          "context": "none",
+          "resolved_location": "pioran.simulate.Simulations"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "Simulations",
+            "()"
+          ],
+          "code_str": "Sim_psd",
+          "lineno": 11,
+          "end_lineno": 11,
+          "context": "none",
+          "resolved_location": "pioran.simulate.Simulations"
+        }
+      ],
+      "example": {
+        "document": "tutorials/simulations_acv",
+        "ref_id": "usage",
+        "headings": [
+          "Gaussian process method",
+          "Usage"
+        ]
+      },
+      "doc_lineno": 40002
+    },
+    {
+      "source": "fig,ax = Sim.plot_acvf(figsize=(7,4))",
+      "names": [],
+      "example": {
+        "document": "tutorials/simulations_acv",
+        "ref_id": "usage",
+        "headings": [
+          "Gaussian process method",
+          "Usage"
+        ]
+      },
+      "doc_lineno": 60002
+    },
+    {
+      "source": "t, ts, ts_err = Sim.simulate(method='GP',seed=342)\nt_psd, ts_psd, ts_psd_err = Sim_psd.simulate(method='GP',seed=342)",
+      "names": [],
+      "example": {
+        "document": "tutorials/simulations_acv",
+        "ref_id": "usage",
+        "headings": [
+          "Gaussian process method",
+          "Usage"
+        ]
+      },
+      "doc_lineno": 80002
+    },
+    {
+      "source": "fig, ax = plt.subplots(figsize=(8,4))\nax.errorbar(t_psd,ts_psd,yerr=ts_psd_err,fmt='o',color='C3')\nax.errorbar(t,ts,yerr=ts_err,fmt='s')\nax.set_xlabel('Time (d)')\nax.set_ylabel('Simulated time series')\nax.legend(['ACV','PSD'])\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/simulations_acv",
+        "ref_id": "usage",
+        "headings": [
+          "Gaussian process method",
+          "Usage"
+        ]
+      },
+      "doc_lineno": 100002
+    }
+  ],
+  "tutorials/simulations_tk": [
+    {
+      "source": "import jax.numpy as jnp\nimport matplotlib.pyplot as plt\nplt.style.use(\"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle\")",
+      "names": [
+        {
+          "import_components": [
+            "jax",
+            "numpy"
+          ],
+          "code_str": "jax.numpy",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "jax.numpy"
+        },
+        {
+          "import_components": [
+            "matplotlib",
+            "pyplot"
+          ],
+          "code_str": "matplotlib.pyplot",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "matplotlib.pyplot"
+        }
+      ],
+      "example": {
+        "document": "tutorials/simulations_tk",
+        "ref_id": null,
+        "headings": []
+      },
+      "doc_lineno": 10002
+    },
+    {
+      "source": "from pioran import Simulations\nfrom pioran.psd import Lorentzian\n\npsd_model = Lorentzian([0.0,1,1e-2])\n\nduration = 500\ndt = 1\nS_low = 20 # scale of the lowest frequency\nS_high = 20 # scale of the highest frequency\nSim = Simulations(T=duration,dt=dt,model=psd_model,S_low=S_low,S_high=S_high)",
+      "names": [
+        {
+          "import_components": [
+            "pioran"
+          ],
+          "code_str": "pioran",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_from",
+          "resolved_location": "pioran"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "Simulations"
+          ],
+          "code_str": "Simulations",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "pioran.simulate.Simulations"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd"
+          ],
+          "code_str": "pioran.psd",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_from",
+          "resolved_location": "pioran.psd"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian"
+          ],
+          "code_str": "Lorentzian",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian"
+          ],
+          "code_str": "Lorentzian",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian",
+            "()"
+          ],
+          "code_str": "psd_model",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "psd",
+            "Lorentzian",
+            "()"
+          ],
+          "code_str": "psd_model",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "none",
+          "resolved_location": "pioran.psd.Lorentzian"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "Simulations"
+          ],
+          "code_str": "Simulations",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "none",
+          "resolved_location": "pioran.simulate.Simulations"
+        },
+        {
+          "import_components": [
+            "pioran",
+            "Simulations",
+            "()"
+          ],
+          "code_str": "Sim",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "none",
+          "resolved_location": "pioran.simulate.Simulations"
+        }
+      ],
+      "example": {
+        "document": "tutorials/simulations_tk",
+        "ref_id": "usage-in-pioran",
+        "headings": [
+          "Timmer and Koenig\u2019s method",
+          "Usage in pioran"
+        ]
+      },
+      "doc_lineno": 70002
+    },
+    {
+      "source": "fig,ax = Sim.plot_psd(figsize=(8,4))",
+      "names": [],
+      "example": {
+        "document": "tutorials/simulations_tk",
+        "ref_id": "usage-in-pioran",
+        "headings": [
+          "Timmer and Koenig\u2019s method",
+          "Usage in pioran"
+        ]
+      },
+      "doc_lineno": 90002
+    },
+    {
+      "source": "t, ts, ts_err = Sim.simulate(method='TK',seed=1423,irregular_sampling=True)",
+      "names": [],
+      "example": {
+        "document": "tutorials/simulations_tk",
+        "ref_id": "usage-in-pioran",
+        "headings": [
+          "Timmer and Koenig\u2019s method",
+          "Usage in pioran"
+        ]
+      },
+      "doc_lineno": 110002
+    },
+    {
+      "source": "fig, ax = plt.subplots(figsize=(8,4))\nax.errorbar(t,ts,yerr=ts_err,fmt='o')\nax.set_xlabel('Time (d)')\nax.set_ylabel('Simulated time series')\nfig.tight_layout()",
+      "names": [],
+      "example": {
+        "document": "tutorials/simulations_tk",
+        "ref_id": "usage-in-pioran",
+        "headings": [
+          "Timmer and Koenig\u2019s method",
+          "Usage in pioran"
+        ]
+      },
+      "doc_lineno": 120002
+    }
+  ],
+  "userguide/Explanation": [],
+  "userguide/Introduction": [],
+  "userguide/Quickstart": [],
+  "userguide/Timeseries": [],
+  "userguide/User": []
+}

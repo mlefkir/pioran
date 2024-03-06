@@ -1,0 +1,1514 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pioran.simulate &#8212; pioran</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=ad57bd55" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pioran/simulate';</script>
+    <link rel="icon" href="../../_static/favico.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo_borderbis.png" class="logo__image only-light" alt="pioran - Home"/>
+    <script>document.write(`<img src="../../_static/logo_borderbis.png" class="logo__image only-dark" alt="pioran - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../userguide/User.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/Tutorials.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../references/references.html">
+                        References
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../autoapi/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../userguide/User.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/Tutorials.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../references/references.html">
+                        References
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../autoapi/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../pioran.html" class="nav-link">pioran</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">pioran.simulate</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pioran.simulate</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Generate time series from a given PSD or ACVF model.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">jax.scipy.linalg</span> <span class="kn">import</span> <span class="n">cholesky</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">savetxt</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+
+<span class="kn">from</span> <span class="nn">.acvf_base</span> <span class="kn">import</span> <span class="n">CovarianceFunction</span>
+<span class="kn">from</span> <span class="nn">.psd_base</span> <span class="kn">import</span> <span class="n">PowerSpectralDensity</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">EuclideanDistance</span>
+
+
+<div class="viewcode-block" id="Simulations">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations">[docs]</a>
+<span class="k">class</span> <span class="nc">Simulations</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulate time series from a given PSD or ACVF model.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    T : :obj:`float`</span>
+<span class="sd">        duration of the time series.</span>
+<span class="sd">    dt : :obj:`float`</span>
+<span class="sd">        sampling period of the time series.</span>
+<span class="sd">    model : :class:`~pioran.acvf_base.CovarianceFunction` or :class:`~pioran.psd_base.PowerSpectralDensity`</span>
+<span class="sd">        The model for the simulation of the process, can be a PSD or an ACVF.</span>
+<span class="sd">    S_low : :obj:`float`, optional</span>
+<span class="sd">        Scale factor for the lower bound of the frequency grid.</span>
+<span class="sd">        If the model is a PSD, this parameter is mandatory.</span>
+<span class="sd">    S_high : :obj:`float`, optional</span>
+<span class="sd">        Scale factor for the upper bound of the frequency grid.</span>
+<span class="sd">        If the model is a PSD, this parameter is mandatory.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the model is not a PSD or ACVF.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Simulations.duration">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.duration">[docs]</a>
+    <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;duration of the time series.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.sampling_period">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.sampling_period">[docs]</a>
+    <span class="n">sampling_period</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;sampling period of the time series.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.n_time">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.n_time">[docs]</a>
+    <span class="n">n_time</span><span class="p">:</span> <span class="nb">int</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;number of time indexes.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.t">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.t">[docs]</a>
+    <span class="n">t</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;time :obj:`jax.Array` of the time series.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.f_max_obs">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.f_max_obs">[docs]</a>
+    <span class="n">f_max_obs</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;maximum frequency of the observed frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.f_min_obs">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.f_min_obs">[docs]</a>
+    <span class="n">f_min_obs</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;minimum frequency of the observed frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.f0">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.f0">[docs]</a>
+    <span class="n">f0</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;minimum frequency of the total frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.fN">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.fN">[docs]</a>
+    <span class="n">fN</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;maximum frequency of the total frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.n_freq_grid">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.n_freq_grid">[docs]</a>
+    <span class="n">n_freq_grid</span><span class="p">:</span> <span class="nb">int</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;number of frequency indexes.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.frequencies">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.frequencies">[docs]</a>
+    <span class="n">frequencies</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;frequency array of the total frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.tau_max">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.tau_max">[docs]</a>
+    <span class="n">tau_max</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;maximum lag of the autocovariance function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.dtau">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.dtau">[docs]</a>
+    <span class="n">dtau</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;sampling period of the autocovariance function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.tau">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.tau">[docs]</a>
+    <span class="n">tau</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;lag array of the autocovariance function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.psd">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.psd">[docs]</a>
+    <span class="n">psd</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;power spectral density of the time series.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.acvf">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.acvf">[docs]</a>
+    <span class="n">acvf</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;autocovariance function of the time series.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.triang">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.triang">[docs]</a>
+    <span class="n">triang</span><span class="p">:</span> <span class="nb">bool</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;triangular matrix used to generate the time series with the Cholesky decomposition.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulations.keys">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.keys">[docs]</a>
+    <span class="n">keys</span><span class="p">:</span> <span class="nb">dict</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;dictionary of the keys used to generate the random numbers. See :func:`~pioran.simulate.Simulations.generate_keys` for more details.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">T</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">PowerSpectralDensity</span> <span class="o">|</span> <span class="n">CovarianceFunction</span><span class="p">,</span>
+        <span class="n">N</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">S_low</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">S_high</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PowerSpectralDensity</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">CovarianceFunction</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;You must provide a model which is either a PowerSpectralDensity or a CovarianceFunction, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PowerSpectralDensity</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">S_low</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">S_high</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;When the model is a PSD, you must provide S_low and S_high for the frequency grid&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># case where the model is an ACVF, we dont really care about the frequency grid</span>
+        <span class="c1"># nor the S_low and S_high parameters, we just need S_low=2 for plotting purposes</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">CovarianceFunction</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">S_low</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">S_high</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">S_low</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="n">S_high</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">S_low</span> <span class="o">=</span> <span class="n">S_low</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">S_high</span> <span class="o">=</span> <span class="n">S_high</span>
+        <span class="c1"># parameters of the time series</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_period</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_time</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">dt</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="k">if</span> <span class="n">N</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">N</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_period</span><span class="p">)</span>
+
+        <span class="c1"># parameters of the **observed** frequency grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_max_obs</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_min_obs</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">T</span>
+
+        <span class="c1"># parameters of the **total** frequency grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min_obs</span> <span class="o">/</span> <span class="n">S_low</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fN</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max_obs</span> <span class="o">*</span> <span class="n">S_high</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_freq_grid</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fN</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequencies</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fN</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_max</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span>  <span class="c1"># 0.5/self.f0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtau</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fN</span>  <span class="c1"># self.tau_max/(self.n_freq_grid-1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_max</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtau</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtau</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triang</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acvf</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PowerSpectralDensity</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequencies</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">acvf</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        
+        <span class="c1"># for error randomisation</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proba</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arr</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Simulations.generate_keys">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.generate_keys">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate the keys to generate the random numbers.</span>
+
+<span class="sd">        This function generates the keys to generate the random numbers for the simulations and store them in the dictionary self.keys.</span>
+<span class="sd">        The keys and their meaning are:</span>
+
+
+<span class="sd">        - `simu_TS`  : key for drawing the values of the time series.</span>
+<span class="sd">        - `errors`   : key for drawing the size of the errorbar of the time series from a given distribution.</span>
+<span class="sd">        - `fluxes`   : key for drawing the fluxes of the time series from a given distribution.</span>
+<span class="sd">        - `subset`   : key for randomising the choice of the subset of the time series.</span>
+<span class="sd">        - `sampling` : key for randomising the choice of the sampling of the time series.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        seed  : :obj:`int`, optional</span>
+<span class="sd">            Seed for the random number generator, by default 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;ts&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;fluxes&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;subset&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;sampling&quot;</span><span class="p">],</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Simulations.plot_acvf">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.plot_acvf">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_acvf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span> <span class="n">xunit</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the autocovariance function.</span>
+
+<span class="sd">        Plot the autocovariance function of the time series.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        figsize  : :obj:`tuple`, optional</span>
+<span class="sd">            Size of the figure, by default (15,3)</span>
+<span class="sd">        xunit  : :obj:`str`, optional</span>
+<span class="sd">            Unit of the x-axis, by default &#39;d&#39;</span>
+<span class="sd">        filename  : :obj:`str`, optional</span>
+<span class="sd">            Name of the file to save the figure, by default None</span>
+<span class="sd">        title  : :obj:`str`, optional</span>
+<span class="sd">            Title of the plot, by default None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`matplotlib.figure.Figure`</span>
+<span class="sd">            Figure of the plot</span>
+<span class="sd">         :obj:`matplotlib.axes.Axes`</span>
+<span class="sd">            Axes of the plot</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acvf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Plotting the ACV when the PSD is modelled is not implemented yet&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">acvf</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Time lag $ \tau&quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;(\mathrm</span><span class="se">{{</span><span class="si">{</span><span class="n">xunit</span><span class="si">}</span><span class="se">}}</span><span class="s2">)$&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Autocovariance function&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;pdf&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="Simulations.plot_psd">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.plot_psd">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_psd</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xunit</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">loglog</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the power spectral density model.</span>
+
+<span class="sd">        A plot of the power spectral density model is generated.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        figsize  : :obj:`tuple`, optional</span>
+<span class="sd">            Size of the figure, by default (6,4)</span>
+<span class="sd">        filename  : :obj:`str`, optional</span>
+<span class="sd">            Name of the file to save the figure, by default None</span>
+<span class="sd">        title  : :obj:`str`, optional</span>
+<span class="sd">            Title of the plot, by default None</span>
+<span class="sd">        xunit  : :obj:`str`, optional</span>
+<span class="sd">            Unit of the x-axis, by default &#39;d&#39;</span>
+<span class="sd">        loglog  : :obj:`bool`, optional</span>
+<span class="sd">            If True, the plot is in loglog, by default True</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`matplotlib.figure.Figure`</span>
+<span class="sd">            Figure of the plot</span>
+<span class="sd">        :obj:`matplotlib.axes.Axes`</span>
+<span class="sd">            Axes of the plot</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Plotting the PSD when the model is the ACV is not implemented yet&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequencies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">,</span> <span class="s2">&quot;.-&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_max_obs</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$f_{\rm max}$&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_min_obs</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$f_{\rm min}$&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C4&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">loglog</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Frequency $(\mathrm</span><span class="se">{{</span><span class="si">{</span><span class="n">xunit</span><span class="si">}</span><span class="se">}}</span><span class="s2">^</span><span class="se">{{</span><span class="s2">-1</span><span class="se">}}</span><span class="s2">)$&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;PSD&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;pdf&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="Simulations.GP_method">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.GP_method">[docs]</a>
+    <span class="k">def</span> <span class="nf">GP_method</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">t_test</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a time series using the GP method.</span>
+
+<span class="sd">        If the ACVF is not already calculated, it is calculated from the PSD</span>
+<span class="sd">        using the inverse Fourier transform.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t_test: :obj:`jax.Array`</span>
+<span class="sd">            Time array of the time series.</span>
+<span class="sd">        interpolation  : :obj:`str`, optional</span>
+<span class="sd">            Interpolation method to use for the GP function, by default &#39;cubic&#39;.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the interpolation method is not &#39;linear&#39; or &#39;cubic&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Time array of the time series.</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Time series.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if no acvf is given, we calculate it from the psd</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acvf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">acv</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">acvf</span> <span class="o">=</span> <span class="n">acv</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">acv</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtau</span>
+
+        <span class="c1"># if the cholesky decomposition of the autocovariance function is not already calculated, we calculate it</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">triang</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">EuclideanDistance</span><span class="p">(</span><span class="n">t_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">t_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">CovarianceFunction</span><span class="p">):</span>
+                <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+                    <span class="n">interpo</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">acvf</span><span class="p">,</span> <span class="s2">&quot;linear&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="s2">&quot;cubic&quot;</span><span class="p">:</span>
+                    <span class="n">interpo</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">acvf</span><span class="p">,</span> <span class="s2">&quot;cubic&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Interpolation method </span><span class="si">{</span><span class="n">interpolation</span><span class="si">}</span><span class="s2"> is not accepted, use either &#39;linear&#39; or &#39;cubic&#39;&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">K</span> <span class="o">=</span> <span class="n">interpo</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">triang</span> <span class="o">=</span> <span class="n">cholesky</span><span class="p">(</span><span class="n">K</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;ts&quot;</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t_test</span><span class="p">),))</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">triang</span> <span class="o">@</span> <span class="n">r</span>
+        <span class="k">return</span> <span class="n">t_test</span><span class="p">,</span> <span class="n">ts</span></div>
+
+
+<div class="viewcode-block" id="Simulations.simulate">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.simulate">[docs]</a>
+    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GP&quot;</span><span class="p">,</span>
+        <span class="n">irregular_sampling</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">irregular_gaps</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">randomise_fluxes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gauss&quot;</span><span class="p">,</span>
+        <span class="n">errors_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span>
+        <span class="n">N_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">seed_gaps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">exponentiate_ts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">min_n_gaps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">max_n_gaps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">max_size_slices</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">interp_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cubic&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Method to simulate time series using either the GP method or the TK method.</span>
+
+<span class="sd">        When using the GP method, the time series is generated using an analytical autocovariance function or a power spectral density.</span>
+<span class="sd">        If the autocovariance function is not provided, it is calculated from the power spectral density using the inverse Fourier transform</span>
+<span class="sd">        and interpolated using a linear interpolation to map the autocovariance function on a grid of time lags.</span>
+
+<span class="sd">        When using the TK method, the time series is generated using the :func:`~pioran.simulate.Simulations.timmer_Koenig_method` method for a larger duration and then the final time series</span>
+<span class="sd">        is obtained by taking a subset of the generate time series.</span>
+
+<span class="sd">        If irregular_sampling is set to `True`, the time series will be sampled at random irregular time intervals.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mean : :obj:`float` or :obj:`str`, optional</span>
+<span class="sd">            Mean of the time series, &#39;default&#39; sets the mean to 0 for non-exponentiated, if None the mean will be set to -2 min(ts)</span>
+<span class="sd">        method : :obj:`str`, optional</span>
+<span class="sd">            method to simulate the time series, by default &#39;GP&#39;</span>
+<span class="sd">            can be &#39;TK&#39; which uses Timmer and Koening method</span>
+<span class="sd">        randomise_fluxes : :obj:`bool`, optional</span>
+<span class="sd">            If True the fluxes will be randomised.</span>
+<span class="sd">        errors : :obj:`str`, optional</span>
+<span class="sd">            If &#39;gauss&#39; the errors will be drawn from a gaussian distribution</span>
+<span class="sd">        errors_size : :obj:`float`, optional</span>
+<span class="sd">            Size of the errors on the time series, by default 0.02 (2%)</span>
+<span class="sd">        N_points : :obj:`int`, optional</span>
+<span class="sd">            Number of points to sample when simulating irregular gaps, by default 0</span>
+<span class="sd">        irregular_sampling : :obj:`bool`, optional</span>
+<span class="sd">            If True the time series will be sampled at irregular time intervals</span>
+<span class="sd">        irregular_gaps : :obj:`bool`, optional</span>
+<span class="sd">            If True the time series will be sampled at irregular time intervals with random gaps</span>
+<span class="sd">        seed : :obj:`int`, optional</span>
+<span class="sd">            Set the seed for the RNG</span>
+<span class="sd">        seed_gaps : :obj:`int`, optional</span>
+<span class="sd">            Set the seed for the RNG when simulating irregular gaps</span>
+<span class="sd">        exponentiate_ts: :obj:`bool`, optional</span>
+<span class="sd">            Exponentiate the time series to produce a lognormal flux distribution.</span>
+<span class="sd">        filename : :obj:`str`, optional</span>
+<span class="sd">            Name of the file to save the time series, by default &#39;&#39;</span>
+<span class="sd">        min_n_gaps : :obj:`int`, optional</span>
+<span class="sd">            Minimum number of gaps when simulating irregular gaps, by default 2</span>
+<span class="sd">        max_n_gaps : :obj:`int`, optional</span>
+<span class="sd">            Maximum number of gaps when simulating irregular gaps, by default 22</span>
+<span class="sd">        max_size_slices: obj:`float`</span>
+<span class="sd">            Max size factor, default it 2.</span>
+<span class="sd">        interp_method : :obj:`str`, optional</span>
+<span class="sd">            Interpolation method to use when calculating the autocovariance function from the power spectral density, by default &#39;linear&#39;</span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the method is not &#39;GP&#39; or &#39;TK&#39;</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the errors are not &#39;gauss&#39; or &#39;poisson&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        t : :obj:`jax.Array`</span>
+<span class="sd">            The time indexes of the time series.</span>
+<span class="sd">        ts : :obj:`jax.Array`</span>
+<span class="sd">            Values of the simulated time series.</span>
+<span class="sd">        ts_err : :obj:`jax.Array`</span>
+<span class="sd">            Errors on the simulated time series</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">irregular_gaps</span> <span class="ow">and</span> <span class="n">N_points</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must provide N_points when simulating irregular gaps&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_keys</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GP&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">irregular_sampling</span><span class="p">:</span>
+                <span class="n">t_test</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+                    <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>
+                        <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;sampling&quot;</span><span class="p">],</span>
+                        <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_time</span><span class="p">,),</span>
+                        <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">maxval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="n">t_test</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">jnp</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">t_test</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;The time series is not sampled at unique time intervals, resampling with new seed&quot;</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;sampling&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">t_test</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+                        <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>
+                            <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;sampling&quot;</span><span class="p">],</span>
+                            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_time</span><span class="p">,),</span>
+                            <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                            <span class="n">maxval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">t_test</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_period</span><span class="p">)</span>
+                <span class="c1"># raise NotImplementedError(&quot;The GP method does not support irregular sampling yet&quot;)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_time</span> <span class="o">&gt;</span> <span class="mi">8000</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;The desired number of point in the simulated time series is quite high&quot;</span>
+                <span class="p">)</span>
+            <span class="n">t</span><span class="p">,</span> <span class="n">true_timeseries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GP_method</span><span class="p">(</span>
+                <span class="n">interpolation</span><span class="o">=</span><span class="n">interp_method</span><span class="p">,</span> <span class="n">t_test</span><span class="o">=</span><span class="n">t_test</span>
+            <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;TK&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;You must provide a PowerSpectralDensity model to use the TK method&quot;</span>
+                <span class="p">)</span>
+            <span class="c1"># generate a long time series using the TK method</span>
+            <span class="n">long_t</span><span class="p">,</span> <span class="n">long_true_timeseries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timmer_Koenig_method</span><span class="p">()</span>
+            <span class="c1"># minimal index of the start of the subset of the time series</span>
+            <span class="n">start_subset</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">/</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fN</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">subset_t</span><span class="p">,</span> <span class="n">subset_true_timeseries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_subset_timeseries</span><span class="p">(</span>
+                <span class="n">long_t</span><span class="p">,</span> <span class="n">long_true_timeseries</span><span class="p">,</span> <span class="n">start_subset</span>
+            <span class="p">)</span>
+            <span class="n">t</span><span class="p">,</span> <span class="n">true_timeseries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_timeseries</span><span class="p">(</span>
+                <span class="n">subset_t</span><span class="p">,</span>
+                <span class="n">subset_true_timeseries</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_time</span><span class="p">,</span>
+                <span class="n">irregular_sampling</span><span class="o">=</span><span class="n">irregular_sampling</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">t</span> <span class="o">-=</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2"> is not accepted, use either &#39;GP&#39; or &#39;TK&#39;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">exponentiate_ts</span><span class="p">:</span>
+            <span class="n">true_timeseries</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">true_timeseries</span><span class="p">)</span>
+
+        <span class="c1"># set the mean of the time series</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mean</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;mean </span><span class="si">{</span><span class="n">mean</span><span class="si">}</span><span class="s2"> is not accepted, use either &#39;default&#39; or a float&quot;</span>
+                <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mean</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">true_timeseries</span> <span class="o">=</span> <span class="n">true_timeseries</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">true_timeseries</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">true_timeseries</span> <span class="o">=</span> <span class="n">true_timeseries</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">true_timeseries</span><span class="p">)</span> <span class="o">+</span> <span class="n">mean</span>
+        <span class="k">if</span> <span class="n">randomise_fluxes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">errors</span> <span class="o">==</span> <span class="s2">&quot;gauss&quot;</span><span class="p">:</span>
+                <span class="c1"># generate the variance of the errors</span>
+                <span class="n">timeseries_error_size</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">errors_size</span>
+                    <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">true_timeseries</span><span class="p">))</span>
+                    <span class="o">*</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                        <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">],</span> <span class="n">a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arr</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">proba</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">),)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>  <span class="c1"># random.uniform(key=self.keys[&quot;errors&quot;], shape=(len(t),))</span>
+
+                <span class="c1"># generate the measured time series with the associated fluxes</span>
+                <span class="n">observed_timeseries</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">true_timeseries</span>
+                    <span class="o">+</span> <span class="n">timeseries_error_size</span>
+                    <span class="o">*</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;fluxes&quot;</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">),))</span>
+                <span class="p">)</span>
+
+                <span class="c1"># if we exponentiated the time series, we need to make sure that the fluxes are positive</span>
+                <span class="k">if</span> <span class="n">exponentiate_ts</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">jnp</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">observed_timeseries</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="s2">&quot;Negative fluxes, adding offset 2*min(ts) to the time series&quot;</span>
+                        <span class="p">)</span>
+                        <span class="n">observed_timeseries</span> <span class="o">=</span> <span class="n">observed_timeseries</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+                            <span class="n">jnp</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">observed_timeseries</span><span class="p">)</span>
+                        <span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">errors</span> <span class="o">==</span> <span class="s2">&quot;poisson&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Poisson errors are not implemented yet&quot;</span><span class="p">)</span>
+                <span class="c1">#### IMPLEMENT POISSON ERRORS</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Error type </span><span class="si">{</span><span class="n">errors</span><span class="si">}</span><span class="s2"> is not accepted, use either &#39;gauss&#39; or &#39;poisson&#39;&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">timeseries_error_size</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">observed_timeseries</span> <span class="o">=</span> <span class="n">true_timeseries</span>
+
+        <span class="c1"># # set the mean of the time series</span>
+        <span class="c1"># if isinstance(mean,str):</span>
+        <span class="c1">#     if mean == &quot;default&quot;:</span>
+        <span class="c1">#         pass</span>
+        <span class="c1">#     else:</span>
+        <span class="c1">#         raise ValueError(f&quot;mean {mean} is not accepted, use either &#39;default&#39; or a float&quot;)</span>
+        <span class="c1"># elif mean is None:</span>
+        <span class="c1">#     observed_timeseries = observed_timeseries + 2 * jnp.abs(</span>
+        <span class="c1">#         jnp.min(observed_timeseries)</span>
+        <span class="c1">#     )</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     observed_timeseries = (</span>
+        <span class="c1">#         observed_timeseries - jnp.mean(observed_timeseries) + mean</span>
+        <span class="c1">#     )</span>
+
+        <span class="k">if</span> <span class="n">filename</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">savetxt</span><span class="p">(</span>
+                <span class="n">filename</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="n">observed_timeseries</span><span class="p">,</span> <span class="n">timeseries_error_size</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">irregular_gaps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">N_points</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">seed_gaps</span><span class="p">)</span>
+                <span class="n">t_points</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+                    <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_points</span><span class="p">,),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">indexes_selected</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t_points</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="p">(</span>
+                    <span class="n">t_points</span><span class="p">,</span>
+                    <span class="n">observed_timeseries</span><span class="p">[</span><span class="n">indexes_selected</span><span class="p">],</span>
+                    <span class="n">timeseries_error_size</span><span class="p">[</span><span class="n">indexes_selected</span><span class="p">],</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">observed_timeseries</span><span class="p">,</span> <span class="n">timeseries_error_size</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t_gappy</span><span class="p">,</span> <span class="n">indexes_selected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulate_irregular_gaps</span><span class="p">(</span>
+                <span class="n">t</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed_gaps</span><span class="p">,</span>
+                <span class="n">N_points</span><span class="o">=</span><span class="n">N_points</span><span class="p">,</span>
+                <span class="n">min_n_gaps</span><span class="o">=</span><span class="n">min_n_gaps</span><span class="p">,</span>
+                <span class="n">max_n_gaps</span><span class="o">=</span><span class="n">max_n_gaps</span><span class="p">,</span>
+                <span class="n">max_size_slices</span><span class="o">=</span><span class="n">max_size_slices</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">t_gappy</span><span class="p">,</span>
+                <span class="n">observed_timeseries</span><span class="p">[</span><span class="n">indexes_selected</span><span class="p">],</span>
+                <span class="n">timeseries_error_size</span><span class="p">[</span><span class="n">indexes_selected</span><span class="p">],</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Simulations.simulate_irregular_gaps">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.simulate_irregular_gaps">[docs]</a>
+    <span class="k">def</span> <span class="nf">simulate_irregular_gaps</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">a</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">N_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">min_n_gaps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">max_n_gaps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">22</span><span class="p">,</span>
+        <span class="n">max_size_slices</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Simulate irregular times from a regular time series with random gaps.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        a : :obj:`jax.Array`</span>
+<span class="sd">            Regular time series indexes.</span>
+<span class="sd">        key : :obj:`jax.random.PRNGKey`</span>
+<span class="sd">            Random key.</span>
+<span class="sd">        N_points : :obj:`int`</span>
+<span class="sd">            Number of points to sample.</span>
+<span class="sd">        min_n_gaps : :obj:`int`</span>
+<span class="sd">            Minimum number of gaps. Default is 2.</span>
+<span class="sd">        max_n_gaps : :obj:`int`</span>
+<span class="sd">            Maximum number of gaps. Default is 22.</span>
+<span class="sd">        max_size_slices : obj:`float`</span>
+<span class="sd">            Max size factor, default it 2.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Irregular times.</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Indexes of the irregular times.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">N_tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">sucess</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">sucess</span><span class="p">:</span>
+            <span class="n">N_slices</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
+                    <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">minval</span><span class="o">=</span><span class="n">min_n_gaps</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="n">max_n_gaps</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+                <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="p">)</span>  <span class="c1"># number of slices</span>
+            <span class="n">min_size_slices</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="mf">0.05</span> <span class="o">*</span> <span class="n">N_tot</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">max_size_slices</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">N_slices</span> <span class="o">*</span> <span class="n">max_size_slices</span><span class="p">)</span> <span class="o">*</span> <span class="n">N_tot</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                <span class="nb">int</span>
+            <span class="p">)</span>
+            <span class="n">size_slices</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">minval</span><span class="o">=</span><span class="n">min_size_slices</span><span class="p">,</span>
+                <span class="n">maxval</span><span class="o">=</span><span class="n">max_size_slices</span><span class="p">,</span>
+                <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_slices</span><span class="p">,),</span>
+            <span class="p">)</span>  <span class="c1"># size of each slice</span>
+
+            <span class="n">keys_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">N_start</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">intervals</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_size_slices</span><span class="p">]]</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="nb">slice</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">size_slices</span><span class="p">):</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keys_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">N_start_slices</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
+                    <span class="n">subkey</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="n">intervals</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">maxval</span><span class="o">=</span><span class="n">intervals</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)</span>
+                <span class="p">)</span>  <span class="c1"># start time of each slice</span>
+                <span class="n">keys_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subkey</span><span class="p">)</span>
+                <span class="n">N_start</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">N_start_slices</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">N_slices</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># print(&#39;Here we can take any startpoint as long as it does not exceed the total number of points&#39;)</span>
+                    <span class="n">intervals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="n">N_start_slices</span> <span class="o">+</span> <span class="nb">slice</span><span class="p">,</span>
+                            <span class="n">N_tot</span> <span class="o">-</span> <span class="nb">slice</span> <span class="o">-</span> <span class="n">max_size_slices</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="c1"># print(f&#39;Next time draw between {intervals[-1][0]} and {intervals[-1][1]}&#39;)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">intervals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="n">N_start_slices</span> <span class="o">+</span> <span class="nb">slice</span><span class="p">,</span>
+                            <span class="n">N_start_slices</span> <span class="o">+</span> <span class="nb">slice</span> <span class="o">+</span> <span class="n">max_size_slices</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+
+            <span class="n">N_start</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">N_start</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># start times of each slice</span>
+            <span class="n">N_stop</span> <span class="o">=</span> <span class="n">N_start</span> <span class="o">+</span> <span class="n">size_slices</span>  <span class="c1"># stop times of each slice</span>
+            <span class="k">if</span> <span class="n">jnp</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">N_stop</span> <span class="o">&gt;</span> <span class="n">N_tot</span><span class="p">):</span>
+                <span class="n">sucess</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="c1"># print(&quot;N_stop &gt; N_tot&quot;)</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sucess</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="n">L</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_slices</span><span class="p">):</span>
+                <span class="n">L</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N_start</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">N_stop</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">))</span>
+
+            <span class="n">x_indexes</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N_tot</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">irreg</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">x_indexes</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+            <span class="n">trunc</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">irreg</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">jnp</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trunc</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">N_points</span><span class="p">):</span>
+                <span class="n">sucess</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="c1"># print(&quot;N_stop &gt; N_tot&quot;)</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sucess</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="n">t_points</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+                <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">keys</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">trunc</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_points</span><span class="p">,),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">indexes_selected</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">t_points</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t_points</span><span class="p">,</span> <span class="n">indexes_selected</span></div>
+
+
+<div class="viewcode-block" id="Simulations.extract_subset_timeseries">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.extract_subset_timeseries">[docs]</a>
+    <span class="k">def</span> <span class="nf">extract_subset_timeseries</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">M</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Select a random subset of points from an input time series.</span>
+
+<span class="sd">        The input time series is regularly sampled of size N.</span>
+<span class="sd">        The output time series is of size M with the same sampling rate as the input time series.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : :obj:`jax.Array`</span>
+<span class="sd">            Input time series of size N.</span>
+<span class="sd">        y : :obj:`jax.Array`</span>
+<span class="sd">            The fluxes of the simulated light curve.</span>
+<span class="sd">        M : :obj:`int`</span>
+<span class="sd">            The number of points in the desired time series.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            The time series of size M.</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            The values of the time series of size M.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">start_index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
+            <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;subset&quot;</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">minval</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="n">N</span> <span class="o">-</span> <span class="n">M</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">t</span><span class="p">[</span><span class="n">start_index</span> <span class="p">:</span> <span class="n">start_index</span> <span class="o">+</span> <span class="n">M</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">start_index</span> <span class="p">:</span> <span class="n">start_index</span> <span class="o">+</span> <span class="n">M</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Simulations.sample_timeseries">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.sample_timeseries">[docs]</a>
+    <span class="k">def</span> <span class="nf">sample_timeseries</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">M</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">irregular_sampling</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract a random subset of points from the time series.</span>
+
+<span class="sd">        Extract a random subset of M points from the time series. The input time series t is regularly sampled of size N with a sampling period dT.</span>
+<span class="sd">        If irregular_sampling is False, the output time series has a sampling period dT/M.</span>
+<span class="sd">        If irregular_sampling is True, the output time series is irregularly sampled.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : :obj:`jax.Array`</span>
+<span class="sd">            The time indexes of the time series.</span>
+<span class="sd">        y : :obj:`jax.Array`</span>
+<span class="sd">            The values of the time series.</span>
+<span class="sd">        M : :obj:`int`</span>
+<span class="sd">            The number of points in the desired time series.</span>
+<span class="sd">        irregular_sampling : :obj:`bool`</span>
+<span class="sd">            If True, the time series is irregularly sampled. If False, the time series is regularly sampled.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            The time indexes of the sampled time series.</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            The values of the sampled time series.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">input_sampling_period</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">output_sampling_period</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">M</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">irregular_sampling</span><span class="p">:</span>
+            <span class="n">index_step_size</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
+                <span class="n">output_sampling_period</span> <span class="o">/</span> <span class="n">input_sampling_period</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">t</span><span class="p">[::</span><span class="n">index_step_size</span><span class="p">],</span> <span class="n">y</span><span class="p">[::</span><span class="n">index_step_size</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t_sampled</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;sampling&quot;</span><span class="p">],</span> <span class="n">a</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">M</span><span class="p">,),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+            <span class="n">y_sampled</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;sampling&quot;</span><span class="p">],</span> <span class="n">a</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">M</span><span class="p">,),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+            <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">t_sampled</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">t_sampled</span><span class="p">[</span><span class="n">sorted_indices</span><span class="p">],</span> <span class="n">y_sampled</span><span class="p">[</span><span class="n">sorted_indices</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Simulations.timmer_Koenig_method">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.timmer_Koenig_method">[docs]</a>
+    <span class="k">def</span> <span class="nf">timmer_Koenig_method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate a time series using the Timmer-Konig method.</span>
+
+<span class="sd">        Use the Timmer-Konig method to generate a time series with a given power spectral density</span>
+<span class="sd">        stored in the attribute psd.</span>
+
+<span class="sd">        Assuming a power-law shaped PSD, the method is as follows:</span>
+
+<span class="sd">        Draw two independent Gaussian random variables N1 and N2 with zero mean and unit variance.</span>
+<span class="sd">        The random variables are drawn using the key self.keys[&#39;ts&#39;] split into two subkeys.</span>
+
+<span class="sd">            1. Define A = sqrt(PSD/2) * (N1 + i*N2)</span>
+<span class="sd">            2. Define A[0] = 0</span>
+<span class="sd">            3. Define A[-1] = real(A[-1])</span>
+<span class="sd">            4. ts = irfft(A)</span>
+<span class="sd">            5. t is defined as the time indexes of the time series, with a sampling period of 0.5/fN.</span>
+<span class="sd">            6. ts is multiplied by the 2*len(psd)*sqrt(f0) factor to ensure that the time series has the correct variance.</span>
+
+<span class="sd">        The duration of the output time series is 2*(len(psd)-1).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            The time indexes of the time series.</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            The values of the time series.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># split the key into two subkeys</span>
+        <span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;ts&quot;</span><span class="p">])</span>
+
+        <span class="n">N1</span><span class="p">,</span> <span class="n">N2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">),)),</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+            <span class="n">key</span><span class="o">=</span><span class="n">subkey</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">),)</span>
+        <span class="p">)</span>
+        <span class="n">randpsd</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">N1</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">N2</span><span class="p">)</span>
+        <span class="n">randpsd</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">randpsd</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">randpsd</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">randpsd</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtau</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtau</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span><span class="p">)</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ts</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f0</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">ts</span></div>
+
+
+<div class="viewcode-block" id="Simulations.split_longtimeseries">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.split_longtimeseries">[docs]</a>
+    <span class="k">def</span> <span class="nf">split_longtimeseries</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">ts</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">n_slices</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Split a long time series into shorter time series.</span>
+
+<span class="sd">        Break the time series into n_slices shorter time series. The short time series are of equal length.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : :obj:`jax.Array`</span>
+<span class="sd">            The time indexes of the long time series.</span>
+<span class="sd">        ts : :obj:`jax.Array`</span>
+<span class="sd">            The values of the long time series.</span>
+<span class="sd">        n_slices : :obj:`int`</span>
+<span class="sd">            The number of slices to break the time series into.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`list`</span>
+<span class="sd">            A list of the time indexes of the shorter time series.</span>
+<span class="sd">        :obj:`list`</span>
+<span class="sd">            A list of the values of the shorter time series.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_slices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ts_slices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">size_slice</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_slices</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_slices</span><span class="p">):</span>
+            <span class="n">start_index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">size_slice</span>
+            <span class="n">end_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">size_slice</span>
+            <span class="n">t_slice</span><span class="p">,</span> <span class="n">ts_slice</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">],</span> <span class="n">ts</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span>
+
+            <span class="n">t_slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_slice</span><span class="p">)</span>
+            <span class="n">ts_slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts_slice</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t_slices</span><span class="p">,</span> <span class="n">ts_slices</span></div>
+
+
+<div class="viewcode-block" id="Simulations.resample_longtimeseries">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.resample_longtimeseries">[docs]</a>
+    <span class="k">def</span> <span class="nf">resample_longtimeseries</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">t_slices</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ts_slices</span><span class="p">:</span> <span class="nb">list</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resample the time series to have a regular sampling period with n_time points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t_slices : :obj:`list`</span>
+<span class="sd">            A list of short time series time indexes.</span>
+<span class="sd">        ts_slices : :obj:`list`</span>
+<span class="sd">            A list of short time series values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`list`</span>
+<span class="sd">            A list of the time indexes of the sampled time series.</span>
+<span class="sd">        :obj:`list`</span>
+<span class="sd">            A list of the values of the sampled time series.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_resampled</span><span class="p">,</span> <span class="n">ts_resampled</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">t_slice</span><span class="p">,</span> <span class="n">ts_slice</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t_slices</span><span class="p">,</span> <span class="n">ts_slices</span><span class="p">):</span>
+            <span class="n">input_sampling_period</span> <span class="o">=</span> <span class="n">t_slice</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t_slice</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">output_sampling_period</span> <span class="o">=</span> <span class="p">(</span><span class="n">t_slice</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t_slice</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_time</span>
+
+            <span class="n">index_step_size</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
+                <span class="n">output_sampling_period</span> <span class="o">/</span> <span class="n">input_sampling_period</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">t_resampled</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_slice</span><span class="p">[::</span><span class="n">index_step_size</span><span class="p">])</span>
+            <span class="n">ts_resampled</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts_slice</span><span class="p">[::</span><span class="n">index_step_size</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">t_resampled</span><span class="p">,</span> <span class="n">ts_resampled</span></div>
+
+
+<div class="viewcode-block" id="Simulations.simulate_longtimeseries">
+<a class="viewcode-back" href="../../autoapi/pioran/simulate/index.html#pioran.Simulations.simulate_longtimeseries">[docs]</a>
+    <span class="k">def</span> <span class="nf">simulate_longtimeseries</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">randomise_fluxes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gauss&quot;</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Method to simulate several long time series using the Timmer-Koenig method.</span>
+
+<span class="sd">        The time series is generated using the :func:`~pioran.simulate.Simulations.timmer_Koenig_method` method for a larger duration and then the final time series</span>
+<span class="sd">        are split into segments of length n_time. The shorter time series are then resampled to have a regular sampling period.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mean : :obj:`float`, optional</span>
+<span class="sd">            Mean of the time series, if None the mean will be set to -2 min(ts)</span>
+<span class="sd">        randomise_fluxes : :obj:`bool`, optional</span>
+<span class="sd">            If True the fluxes will be randomised.</span>
+<span class="sd">        errors : :obj:`str`, optional</span>
+<span class="sd">            If &#39;gauss&#39; the errors will be drawn from a gaussian distribution</span>
+<span class="sd">        seed : :obj:`int`, optional</span>
+<span class="sd">            Set the seed for the RNG</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the errors are not &#39;gauss&#39; or &#39;poisson&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`list`</span>
+<span class="sd">            A list of the time indexes of the segments.</span>
+<span class="sd">        :obj:`list`</span>
+<span class="sd">            A list of the values of the segments.</span>
+<span class="sd">        :obj:`list`</span>
+<span class="sd">            A list of the errors of the segments.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_keys</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;You must provide a PowerSpectralDensity model to use the TK method&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># generate a long time series using the TK method</span>
+        <span class="n">long_t</span><span class="p">,</span> <span class="n">long_true_timeseries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timmer_Koenig_method</span><span class="p">()</span>
+
+        <span class="c1"># split the long time series into segments given by the S_low parameter</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S_low</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The number of slices is not an integer, it will be rounded to the nearest integer&quot;</span>
+            <span class="p">)</span>
+        <span class="n">n_slices</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S_low</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_slices</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The number of slices is less than 10, this may cause leakage between the segments&quot;</span>
+            <span class="p">)</span>
+        <span class="n">t_slices</span><span class="p">,</span> <span class="n">ts_slices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_longtimeseries</span><span class="p">(</span>
+            <span class="n">long_t</span><span class="p">,</span> <span class="n">long_true_timeseries</span><span class="p">,</span> <span class="n">n_slices</span>
+        <span class="p">)</span>
+
+        <span class="c1"># resample the segments to have a regular sampling period</span>
+        <span class="n">t_resampled</span><span class="p">,</span> <span class="n">ts_resampled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resample_longtimeseries</span><span class="p">(</span><span class="n">t_slices</span><span class="p">,</span> <span class="n">ts_slices</span><span class="p">)</span>
+        <span class="c1"># set origin of time to 0 for each segment</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t_resampled</span><span class="p">)):</span>
+            <span class="n">t_resampled</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">t_resampled</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">t_resampled</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">ts_err</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">randomise_fluxes</span><span class="p">:</span>
+            <span class="c1"># split the keys for the fluxes and errors for each segment</span>
+            <span class="n">keys_errors</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">],</span> <span class="n">n_slices</span><span class="p">)</span>
+            <span class="n">keys_fluxes</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="s2">&quot;fluxes&quot;</span><span class="p">],</span> <span class="n">n_slices</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">errors</span> <span class="o">==</span> <span class="s2">&quot;gauss&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_slices</span><span class="p">):</span>
+                    <span class="c1"># generate the variance of the errors</span>
+                    <span class="n">timeseries_error_size</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+                        <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">keys_errors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t_resampled</span><span class="p">[</span><span class="n">i</span><span class="p">]),))</span>
+                    <span class="p">)</span>
+                    <span class="c1"># generate the measured time series with the associated fluxes</span>
+                    <span class="n">observed_timeseries</span> <span class="o">=</span> <span class="n">ts_resampled</span><span class="p">[</span>
+                        <span class="n">i</span>
+                    <span class="p">]</span> <span class="o">+</span> <span class="n">timeseries_error_size</span> <span class="o">*</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+                        <span class="n">key</span><span class="o">=</span><span class="n">keys_fluxes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t_resampled</span><span class="p">[</span><span class="n">i</span><span class="p">]),)</span>
+                    <span class="p">)</span>
+
+                    <span class="n">ts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">observed_timeseries</span><span class="p">)</span>
+                    <span class="n">ts_err</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">timeseries_error_size</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">errors</span> <span class="o">==</span> <span class="s2">&quot;poisson&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Poisson errors are not implemented yet&quot;</span><span class="p">)</span>
+                <span class="c1">#### IMPLEMENT POISSON ERRORS</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Error type </span><span class="si">{</span><span class="n">errors</span><span class="si">}</span><span class="s2"> is not accepted, use either &#39;gauss&#39; or &#39;poisson&#39;&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_slices</span><span class="p">):</span>
+                <span class="n">ts_err</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">t_resampled</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="n">ts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts_resampled</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">mean</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_slices</span><span class="p">):</span>
+                <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">mean</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_slices</span><span class="p">):</span>
+                <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">t_resampled</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">ts_err</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Mehdy Lefkir.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

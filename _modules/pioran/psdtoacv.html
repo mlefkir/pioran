@@ -1,0 +1,1182 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pioran.psdtoacv &#8212; pioran</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=ad57bd55" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pioran/psdtoacv';</script>
+    <link rel="icon" href="../../_static/favico.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo_borderbis.png" class="logo__image only-light" alt="pioran - Home"/>
+    <script>document.write(`<img src="../../_static/logo_borderbis.png" class="logo__image only-dark" alt="pioran - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../userguide/User.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/Tutorials.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../references/references.html">
+                        References
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../autoapi/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../userguide/User.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/Tutorials.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../references/references.html">
+                        References
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../autoapi/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../pioran.html" class="nav-link">pioran</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">pioran.psdtoacv</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pioran.psdtoacv</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Convert a power spectral density to an autocovariance function via the inverse Fourier transform methods or kernel decomposition.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">equinox</span> <span class="k">as</span> <span class="nn">eqx</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <span class="nn">tinygp</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">celerite2.jax</span> <span class="kn">import</span> <span class="n">terms</span>
+    <span class="kn">import</span> <span class="nn">celerite2.terms</span> <span class="k">as</span> <span class="nn">legacy_terms</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+<div class="viewcode-block" id="terms">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.terms">[docs]</a>
+    <span class="n">terms</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="n">legacy_terms</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="kn">from</span> <span class="nn">tinygp.kernels.quasisep</span> <span class="kn">import</span> <span class="n">SHO</span> <span class="k">as</span> <span class="n">SHO_term</span>
+
+<span class="kn">from</span> <span class="nn">.parameters</span> <span class="kn">import</span> <span class="n">ParametersModel</span>
+<span class="kn">from</span> <span class="nn">.psd_base</span> <span class="kn">import</span> <span class="n">PowerSpectralDensity</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EuclideanDistance</span><span class="p">,</span>
+    <span class="n">decompose_triangular_matrix</span><span class="p">,</span>
+    <span class="n">reconstruct_triangular_matrix</span><span class="p">,</span>
+    <span class="n">valid_methods</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">_USE_JAX_FINUFFT</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">jax_finufft</span> <span class="kn">import</span> <span class="n">nufft2</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+<div class="viewcode-block" id="nufft2">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.nufft2">[docs]</a>
+    <span class="n">nufft2</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="n">_USE_JAX_FINUFFT</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="PSDToACV">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV">[docs]</a>
+<span class="k">class</span> <span class="nc">PSDToACV</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents the tranformation of a power spectral density to an autocovariance function.</span>
+
+<span class="sd">    Computes the autocovariance function from a power spectral density using the several methods.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    PSD : :class:`~pioran.psd_base.PowerSpectralDensity`</span>
+<span class="sd">        Power spectral density object.</span>
+<span class="sd">    S_low : :obj:`float`</span>
+<span class="sd">        Lower bound of the frequency grid.</span>
+<span class="sd">    S_high : :obj:`float`</span>
+<span class="sd">        Upper bound of the frequency grid.</span>
+<span class="sd">    T : :obj:`float`</span>
+<span class="sd">        Duration of the time series.</span>
+<span class="sd">    dt : :obj:`float`</span>
+<span class="sd">        Minimum sampling duration of the time series.</span>
+<span class="sd">    method : :obj:`str`</span>
+<span class="sd">        Method used to compute the autocovariance function. Can be &#39;FFT&#39; if the inverse Fourier transform is used or &#39;NuFFT&#39;</span>
+<span class="sd">        for the non uniform Fourier transform. The &#39;SHO&#39; method will approximate the power spectral density into a sum of SHO functions.</span>
+<span class="sd">    n_components : :obj:`int`</span>
+<span class="sd">        Number of components used to approximate the power spectral density using the &#39;SHO&#39; method.</span>
+<span class="sd">    estimate_variance : :obj:`bool`, optional</span>
+<span class="sd">        If True, the amplitude of the autocovariance function is estimated. Default is True.</span>
+<span class="sd">    init_variance : :obj:`float`, optional</span>
+<span class="sd">        Initial value of the variance. Default is 1.0.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If PSD is not a :class:`~pioran.psd_base.PowerSpectralDensity` object.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If S_low is smaller than 2., if method is not in the allowed methods or if n_components is smaller than 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PSDToACV.PSD">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.PSD">[docs]</a>
+    <span class="n">PSD</span><span class="p">:</span> <span class="n">PowerSpectralDensity</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Power spectral density object.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.ACVF">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.ACVF">[docs]</a>
+    <span class="n">ACVF</span><span class="p">:</span> <span class="n">tinygp</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">quasisep</span><span class="o">.</span><span class="n">SHO</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Autocovariance function as sum of SHO kernels.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.parameters">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.parameters">[docs]</a>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersModel</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of the power spectral density.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.method">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.method">[docs]</a>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Method to compute the covariance function from the power spectral density, by default &#39;FFT&#39;.Possible values are:</span>
+<span class="sd">            - &#39;FFT&#39;: use the FFT to compute the autocovariance function.</span>
+<span class="sd">            - &#39;NuFFT&#39;: use the non-uniform FFT to compute the autocovariance function.</span>
+<span class="sd">            - &#39;SHO&#39;: approximate the power spectrum as a sum of SHO basis functions to compute the autocovariance function.</span>
+<span class="sd">            - &#39;DRWCelerite&#39; : approximate the power spectrum as a sum of DRW+Celerite basis functions to compute the autocovariance function.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.f_max_obs">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.f_max_obs">[docs]</a>
+    <span class="n">f_max_obs</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maximum observed frequency, i.e. the Nyquist frequency.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.f_min_obs">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.f_min_obs">[docs]</a>
+    <span class="n">f_min_obs</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Minimum observed frequency.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.f0">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.f0">[docs]</a>
+    <span class="n">f0</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lower bound of the frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.S_low">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.S_low">[docs]</a>
+    <span class="n">S_low</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scale for the lower bound of the frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.S_high">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.S_high">[docs]</a>
+    <span class="n">S_high</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scale for the upper bound of the frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.fN">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.fN">[docs]</a>
+    <span class="n">fN</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Upper bound of the frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.estimate_variance">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.estimate_variance">[docs]</a>
+    <span class="n">estimate_variance</span><span class="p">:</span> <span class="nb">bool</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If True, the amplitude of the autocovariance function is estimated.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.n_freq_grid">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.n_freq_grid">[docs]</a>
+    <span class="n">n_freq_grid</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of points in the frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.frequencies">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.frequencies">[docs]</a>
+    <span class="n">frequencies</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Frequency grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.tau">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.tau">[docs]</a>
+    <span class="n">tau</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Time lag grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.dtau">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.dtau">[docs]</a>
+    <span class="n">dtau</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Time lag step.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.n_components">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.n_components">[docs]</a>
+    <span class="n">n_components</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of components used to approximate the power spectral density using the &#39;SHO&#39; method.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.spectral_points">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.spectral_points">[docs]</a>
+    <span class="n">spectral_points</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Frequencies of the SHO kernels.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.spectral_matrix">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.spectral_matrix">[docs]</a>
+    <span class="n">spectral_matrix</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Matrix of the SHO kernels.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.use_celerite">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.use_celerite">[docs]</a>
+    <span class="n">use_celerite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use celerite2-jax as a backend to model the autocovariance function and compute the log marginal likelihood.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PSDToACV.use_legacy_celerite">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.use_legacy_celerite">[docs]</a>
+    <span class="n">use_legacy_celerite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use celerite2 as a backend to model the autocovariance function and compute the log marginal likelihood.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">PSD</span><span class="p">:</span> <span class="n">PowerSpectralDensity</span><span class="p">,</span>
+        <span class="n">S_low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">S_high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">T</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">n_components</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">estimate_variance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">init_variance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">use_celerite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_legacy_celerite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the PSDToACV class.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimate_variance</span> <span class="o">=</span> <span class="n">estimate_variance</span>
+
+        <span class="c1"># sanity checks:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">PSD</span><span class="p">,</span> <span class="n">PowerSpectralDensity</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PSD must be a PowerSpectralDensity object, not a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">PSD</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="n">T</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dt (</span><span class="si">{</span><span class="n">dt</span><span class="si">}</span><span class="s2">) must be smaller than T (</span><span class="si">{</span><span class="n">T</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">S_low</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;S_low must be greater than 2, </span><span class="si">{</span><span class="n">S_low</span><span class="si">}</span><span class="s2"> was given&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_methods</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2"> not allowed. Choose between </span><span class="si">{</span><span class="n">valid_methods</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;NuFFT&quot;</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">_USE_JAX_FINUFFT</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;NuFFT method requires jax_finufft package&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;FFT&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">method</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_components</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n_components must be greater than 1&quot;</span><span class="p">)</span>
+
+        <span class="c1"># define the attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PSD</span> <span class="o">=</span> <span class="n">PSD</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">PSD</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">S_low</span> <span class="o">=</span> <span class="n">S_low</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">S_high</span> <span class="o">=</span> <span class="n">S_high</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_celerite</span> <span class="o">=</span> <span class="n">use_celerite</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_legacy_celerite</span> <span class="o">=</span> <span class="n">use_legacy_celerite</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_variance</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">,</span> <span class="n">init_variance</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">hyperparameter</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># parameters of the **observed** frequency grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_max_obs</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">dt</span>  <span class="c1"># Nyquist frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_min_obs</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">T</span>  <span class="c1"># minimum observed frequency</span>
+
+        <span class="c1"># parameters of the **total** frequency grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min_obs</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">S_low</span>  <span class="c1"># minimum frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fN</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max_obs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">S_high</span>  <span class="c1"># maximum frequency</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_freq_grid</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fN</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">tau_max</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtau</span> <span class="o">=</span> <span class="n">tau_max</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_freq_grid</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;FFT&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;NuFFT&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frequencies</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fN</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tau_max</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtau</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtau</span><span class="p">)</span>
+
+        <span class="c1"># here we define the spectral matrix for the PSD approximation</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;SHO&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectral_points</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectral_matrix</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="mi">1</span>
+                <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span>
+                    <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral_points</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_points</span><span class="p">,</span> <span class="mi">4</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;DRWCelerite&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectral_points</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectral_matrix</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="mi">1</span>
+                <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span>
+                    <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral_points</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_points</span><span class="p">,</span> <span class="mi">6</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Method </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2"> not implemented&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PSDToACV.decompose_model">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.decompose_model">[docs]</a>
+    <span class="k">def</span> <span class="nf">decompose_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psd_normalised</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decompose the PSD model into a sum of basis functions.</span>
+
+<span class="sd">        Assuming that the PSD model can be written as a sum of :math:`J` , this method</span>
+<span class="sd">        solve the linear system to find the amplitude :math:`a_j` of each kernel.</span>
+
+<span class="sd">        .. math:: :label: sho_power_spectrum</span>
+
+<span class="sd">        \boldsymbol{y} = B \boldsymbol{a}</span>
+
+<span class="sd">        with :math:`\boldsymbol{y}=\begin{bmatrix}1 &amp; \mathcal{P}(f_1)/\mathcal{P}(f_0) &amp; \cdots &amp; \mathcal{P}(f_J)/\mathcal{P}(f_0) \end{bmatrix}^\mathrm{T}`</span>
+<span class="sd">        the normalised power spectral density vector, :math:`B` the spectral matrix associated to the linear system and :math:`\boldsymbol{a}` the amplitudes of the functions.</span>
+
+
+<span class="sd">        .. math:: :label: sho_spectral_matrix</span>
+
+<span class="sd">        B_{ij} = \dfrac{1}{1 + \left(\dfrac{f_i}{f_j}\right)^4}</span>
+
+
+<span class="sd">        .. math:: :label: drwcel_spectral_matrix</span>
+
+<span class="sd">        B_{ij} = \dfrac{1}{1 + \left(\dfrac{f_i}{f_j}\right)^6}</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        psd_normalised : :obj:`jax.Array`</span>
+<span class="sd">            Normalised power spectral density by the first value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Amplitudes of the functions.</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Frequencies of the function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral_matrix</span><span class="p">,</span> <span class="n">psd_normalised</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_points</span></div>
+
+
+<div class="viewcode-block" id="PSDToACV.get_approx_coefs">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.get_approx_coefs">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_approx_coefs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the amplitudes and frequencies of the basis functions.</span>
+
+<span class="sd">        Estimate the amplitudes and frequencies of the basis functions by solving the linear system.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        amplitudes : :obj:`jax.Array`</span>
+<span class="sd">            Amplitudes of the SHO kernels.</span>
+<span class="sd">        frequencies : :obj:`jax.Array`</span>
+<span class="sd">            Frequencies of the SHO kernels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">psd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PSD</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral_points</span><span class="p">)</span>
+        <span class="n">psd</span> <span class="o">/=</span> <span class="n">psd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">a</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decompose_model</span><span class="p">(</span><span class="n">psd</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="PSDToACV.build_SHO_model_legacy_cel">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.build_SHO_model_legacy_cel">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_SHO_model_legacy_cel</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">amplitudes</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">frequencies</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span>
+    <span class="p">):</span>  <span class="c1"># -&gt; terms.Term:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the semi-separable SHO model in celerite from the amplitudes and frequencies.</span>
+
+<span class="sd">        Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes.</span>
+<span class="sd">        The amplitudes are modelled as a DRW model with c=0.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        amplitudes : :obj:`jax.Array`</span>
+<span class="sd">            Amplitudes of the SHO kernels.</span>
+<span class="sd">        frequencies : :obj:`jax.Array`</span>
+<span class="sd">            Frequencies of the SHO kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`term.Term`</span>
+<span class="sd">            Constructed SHO kernel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">legacy_terms</span><span class="o">.</span><span class="n">RealTerm</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">amplitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">legacy_terms</span><span class="o">.</span><span class="n">SHOTerm</span><span class="p">(</span>
+            <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Q</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">w0</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">frequencies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">):</span>
+            <span class="n">kernel</span> <span class="o">+=</span> <span class="n">legacy_terms</span><span class="o">.</span><span class="n">RealTerm</span><span class="p">(</span>
+                <span class="n">a</span><span class="o">=</span><span class="n">amplitudes</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+            <span class="p">)</span> <span class="o">*</span> <span class="n">legacy_terms</span><span class="o">.</span><span class="n">SHOTerm</span><span class="p">(</span>
+                <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Q</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">w0</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">frequencies</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">kernel</span></div>
+
+
+<div class="viewcode-block" id="PSDToACV.build_SHO_model_cel">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.build_SHO_model_cel">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_SHO_model_cel</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">amplitudes</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">frequencies</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span>
+    <span class="p">):</span>  <span class="c1"># -&gt; terms.Term:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the semi-separable SHO model in celerite from the amplitudes and frequencies.</span>
+
+<span class="sd">        Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes.</span>
+<span class="sd">        The amplitudes are modelled as a DRW model with c=0.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        amplitudes : :obj:`jax.Array`</span>
+<span class="sd">            Amplitudes of the SHO kernels.</span>
+<span class="sd">        frequencies : :obj:`jax.Array`</span>
+<span class="sd">            Frequencies of the SHO kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`term.Term`</span>
+<span class="sd">            Constructed SHO kernel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">terms</span><span class="o">.</span><span class="n">RealTerm</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">amplitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">terms</span><span class="o">.</span><span class="n">SHOTerm</span><span class="p">(</span>
+            <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Q</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">w0</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">frequencies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">):</span>
+            <span class="n">kernel</span> <span class="o">+=</span> <span class="n">terms</span><span class="o">.</span><span class="n">RealTerm</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">amplitudes</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">terms</span><span class="o">.</span><span class="n">SHOTerm</span><span class="p">(</span>
+                <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Q</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">w0</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">frequencies</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">kernel</span></div>
+
+
+<div class="viewcode-block" id="PSDToACV.build_DRWCelerite_model_cel">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.build_DRWCelerite_model_cel">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_DRWCelerite_model_cel</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">amplitudes</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">frequencies</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span>
+    <span class="p">):</span>  <span class="c1"># -&gt; terms.Term:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the semi-separable DRW+Celerite model in celerite from the amplitudes and frequencies.</span>
+
+<span class="sd">        The amplitudes</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        amplitudes : :obj:`jax.Array`</span>
+<span class="sd">            Amplitudes of the SHO kernels.</span>
+<span class="sd">        frequencies : :obj:`jax.Array`</span>
+<span class="sd">            Frequencies of the SHO kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`term.Term`</span>
+<span class="sd">            Constructed SHO kernel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w_j</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">frequencies</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">amplitudes</span> <span class="o">*</span> <span class="n">w_j</span> <span class="o">/</span> <span class="mi">6</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">w_j</span> <span class="o">*</span> <span class="n">amplitudes</span> <span class="o">/</span> <span class="mi">6</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">w_j</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">w_j</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">terms</span><span class="o">.</span><span class="n">RealTerm</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">w_j</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">terms</span><span class="o">.</span><span class="n">ComplexTerm</span><span class="p">(</span>
+            <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">):</span>
+            <span class="n">kernel</span> <span class="o">+=</span> <span class="n">terms</span><span class="o">.</span><span class="n">RealTerm</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">w_j</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">+</span> <span class="n">terms</span><span class="o">.</span><span class="n">ComplexTerm</span><span class="p">(</span>
+                <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">kernel</span></div>
+
+
+<div class="viewcode-block" id="PSDToACV.build_SHO_model_tinygp">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.build_SHO_model_tinygp">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_SHO_model_tinygp</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">amplitudes</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">frequencies</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tinygp</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">quasisep</span><span class="o">.</span><span class="n">SHO</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the semi-separable SHO model in tinygp from the amplitudes and frequencies.</span>
+
+<span class="sd">        Currently multiplying the amplitudes to the SHO kernels as sometimes we need negative amplitudes,</span>
+<span class="sd">        which is not possible with the SHO kernel implementation in tinygp.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        amplitudes : :obj:`jax.Array`</span>
+<span class="sd">            Amplitudes of the SHO kernels.</span>
+<span class="sd">        frequencies : :obj:`jax.Array`</span>
+<span class="sd">            Frequencies of the SHO kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`tinygp.kernels.quasisep.SHO`</span>
+<span class="sd">            Constructed SHO kernel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">amplitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">SHO_term</span><span class="p">(</span>
+            <span class="n">quality</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">omega</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">frequencies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">):</span>
+            <span class="n">kernel</span> <span class="o">+=</span> <span class="n">amplitudes</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">SHO_term</span><span class="p">(</span>
+                <span class="n">quality</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">omega</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">frequencies</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">kernel</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ACVF</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tinygp</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">quasisep</span><span class="o">.</span><span class="n">SHO</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the autocovariance function from the SHO model.</span>
+
+<span class="sd">        Define the autocovariance function from the semi-separable SHO model.</span>
+<span class="sd">        This property is used to define the autocovariance function in the GP model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`tinygp.kernels.quasisep.SHO`</span>
+<span class="sd">            Autocovariance function as sum of SHO kernels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">psd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PSD</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral_points</span><span class="p">)</span>
+        <span class="n">psd</span> <span class="o">/=</span> <span class="n">psd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">a</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decompose_model</span><span class="p">(</span><span class="n">psd</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;SHO&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_celerite</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_legacy_celerite</span><span class="p">:</span>
+                    <span class="n">kernel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_SHO_model_legacy_cel</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">f</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">kernel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_SHO_model_cel</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">f</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">kernel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_SHO_model_tinygp</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">f</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;DRWCelerite&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_celerite</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_legacy_celerite</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not implemented for legacy celerite&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">kernel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_DRWCelerite_model_cel</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="s2">&quot;DRWCelerite is only implemented for the celerite2 backend&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only SHO is implemented for now&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_variance</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_celerite</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;SHO&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_legacy_celerite</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">(</span>
+                            <span class="n">legacy_terms</span><span class="o">.</span><span class="n">RealTerm</span><span class="p">(</span>
+                                <span class="n">a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">f</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+                            <span class="p">)</span>
+                            <span class="o">*</span> <span class="n">kernel</span>
+                        <span class="p">)</span>
+                    <span class="k">return</span> <span class="p">(</span>
+                        <span class="n">terms</span><span class="o">.</span><span class="n">RealTerm</span><span class="p">(</span>
+                            <span class="n">a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">f</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+                        <span class="p">)</span>
+                        <span class="o">*</span> <span class="n">kernel</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;DRWCelerite&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_legacy_celerite</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not implemented for legacy celerite&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">(</span>
+                        <span class="n">terms</span><span class="o">.</span><span class="n">RealTerm</span><span class="p">(</span>
+                            <span class="n">a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                            <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">f</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span>
+                            <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="o">*</span> <span class="n">kernel</span>
+                    <span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                        <span class="s2">&quot;The estimation of the variance is implemented for SHO and DRWCelerite only&quot;</span>
+                    <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">kernel</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">f</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">kernel</span>
+
+<div class="viewcode-block" id="PSDToACV.calculate">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.calculate">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">with_ACVF_factor</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the autocovariance function from the power spectral density.</span>
+
+<span class="sd">        The autocovariance function is computed by the inverse Fourier transform by</span>
+<span class="sd">        calling the method get_acvf_byFFT. The autocovariance function is then interpolated</span>
+<span class="sd">        using the method interpolation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : :obj:`jax.Array`</span>
+<span class="sd">            Time lags where the autocovariance function is computed.</span>
+<span class="sd">        with_ACVF_factor : :obj:`bool`, optional</span>
+<span class="sd">            If True, the autocovariance function is multiplied by the factor :math:`\mathcal{R}(0)`. Default is False.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the method is not implemented.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Autocovariance values at the time lags t.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;FFT&quot;</span><span class="p">:</span>
+            <span class="n">psd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PSD</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequencies</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="c1"># add a zero at the beginning to account for the zero frequency</span>
+            <span class="n">psd</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">psd</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">acvf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_acvf_byFFT</span><span class="p">(</span><span class="n">psd</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_variance</span><span class="p">:</span>
+                <span class="c1"># normalize by the variance instead of integrating the PSD with the trapezium rule</span>
+                <span class="n">R</span> <span class="o">=</span> <span class="n">acvf</span> <span class="o">/</span> <span class="n">acvf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">with_ACVF_factor</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="n">acvf</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">acvf</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;NuFFT&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_variance</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;estimate_variance not implemented for NuFFT&quot;</span><span class="p">)</span>
+
+            <span class="n">N</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_freq_grid</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">N</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span>
+            <span class="n">psd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PSD</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="mi">0</span><span class="n">j</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_acvf_byNuFFT</span><span class="p">(</span><span class="n">psd</span><span class="p">,</span> <span class="n">t</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Method </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2"> not implemented&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PSDToACV.get_acvf_byNuFFT">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.get_acvf_byNuFFT">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_acvf_byNuFFT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psd</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the autocovariance function from the power spectral density using the non uniform Fourier transform.</span>
+
+<span class="sd">        This function uses the jax_finufft package to compute the non uniform Fourier transform with the nufft2 function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        psd : :obj:`jax.Array`</span>
+<span class="sd">            Power spectral density values.</span>
+<span class="sd">        t : :obj:`jax.Array`</span>
+<span class="sd">            Time lags where the autocovariance function is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Autocovariance values at the time lags t.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span>
+        <span class="k">return</span> <span class="n">nufft2</span><span class="p">(</span><span class="n">psd</span><span class="p">,</span> <span class="n">t</span> <span class="o">/</span> <span class="n">P</span><span class="p">)</span><span class="o">.</span><span class="n">real</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span></div>
+
+
+<div class="viewcode-block" id="PSDToACV.get_acvf_byFFT">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.get_acvf_byFFT">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_acvf_byFFT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psd</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the autocovariance function from the power spectral density using the inverse Fourier transform.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        psd : :obj:`jax.Array`</span>
+<span class="sd">            Power spectral density.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Autocovariance function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">acvf</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">psd</span><span class="p">)</span>
+        <span class="n">acvf</span> <span class="o">=</span> <span class="n">acvf</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">)]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtau</span>
+        <span class="k">return</span> <span class="n">acvf</span></div>
+
+
+    <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
+<div class="viewcode-block" id="PSDToACV.interpolation">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.interpolation">[docs]</a>
+    <span class="k">def</span> <span class="nf">interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">acvf</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interpolate the autocovariance function at the points t.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : :obj:`jax.Array`</span>
+<span class="sd">            Points where the autocovariance function is computed.</span>
+<span class="sd">        acvf : :obj:`jax.Array`</span>
+<span class="sd">            Autocovariance values at the points tau.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Autocovariance function at the points t.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="n">acvf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">I</span></div>
+
+
+<div class="viewcode-block" id="PSDToACV.get_cov_matrix">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.get_cov_matrix">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_cov_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xq</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">xp</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the covariance matrix between two arrays xq, xp.</span>
+
+<span class="sd">        The term (xq-xp) is computed using the :func:`~pioran.utils.EuclideanDistance` function from the utils module.</span>
+<span class="sd">        If the method used is &#39;NuFFT&#39; and if the two arrays have the same shape, the covariance matrix is computed only on the unique values of the distance matrix</span>
+<span class="sd">        using the :func:`~pioran.utils.decompose_triangular_matrix` and :func:`~pioran.utils.reconstruct_triangular_matrix` functions from the utils module.</span>
+<span class="sd">        Otherwise, the covariance matrix is computed on the full distance matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xq : :obj:`jax.Array`</span>
+<span class="sd">            First array.</span>
+<span class="sd">        xp : :obj:`jax.Array`</span>
+<span class="sd">            Second array.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the method is not implemented.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`jax.Array`</span>
+<span class="sd">            Covariance matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Compute the Euclidean distance between the query and the points</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">EuclideanDistance</span><span class="p">(</span><span class="n">xq</span><span class="p">,</span> <span class="n">xp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;NuFFT&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">xq</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">xp</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="n">unique</span><span class="p">,</span> <span class="n">reverse_indexes</span><span class="p">,</span> <span class="n">triu_indexes</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">decompose_triangular_matrix</span><span class="p">(</span>
+                    <span class="n">dist</span>
+                <span class="p">)</span>
+                <span class="n">avcf_unique</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">unique</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">reconstruct_triangular_matrix</span><span class="p">(</span>
+                    <span class="n">avcf_unique</span><span class="p">,</span> <span class="n">reverse_indexes</span><span class="p">,</span> <span class="n">triu_indexes</span><span class="p">,</span> <span class="n">n</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dist</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;FFT&quot;</span><span class="p">:</span>
+            <span class="c1"># Compute the covariance matrix</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Calculating the covariance matrix for method &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; not implemented&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PSDToACV.__str__">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.__str__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;String representation of the PSDToACV object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`str`</span>
+<span class="sd">            String representation of the PSDToACV object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PSDToACV</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s2">&quot;NuFFT&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s2">&quot;FFT&quot;</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;method: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2"> decomposition</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;N_components: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;method: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;N_freq_grid: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_freq_grid</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;S_low: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">S_low</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;S_high: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">S_high</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PSD</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+
+<div class="viewcode-block" id="PSDToACV.__repr__">
+<a class="viewcode-back" href="../../autoapi/pioran/psdtoacv/index.html#pioran.PSDToACV.__repr__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Representation of the PSDToACV object.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Mehdy Lefkir.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

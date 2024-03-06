@@ -1,0 +1,502 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-cell"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "import jax.numpy as jnp\n",
+    "import matplotlib.pyplot as plt\n",
+    "plt.style.use(\"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle\")"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Modelling with a power spectral density\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The power spectral density function of the time series is represented by the object {class}`~pioran.psd_base.PowerSpectralDensity`. More details about this class and the implemented models can be found {class}`~pioran.psd`. We will describe how to use, combine and create models for the power spectral density function in the following sections."
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## A first model\n",
+    "\n",
+    "We show how to use the models implemented in {mod}`pioran.psd` to compute the power spectrum at given frequencies. We first define an instance of the chosen class. In this example, we create instances of the classes {class}`~pioran.psd.Lorentzian` and {class}`~pioran.psd.Gaussian`. \n",
+    "\n",
+    "The values of the parameters of the models are given as a list of floats, during instantiation."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pioran.psd import Lorentzian, Gaussian\n",
+    "\n",
+    "Lore = Lorentzian([0,1, 0.5])\n",
+    "Gauss = Gaussian([0,1.2, 0.5])"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A ``PowerSpectralDensity`` object has a field ``parameters`` which an object of the class {class}`~pioran.parameters.ParametersModel` storing for the parameters of the model. We can inspect the values of the parameters of the model by printing the ``PowerSpectralDensity`` object. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(Lore)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If we want to change the values of the parameters of the model, we can use the method ``set_free_values`` on the attribute``PowerSpectralDensity.parameters``. The method takes as input a list of floats, which are the values of the free parameters of the model. Currently, it is not possible to change the values of the fixed parameters of the model after instantiation. To do so, we need to create a new instance of the model and set the parameters as free or fixed using the keyword argument ``free_parameters``. More details about the class {class}`~pioran.parameters.ParametersModel` can be found in the API."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Lore.parameters.set_free_values([0.9,2.2, 1.5])\n",
+    "print(Lore)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can evaluate the PSD at given frequencies by calling the method ``calculate`` of the ``PowerSpectralDensity`` object. The method ``calculate`` takes as input a list of floats representing the frequencies at which the PSD is evaluated. The method returns a list of floats representing the values of the PSD at the given frequencies."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "t = jnp.linspace(0, 10, 1000)\n",
+    "\n",
+    "fig, ax = plt.subplots(1, 1, figsize=(7, 4))\n",
+    "ax.plot(t, Gauss.calculate(t), label=\"Gaussian\")\n",
+    "ax.plot(t, Lore.calculate(t), label=\"Lorentzian\")\n",
+    "ax.set_xlabel(r'$f$')\n",
+    "ax.set_ylabel(r'$\\tt{PSD.calculate}(f)$')\n",
+    "ax.legend()\n",
+    "fig.tight_layout()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Combining PSD models\n",
+    "\n",
+    "In this section, we show how to combine power spectral density functions via arithmetic operations."
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In this example we create instances of the classes {class}`~pioran.psd.Gaussian` and {class}`~pioran.psd.Lorentzian`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pioran.psd import Lorentzian, Gaussian\n",
+    "\n",
+    "Lore = Lorentzian([3,1, 1.5])\n",
+    "Gauss = Gaussian([0,1.2, 0.5])\n",
+    "Gauss2 = Gaussian([6,1.4, 2.5])"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Sum of PSD functions"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can create a model which is the sum of the three components by using the ``+`` operator. The result is a new instance of the class {class}`~pioran.psd_base.PowerSpectralDensity`. We can inspect the parameters of the model by printing the object."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Model = Lore + Gauss + Gauss2\n",
+    "print(Model)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Because several parameters have identical names it is necessary to use the indices of the parameters to access them. ``CID`` gives the component index and ``ID`` gives the parameter index in the whole model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(Model.parameters[5])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "t = jnp.linspace(0, 10, 1000)\n",
+    "\n",
+    "fig, ax = plt.subplots(1, 1, figsize=(7, 4))\n",
+    "\n",
+    "ax.plot(t, Model.calculate(t), label=\"Sum of the three\")\n",
+    "ax.plot(t, Gauss.calculate(t), label=\"Gaussian\", lw=2,ls=\"--\")\n",
+    "ax.plot(t, Lore.calculate(t), label=\"Lorentzian\", lw=2,ls=\"--\")\n",
+    "ax.plot(t, Gauss2.calculate(t), label=\"Gaussian2\", lw=2,ls=\"--\")\n",
+    "ax.set_xlabel(r'$f$')\n",
+    "ax.set_ylabel(r'$\\tt{PSD.calculate}(f)$')\n",
+    "ax.legend()\n",
+    "fig.tight_layout()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Product of PSD functions"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can create a model which is a product of PSD functions by using the ``*`` operator. The result is a new instance of the class {class}`~pioran.psd_base.PowerSpectralDensity`. We show an example with the product of the two first components plus the third component."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Lore = Lorentzian([3,1, 1.5])\n",
+    "Gauss = Gaussian([0,3.2, 3.5])\n",
+    "Gauss2 = Gaussian([2,1.4, 2.5])\n",
+    "\n",
+    "Model = Lore + Gauss * Gauss2\n",
+    "print(Model)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "t = jnp.linspace(0, 10, 1000)\n",
+    "\n",
+    "fig, ax = plt.subplots(1, 1, figsize=(7, 4))\n",
+    "\n",
+    "ax.plot(t, Model.calculate(t), label=\"Lore + Gauss * Gauss2\", lw=2)\n",
+    "ax.plot(t, Gauss.calculate(t), label=\"Gaussian\", lw=2,ls=\"--\")\n",
+    "ax.plot(t, Lore.calculate(t), label=\"Lorentzian\", lw=2,ls=\"--\")\n",
+    "ax.plot(t, Gauss2.calculate(t), label=\"Gaussian2\", lw=2,ls=\"--\")\n",
+    "ax.set_xlabel(r'$f$')\n",
+    "ax.set_ylabel(r'$\\tt{PSD.calculate}(f)$')\n",
+    "ax.legend()\n",
+    "fig.tight_layout()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Conversion to an autocovariance function"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To use PSD models which have no analytical expression for the autocovariance function we have to compute the Fourier Transform of the PSD. This is done using the class {class}`~pioran.psdtoacv.PSDToACV`. The class takes as input a ``PowerSpectralDensity`` object and computes the Fourier Transform of the PSD. The class has a method ``calculate`` which takes as input a list of floats representing the time lags at which the autocovariance function is evaluated. The method returns a list of floats representing the values of the autocovariance function at the given time lags."
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We first define a PSD model, here a Lorentzian. We then create an instance of the class {class}`~pioran.psdtoacv.PSDToACV`, four other values are necessary to do so. The total duration of the time series $T$, $\\Delta T$ the minimal time step between two consecutive points in the time series, $S_\\mathrm{low}$ and $S_\\mathrm{high}$ two factors to extend the grid of frequencies used to compute the Fourier Transform.\n",
+    "\n",
+    "The extended grid of frequencies is then given by $f_0 = f_\\mathrm{min}/S_\\mathrm{low} = \\Delta f$ to $f_N = f_\\mathrm{max}S_\\mathrm{high}=N \\Delta f$, where $f_\\mathrm{min}=1/T$ and $f_\\mathrm{max}=1/2\\Delta T$. More details about these two factors can be found in the Notebook [on the FFT](../references/On_the_fft.ipynb).\n",
+    "\n",
+    "\n",
+    "```{eval-rst}\n",
+    ".. tikz:: \n",
+    "    :xscale: 90\n",
+    "\n",
+    "    [thick]\n",
+    "\n",
+    "    \\draw (0,2pt) -- + (0,-2pt) node[below=1mm] {0};\n",
+    "    \\draw (.5,2pt) -- + (0,-2pt) node[below=1mm] {$f_0$};\n",
+    "    \\draw (3.5,5pt) -- + (0,-5pt) node[below=1mm] {$f_\\mathrm{min}$};\n",
+    "    \\draw (10.,5pt) -- + (0,-5pt) node[below=1mm] {$f_\\mathrm{max}$};\n",
+    "    \\draw (14,5pt) -- + (0,-5pt) node[below=1mm] {$f_\\mathrm{N}$};\n",
+    "    \\draw[thick] (0,0) -- node[below=7mm] {Frequency $f$} + (15,0);\n",
+    "    \\foreach \\x in {0,0.5,...,14.}\n",
+    "       \\draw (\\x cm,3pt) -- (\\x cm,-3pt) node[anchor=north] {};\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pioran import PSDToACV\n",
+    "\n",
+    "Lore = Lorentzian([0, 1, .5])\n",
+    "P2A = PSDToACV(PSD=Lore, S_low=10, S_high=10, T=100, dt=1, method=\"FFT\")"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can evaluate the autocovariance of the time series at given time lags by calling the method ``calculate`` of the ``PSDToACV`` object. The method ``calculate`` takes as input a list of floats representing the time lags at which the autocovariance function is evaluated. The method returns a list of floats representing the values of the autocovariance function at the given time lags. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "f = P2A.frequencies\n",
+    "t = jnp.linspace(0, 100, 1000)\n",
+    "acv = P2A.calculate(t)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We show the original PSD and the autocovariance function computed from the PSD."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "fig, ax = plt.subplots(2, 1, figsize=(7, 7))\n",
+    "\n",
+    "ax[0].loglog(f, Lore.calculate(f), label=\"Lorentzian\")\n",
+    "ax[0].set_xlabel(r'$f$')\n",
+    "ax[0].set_ylabel(r'$\\tt{PSD.calculate}(f)$')\n",
+    "\n",
+    "ax[1].plot(t, acv, label=\"ACV\")\n",
+    "ax[1].set_xlabel(r'$\\tau$')\n",
+    "ax[1].set_ylabel(r'$\\tt{ACV.calculate}(\\tau)$')\n",
+    "\n",
+    "fig.align_ylabels()\n",
+    "fig.tight_layout()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "source": [
+    "## Writing a new model\n",
+    "\n",
+    "Here we show how to write a PSD new model, which can be used like any models we have shown above.\n",
+    "\n",
+    "### Creating the class and the constructor\n",
+    "We write a new class ``MyPSD``, which inherits from `PowerSpectralDensity`. It is important to specify the attributes ``parameters`` and ``expression`` at the class level since `PowerSpectralDensity` inherits from {class}`~equinox.Module`. ``parameters`` is an object of the class {class}`~pioran.parameters.ParametersModel` which is a container for the parameters of the model. The constructor ``__init__`` must be defined as in the example and the names of the parameters are given in the ``param_names`` list. \n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "### The ``calculate`` method\n",
+    "The ``calculate`` method must be defined and it must return the PSD function evaluated at the frequencies ``f``. When writing the expression of the PSD function, the values of parameters of the model can be accessed using the attribute ``self.parameters['name'].value`` where ``name`` is the name of the parameter."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import jax.numpy as jnp\n",
+    "from pioran import PowerSpectralDensity\n",
+    "from pioran.parameters import ParametersModel\n",
+    "\n",
+    "\n",
+    "class MyPSD(PowerSpectralDensity):\n",
+    "    parameters: ParametersModel\n",
+    "    expression = 'my_psd'\n",
+    "    \n",
+    "    def __init__(self, parameters_values, free_parameters=[True, True,True]):\n",
+    "        \"\"\"Constructor of the power spectrum inherited \n",
+    "        from the PowerSpectralDensity class.\n",
+    "        \"\"\"\n",
+    "        assert len(parameters_values) == 3, 'The number of parameters must be 3'\n",
+    "        # initialise the parameters and check\n",
+    "        PowerSpectralDensity.__init__(self, param_values=parameters_values, param_names=['amplitude', 'freq','power'], free_parameters=free_parameters)\n",
+    "    \n",
+    "    def calculate(self,f):\n",
+    "        \"\"\"Calculate the power spectrum at the given frequencies.\"\"\"\n",
+    "        return self.parameters['amplitude'].value  /  ( 1+f/self.parameters['freq'].value)**self.parameters['power'].value\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can use the newly defined model as any other models we have shown above:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "P = MyPSD([1., 0.5,3.4])\n",
+    "frequencies = jnp.linspace(0, 5, 1000)\n",
+    "PSD = P.calculate(frequencies)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "fig, ax = plt.subplots(1,1,figsize=(7,4))\n",
+    "ax.plot(frequencies, PSD)\n",
+    "ax.set_xlabel(r'$f$')\n",
+    "ax.set_ylabel(r'$\\tt{PSD.calculate}(f)$')\n",
+    "ax.loglog()\n",
+    "fig.tight_layout()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "pioran",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.9"
+  },
+  "orig_nbformat": 4
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

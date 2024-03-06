@@ -1,0 +1,453 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-cell"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "import jax.numpy as jnp\n",
+    "import matplotlib.pyplot as plt\n",
+    "plt.style.use(\"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle\")"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Modelling with an autocovariance function\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The autocovariance function of the time series is represented by the object {class}`~pioran.acvf_base.CovarianceFunction`. More details about this class and the implemented models can be found in {class}`~pioran.acvf`. We will describe how to use, combine and create models for the autocovariance function in the following sections."
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## A first model\n",
+    "\n",
+    "We show how to use the models implemented in {class}`~pioran.acvf` to compute the autocovariance at given time lags. We first define an instance of the chosen class. In this example, we create instances of the classes {class}`~pioran.acvf.Exponential`and {class}`~pioran.acvf.Matern32`. \n",
+    "\n",
+    "The values of the parameters of the models are given as a list of floats, during instantiation."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pioran.acvf import Exponential, Matern32\n",
+    "\n",
+    "Expo = Exponential([1, 0.5])\n",
+    "Mat32 = Matern32([1.2, 0.5])"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A ``CovarianceFunction`` object has a field ``parameters`` which an object of the class {class}`~pioran.parameters.ParametersModel` storing for the parameters of the model. We can inspect the values of the parameters of the model by printing the ``CovarianceFunction`` object. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(Mat32)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If we want to change the values of the parameters of the model, we can use the method ``set_free_values`` on the attribute``CovarianceFunction.parameters``. The method takes as input a list of floats, which are the values of the free parameters of the model. Currently, it is not possible to change the values of the fixed parameters of the model after instantiation. To do so, we need to create a new instance of the model and set the parameters as free or fixed using the keyword argument ``free_parameters``. More details about the class {class}`~pioran.parameters.ParametersModel` can be found {class}`~pioran.parameters`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Mat32.parameters.set_free_values([2.2, 1.5])\n",
+    "print(Mat32)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can evaluate the autocovariance function at given time lags by calling the method ``calculate`` of the ``CovarianceFunction`` object. The method ``calculate`` takes as input a list of floats representing the time lags at which the autocovariance function is evaluated. The method returns a list of floats representing the values of the autocovariance function at the given time lags."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "t = jnp.linspace(0, 10, 1000)\n",
+    "\n",
+    "fig, ax = plt.subplots(1, 1, figsize=(7, 4))\n",
+    "ax.plot(t, Expo.calculate(t), label=\"Exponential\")\n",
+    "ax.plot(t, Mat32.calculate(t), label=\"Matern 3/2\")\n",
+    "ax.set_xlabel(r'$\\tau$')\n",
+    "ax.set_ylabel(r'$\\tt{Cov.calculate}(\\tau)$')\n",
+    "ax.legend()\n",
+    "fig.tight_layout()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The covariance matrix can be obtained by calling the method {meth}```~pioran.acvf_base.CovarianceFunction.get_cov_matrix```. This method takes in input two arrays of shape $(N,1)$ and $(M,1)$ representing the time lags at which the covariance matrix is evaluated. The method returns a matrix of shape $(N,M)$ representing the covariance matrix at the given time lags."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "K_Mat32 = Mat32.get_cov_matrix(t.reshape(-1, 1), t.reshape(-1, 1))\n",
+    "K_expo = Expo.get_cov_matrix(t.reshape(-1, 1), t.reshape(-1, 1))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "fig, ax = plt.subplots(1, 2, figsize=(7, 4))\n",
+    "\n",
+    "ax[0].imshow(K_Mat32)\n",
+    "ax[0].set_xlabel(r'$\\tt{i}$')\n",
+    "ax[0].set_ylabel(r'$\\tt{j}$')\n",
+    "ax[0].set_title(r'$\\tt{Matern32}$')\n",
+    "\n",
+    "ax[1].imshow(K_expo)\n",
+    "ax[1].set_xlabel(r'$\\tt{i}$')\n",
+    "ax[1].set_ylabel(r'$\\tt{j}$')\n",
+    "ax[1].set_title(r'$\\tt{Exponential}$')\n",
+    "fig.tight_layout()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Combining autocovariance functions\n",
+    "\n",
+    "In this section, we show how to combine autocovariance functions via arithmetic operations."
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In this example we create instances of the classes {class}`~pioran.acvf.Exponential`, {class}`~pioran.acvf.SquaredExponential` and {class}`~pioran.acvf.Matern32`. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pioran.acvf import Exponential, Matern32, SquaredExponential\n",
+    "\n",
+    "Expo = Exponential([1.68, 0.75])\n",
+    "Mat32 = Matern32([.33, 1.5])\n",
+    "SqExpo = SquaredExponential([1.45, 0.5])"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Sum of autocovariance functions"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can create a model which is the sum of the three components by using the ``+`` operator. The result is a new instance of the class {class}`~pioran.acvf_base.CovarianceFunction`. We can inspect the parameters of the model by printing the object."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Model = Expo + Mat32 + SqExpo\n",
+    "print(Model)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Because several parameters have identical names it is necessary to use the indices of the parameters to access them. ``CID`` gives the component index and ``ID`` gives the parameter index in the whole model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(Model.parameters[5])"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As previously, we can change the values of the free parameters:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Model.parameters.set_free_values([13.68, 0.975, 0.339, 1.95, 1.345, 3.5])\n",
+    "print(Model)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "t = jnp.linspace(0, 10, 1000)\n",
+    "\n",
+    "fig, ax = plt.subplots(1, 1, figsize=(7, 4))\n",
+    "\n",
+    "ax.plot(t, Expo.calculate(t), label=\"Exponential\", lw=2,ls=\"--\")\n",
+    "ax.plot(t, Mat32.calculate(t), label=\"Matern 3/2\", lw=2,ls=\"--\")\n",
+    "ax.plot(t, SqExpo.calculate(t), label=\"Squared Exponential\", lw=2,ls=\"--\")\n",
+    "ax.plot(t, Model.calculate(t), label=\"Sum of the three\")\n",
+    "ax.set_xlabel(r'$\\tau$')\n",
+    "ax.set_ylabel(r'$\\tt{Cov.calculate}(\\tau)$')\n",
+    "ax.legend()\n",
+    "fig.tight_layout()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Product of autocovariance functions"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can create a model which is a product of covariance functions by using the ``*`` operator. The result is a new instance of the class {class}`~pioran.acvf_base.CovarianceFunction`. We show an example with the product of the two first components plus the third component."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Expo = Exponential([1.68, 0.75])\n",
+    "Mat32 = Matern32([.33, 1.5])\n",
+    "SqExpo = SquaredExponential([.45, 0.5])\n",
+    "\n",
+    "Model = Expo * Mat32+ SqExpo\n",
+    "print(Model)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "t = jnp.linspace(0, 10, 1000)\n",
+    "\n",
+    "fig, ax = plt.subplots(1, 1, figsize=(7, 4))\n",
+    "\n",
+    "ax.plot(t, Expo.calculate(t), label=\"Exponential\", lw=2,ls=\"--\")\n",
+    "ax.plot(t, Mat32.calculate(t), label=\"Matern 3/2\", lw=2,ls=\"--\")\n",
+    "ax.plot(t, SqExpo.calculate(t), label=\"Squared Exponential\", lw=2,ls=\"--\")\n",
+    "ax.plot(t, Model.calculate(t), label=\"Expo * Matern 3/2 + Sq Expo\")\n",
+    "ax.set_xlabel(r'$\\tau$')\n",
+    "ax.set_ylabel(r'$\\tt{Cov.calculate}(\\tau)$')\n",
+    "ax.legend()\n",
+    "fig.tight_layout()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Writing a new model\n",
+    "\n",
+    "Here we show how to write a new model for the autocovariance function, which can be used like any models we have shown above.\n",
+    "\n",
+    "### Creating the class and the constructor\n",
+    "We write a new class ``MyAutocovariance``, which inherits from `CovarianceFunction`. It is important to specify the attributes ``parameters`` and ``expression`` at the class level as `CovarianceFunction` inherits from {class}`~equinox.Module`. ``parameters`` is an object of the class {class}`~pioran.parameters.ParametersModel` which is a container for the parameters of the model. The constructor ``__init__`` must be defined as in the example and the names of the parameters are given in the ``param_names`` list. \n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "### The ``calculate`` method\n",
+    "The ``calculate`` method must be defined and it must return the autocovariance function evaluated at the time ``t``. When writing the expression of the autocovariance function, the values of parameters of the model can be accessed using the attribute ``self.parameters['name'].value`` where ``name`` is the name of the parameter.\n",
+    "\n",
+    "This method is then called by the method {meth}`~pioran.acvf_base.CovarianceFunction.get_cov_matrix` to compute for instance the likelihood or the posterior predictive distribution of a Gaussian process.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import jax.numpy as jnp\n",
+    "from pioran import CovarianceFunction\n",
+    "from pioran.parameters import ParametersModel\n",
+    "\n",
+    "class MyAutocovariance(CovarianceFunction):\n",
+    "    parameters: ParametersModel\n",
+    "    expression = 'name of the model'\n",
+    "\n",
+    "    def __init__(self, param_values, free_parameters=[True, True, True]):\n",
+    "        \"\"\"Constructor of the covariance function inherited \n",
+    "        from the CovarianceFunction class.\n",
+    "        \"\"\"\n",
+    "        assert len(param_values) == 3, 'The number of parameters must be 3'\n",
+    "        CovarianceFunction.__init__(self, param_values=param_values, \n",
+    "        param_names=['variance', 'length','period'], free_parameters=free_parameters)\n",
+    "    \n",
+    "    def calculate(self,t):\n",
+    "        \"\"\"Returns the autocovariance function evaluated at t.\n",
+    "        \"\"\"\n",
+    "        return  self.parameters['variance'].value *jnp.exp(- jnp.abs(t) * self.parameters['length'].value)*jnp.cos(2*jnp.pi*t / self.parameters['period'].value)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can use the newly defined model as any other models we have shown above:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Cov = MyAutocovariance([1., 0.5,.5])\n",
+    "taus = jnp.linspace(0, 10, 1000)\n",
+    "avc = Cov.calculate(taus)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "fig, ax = plt.subplots(1,1,figsize=(7,4))\n",
+    "ax.plot(taus, avc)\n",
+    "ax.set_xlabel(r'$\\tau$')\n",
+    "ax.set_ylabel(r'$\\tt{Cov.calculate}(\\tau)$')\n",
+    "fig.tight_layout()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "pioran",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.13"
+  },
+  "orig_nbformat": 4
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

@@ -1,0 +1,1115 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>psd &#8212; pioran</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=ad57bd55" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/pioran/psd/index';</script>
+    <link rel="icon" href="../../../_static/favico.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="psd_base" href="../psd_base/index.html" />
+    <link rel="prev" title="priors" href="../priors/index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/logo_borderbis.png" class="logo__image only-light" alt="pioran - Home"/>
+    <script>document.write(`<img src="../../../_static/logo_borderbis.png" class="logo__image only-dark" alt="pioran - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../userguide/User.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../tutorials/Tutorials.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../references/references.html">
+                        References
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../userguide/User.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../tutorials/Tutorials.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../references/references.html">
+                        References
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">pioran</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../carma/index.html">carma</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../carma/carma_acvf/index.html">carma_acvf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../carma/carma_core/index.html">carma_core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../carma/carma_model/index.html">carma_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../carma/carma_utils/index.html">carma_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../carma/kalman/index.html">kalman</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../parameters/index.html">parameters</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../parameters/parameter_base/index.html">parameter_base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../parameters/parameters/index.html">parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../utils/index.html">utils</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../utils/ICCF/index.html">ICCF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/gp_utils/index.html">gp_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/inference_utils/index.html">inference_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/mcmc_visualisations/index.html">mcmc_visualisations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/psd_utils/index.html">psd_utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../acvf/index.html">acvf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../acvf_base/index.html">acvf_base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/index.html">core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diagnostics/index.html">diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../inference/index.html">inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plots/index.html">plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../priors/index.html">priors</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">psd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../psd_base/index.html">psd_base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../psdtoacv/index.html">psdtoacv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../simulate/index.html">simulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tools/index.html">tools</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">API Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">pioran</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">psd</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-pioran.psd">
+<span id="psd"></span><h1>psd<a class="headerlink" href="#module-pioran.psd" title="Link to this heading">#</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<table class="summarytable table" id="id1">
+<caption><span class="caption-text">Classes</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Lorentzian" title="pioran.psd.Lorentzian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Lorentzian</span></code></a></p></td>
+<td><p>Lorentzian power spectral density.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psd.Gaussian" title="pioran.psd.Gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Gaussian</span></code></a></p></td>
+<td><p>Gaussian power spectral density.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.OneBendPowerLaw" title="pioran.psd.OneBendPowerLaw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OneBendPowerLaw</span></code></a></p></td>
+<td><p>One-bend power-law power spectral density.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psd.OneBendPowerLawBis" title="pioran.psd.OneBendPowerLawBis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OneBendPowerLawBis</span></code></a></p></td>
+<td><p>Other one-bend power-law power spectral density.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Matern32PSD" title="pioran.psd.Matern32PSD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Matern32PSD</span></code></a></p></td>
+<td><p>Power spectral density of the Matern 3/2 covariance function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psd.TwoBendPowerLaw" title="pioran.psd.TwoBendPowerLaw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TwoBendPowerLaw</span></code></a></p></td>
+<td><p>Two-bend power-law power spectral density.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pioran.psd.Lorentzian">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pioran.psd.</span></span><span class="sig-name descname"><span class="pre">Lorentzian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[True,</span> <span class="pre">True,</span> <span class="pre">True]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psd.html#Lorentzian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Lorentzian" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pioran.psd_base.PowerSpectralDensity</span></code></a></p>
+<p>Lorentzian power spectral density.</p>
+<div class="math notranslate nohighlight" id="equation-lorentzianpsd">
+<span class="eqno">(1)<a class="headerlink" href="#equation-lorentzianpsd" title="Link to this equation">#</a></span>\[\mathcal{P}(f) = \dfrac{A}{\gamma^2 +4\pi^2 (f-f_0)^2}.\]</div>
+<p>with the amplitude <span class="math notranslate nohighlight">\(A\ge 0\)</span>, the position <span class="math notranslate nohighlight">\(f_0\ge 0\)</span> and the halfwidth <span class="math notranslate nohighlight">\(\gamma&gt;0\)</span>.</p>
+<p>The parameters are stored in the <cite>parameters</cite> attribute which is a <a class="reference internal" href="../parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParametersModel</span></code></a> object.
+The values of the parameters can be accessed using the <cite>parameters</cite> attribute via three keys: ‘<cite>position</cite>’, ‘<cite>amplitude</cite>’ and ‘<cite>halfwidth</cite>’.</p>
+<p>The power spectral density function is evaluated on an array of frequencies <span class="math notranslate nohighlight">\(f\)</span> using the <cite>calculate</cite> method.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>param_values</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Values of the parameters of the power spectral density function. [position, amplitude, halfwidth]</p>
+</dd>
+<dt><strong>free_parameters: :obj:`list` of :obj:`bool`, optional</strong></dt><dd><p>List of bool to indicate if the parameters are free or not. Default is <cite>[True, True,True]</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Overview</p>
+<table class="summarytable table" id="id2">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id2" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Lorentzian.parameters" title="pioran.psd.Lorentzian.parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameters</span></code></a></p></td>
+<td><p>Parameters of the power spectral density function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psd.Lorentzian.expression" title="pioran.psd.Lorentzian.expression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expression</span></code></a></p></td>
+<td><p>Expression of the power spectral density function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Lorentzian.analytical" title="pioran.psd.Lorentzian.analytical"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analytical</span></code></a></p></td>
+<td><p>If True, the power spectral density function is analytical, otherwise it is not.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="summarytable table" id="id3">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id3" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Lorentzian.calculate" title="pioran.psd.Lorentzian.calculate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate</span></code></a>(f)</p></td>
+<td><p>Computes the power spectral density.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Members</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.Lorentzian.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><span class="pre">pioran.parameters.ParametersModel</span></a></em><a class="reference internal" href="../../../_modules/pioran/psd.html#Lorentzian.parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Lorentzian.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Parameters of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.Lorentzian.expression">
+<span class="sig-name descname"><span class="pre">expression</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lorentzian'</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#Lorentzian.expression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Lorentzian.expression" title="Link to this definition">#</a></dt>
+<dd><p>Expression of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.Lorentzian.analytical">
+<span class="sig-name descname"><span class="pre">analytical</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#Lorentzian.analytical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Lorentzian.analytical" title="Link to this definition">#</a></dt>
+<dd><p>If True, the power spectral density function is analytical, otherwise it is not.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psd.Lorentzian.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psd.html#Lorentzian.calculate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Lorentzian.calculate" title="Link to this definition">#</a></dt>
+<dd><p>Computes the power spectral density.</p>
+<p>The expression is given by Equation <a class="reference internal" href="#equation-lorentzianpsd">(1)</a>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>f</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Power spectral density function evaluated on the array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pioran.psd.Gaussian">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pioran.psd.</span></span><span class="sig-name descname"><span class="pre">Gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[True,</span> <span class="pre">True,</span> <span class="pre">True]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psd.html#Gaussian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Gaussian" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pioran.psd_base.PowerSpectralDensity</span></code></a></p>
+<p>Gaussian power spectral density.</p>
+<div class="math notranslate nohighlight" id="equation-gaussianpsd">
+<span class="eqno">(2)<a class="headerlink" href="#equation-gaussianpsd" title="Link to this equation">#</a></span>\[\mathcal{P}(f) = \dfrac{A}{\sqrt{2\pi}\sigma} \exp\left(-\dfrac{\left(f-f_0\right)^2}{2\sigma^2} \right).\]</div>
+<p>with the amplitude <span class="math notranslate nohighlight">\(A\ge 0\)</span>, the position <span class="math notranslate nohighlight">\(f_0\ge 0\)</span> and the standard-deviation ‘<cite>sigma</cite>’ <span class="math notranslate nohighlight">\(\sigma&gt;0\)</span>.</p>
+<p>The parameters are stored in the <cite>parameters</cite> attribute which is a <a class="reference internal" href="../parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParametersModel</span></code></a> object.
+The values of the parameters can be accessed using the <cite>parameters</cite> attribute via three keys: ‘<cite>position</cite>’, ‘<cite>amplitude</cite>’ and ‘<cite>sigma</cite>’</p>
+<p>The power spectral density function is evaluated on an array of frequencies <span class="math notranslate nohighlight">\(f\)</span> using the <cite>calculate</cite> method.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>param_values</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Values of the parameters of the power spectral density function.</p>
+</dd>
+<dt><strong>free_parameters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>List of bool to indicate if the parameters are free or not. Default is <cite>[True, True,True]</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Overview</p>
+<table class="summarytable table" id="id4">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id4" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Gaussian.expression" title="pioran.psd.Gaussian.expression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expression</span></code></a></p></td>
+<td><p>Expression of the power spectral density function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psd.Gaussian.parameters" title="pioran.psd.Gaussian.parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameters</span></code></a></p></td>
+<td><p>Expression of the power spectral density function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Gaussian.analytical" title="pioran.psd.Gaussian.analytical"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analytical</span></code></a></p></td>
+<td><p>If True, the power spectral density function is analytical, otherwise it is not.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="summarytable table" id="id5">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id5" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Gaussian.calculate" title="pioran.psd.Gaussian.calculate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate</span></code></a>(f)</p></td>
+<td><p>Computes the power spectral density.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Members</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.Gaussian.expression">
+<span class="sig-name descname"><span class="pre">expression</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gaussian'</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#Gaussian.expression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Gaussian.expression" title="Link to this definition">#</a></dt>
+<dd><p>Expression of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.Gaussian.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><span class="pre">pioran.parameters.ParametersModel</span></a></em><a class="reference internal" href="../../../_modules/pioran/psd.html#Gaussian.parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Gaussian.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Expression of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.Gaussian.analytical">
+<span class="sig-name descname"><span class="pre">analytical</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#Gaussian.analytical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Gaussian.analytical" title="Link to this definition">#</a></dt>
+<dd><p>If True, the power spectral density function is analytical, otherwise it is not.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psd.Gaussian.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psd.html#Gaussian.calculate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Gaussian.calculate" title="Link to this definition">#</a></dt>
+<dd><p>Computes the power spectral density.</p>
+<p>The expression is given by Equation <a class="reference internal" href="#equation-gaussianpsd">(2)</a>
+with the variance <span class="math notranslate nohighlight">\(A\ge 0\)</span>, the position <span class="math notranslate nohighlight">\(f_0\ge 0\)</span> and the standard-deviation <span class="math notranslate nohighlight">\(\sigma&gt;0\)</span>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>f</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Power spectral density function evaluated on the array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pioran.psd.OneBendPowerLaw">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pioran.psd.</span></span><span class="sig-name descname"><span class="pre">OneBendPowerLaw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[False,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psd.html#OneBendPowerLaw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.OneBendPowerLaw" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pioran.psd_base.PowerSpectralDensity</span></code></a></p>
+<p>One-bend power-law power spectral density.</p>
+<div class="math notranslate nohighlight" id="equation-onebendpowerlawpsd">
+<span class="eqno">(3)<a class="headerlink" href="#equation-onebendpowerlawpsd" title="Link to this equation">#</a></span>\[\mathcal{P}(f) = A\times (f/f_1)^{-\alpha_1} \frac{1}{1+(f/f_1)^{(\alpha_2-\alpha_1)}}.\]</div>
+<p>with the amplitude <span class="math notranslate nohighlight">\(A\ge 0\)</span>, the bend frequency <span class="math notranslate nohighlight">\(f_1\ge 0\)</span> and the indices <span class="math notranslate nohighlight">\(\alpha_1,\alpha_2\)</span>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>param_values</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Values of the parameters of the power spectral density function.
+In order: [norm, index_1, freq_1, index_2]</p>
+</dd>
+<dt><strong>free_parameters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>List of bool to indicate if the parameters are free or not. Default is <cite>[False, True, True,True]</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Overview</p>
+<table class="summarytable table" id="id6">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id6" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.OneBendPowerLaw.expression" title="pioran.psd.OneBendPowerLaw.expression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expression</span></code></a></p></td>
+<td><p>Expression of the power spectral density function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psd.OneBendPowerLaw.parameters" title="pioran.psd.OneBendPowerLaw.parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameters</span></code></a></p></td>
+<td><p>Parameters of the power spectral density function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.OneBendPowerLaw.analytical" title="pioran.psd.OneBendPowerLaw.analytical"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analytical</span></code></a></p></td>
+<td><p>If True, the power spectral density function is analytical, otherwise it is not.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="summarytable table" id="id7">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id7" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.OneBendPowerLaw.calculate" title="pioran.psd.OneBendPowerLaw.calculate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate</span></code></a>(f)</p></td>
+<td><p>Computes the power spectral density.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Members</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.OneBendPowerLaw.expression">
+<span class="sig-name descname"><span class="pre">expression</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'onebend-powerlaw'</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#OneBendPowerLaw.expression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.OneBendPowerLaw.expression" title="Link to this definition">#</a></dt>
+<dd><p>Expression of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.OneBendPowerLaw.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><span class="pre">pioran.parameters.ParametersModel</span></a></em><a class="reference internal" href="../../../_modules/pioran/psd.html#OneBendPowerLaw.parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.OneBendPowerLaw.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Parameters of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.OneBendPowerLaw.analytical">
+<span class="sig-name descname"><span class="pre">analytical</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#OneBendPowerLaw.analytical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.OneBendPowerLaw.analytical" title="Link to this definition">#</a></dt>
+<dd><p>If True, the power spectral density function is analytical, otherwise it is not.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psd.OneBendPowerLaw.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psd.html#OneBendPowerLaw.calculate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.OneBendPowerLaw.calculate" title="Link to this definition">#</a></dt>
+<dd><p>Computes the power spectral density.</p>
+<p>The expression is given by Equation <a class="reference internal" href="#equation-onebendpowerlawpsd">(3)</a></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>f</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Power spectral density function evaluated on the array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pioran.psd.OneBendPowerLawBis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pioran.psd.</span></span><span class="sig-name descname"><span class="pre">OneBendPowerLawBis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[False,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psd.html#OneBendPowerLawBis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.OneBendPowerLawBis" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pioran.psd_base.PowerSpectralDensity</span></code></a></p>
+<p>Other one-bend power-law power spectral density.</p>
+<div class="math notranslate nohighlight" id="equation-onebendpowerlawpsd-bis">
+<span class="eqno">(4)<a class="headerlink" href="#equation-onebendpowerlawpsd-bis" title="Link to this equation">#</a></span>\[\mathcal{P}(f) = A\times (f/f_1)^{-\alpha_1} \frac{1}{1+(f/f_1)^{(\alpha_1+\Delta\alpha)}}.\]</div>
+<p>with the amplitude <span class="math notranslate nohighlight">\(A\ge 0\)</span>, the bend frequency <span class="math notranslate nohighlight">\(f_1\ge 0\)</span> and the indices <span class="math notranslate nohighlight">\(\alpha_1,\Delta\alpha\)</span>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>param_values</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Values of the parameters of the power spectral density function.
+In order: [norm, alpha, f_b, delta_alpha]</p>
+</dd>
+<dt><strong>free_parameters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>List of bool to indicate if the parameters are free or not. Default is <cite>[False, True, True,True]</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Overview</p>
+<table class="summarytable table" id="id8">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id8" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.OneBendPowerLawBis.expression" title="pioran.psd.OneBendPowerLawBis.expression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expression</span></code></a></p></td>
+<td><p>Expression of the power spectral density function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psd.OneBendPowerLawBis.parameters" title="pioran.psd.OneBendPowerLawBis.parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameters</span></code></a></p></td>
+<td><p>Parameters of the power spectral density function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.OneBendPowerLawBis.analytical" title="pioran.psd.OneBendPowerLawBis.analytical"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analytical</span></code></a></p></td>
+<td><p>If True, the power spectral density function is analytical, otherwise it is not.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="summarytable table" id="id9">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id9" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.OneBendPowerLawBis.calculate" title="pioran.psd.OneBendPowerLawBis.calculate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate</span></code></a>(f)</p></td>
+<td><p>Computes the power spectral density.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Members</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.OneBendPowerLawBis.expression">
+<span class="sig-name descname"><span class="pre">expression</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'onebend-powerlaw'</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#OneBendPowerLawBis.expression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.OneBendPowerLawBis.expression" title="Link to this definition">#</a></dt>
+<dd><p>Expression of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.OneBendPowerLawBis.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><span class="pre">pioran.parameters.ParametersModel</span></a></em><a class="reference internal" href="../../../_modules/pioran/psd.html#OneBendPowerLawBis.parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.OneBendPowerLawBis.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Parameters of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.OneBendPowerLawBis.analytical">
+<span class="sig-name descname"><span class="pre">analytical</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#OneBendPowerLawBis.analytical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.OneBendPowerLawBis.analytical" title="Link to this definition">#</a></dt>
+<dd><p>If True, the power spectral density function is analytical, otherwise it is not.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psd.OneBendPowerLawBis.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psd.html#OneBendPowerLawBis.calculate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.OneBendPowerLawBis.calculate" title="Link to this definition">#</a></dt>
+<dd><p>Computes the power spectral density.</p>
+<p>The expression is given by Equation <a class="reference internal" href="#equation-onebendpowerlawpsd-bis">(4)</a></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>f</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Power spectral density function evaluated on the array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pioran.psd.Matern32PSD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pioran.psd.</span></span><span class="sig-name descname"><span class="pre">Matern32PSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[True,</span> <span class="pre">True]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psd.html#Matern32PSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Matern32PSD" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pioran.psd_base.PowerSpectralDensity</span></code></a></p>
+<p>Power spectral density of the Matern 3/2 covariance function.</p>
+<div class="math notranslate nohighlight" id="equation-matern32psd">
+<span class="eqno">(5)<a class="headerlink" href="#equation-matern32psd" title="Link to this equation">#</a></span>\[\mathcal{P}(f) = \dfrac{A}{\gamma^3}\dfrac{12\sqrt{3}}{{(3/\gamma^2 +4\pi^2 f^2)}^2}.\]</div>
+<p>with the amplitude <span class="math notranslate nohighlight">\(A\ge 0\)</span> and the scale <span class="math notranslate nohighlight">\(\gamma&gt;0\)</span>.</p>
+<p>The parameters are stored in the <cite>parameters</cite> attribute which is a <a class="reference internal" href="../parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParametersModel</span></code></a> object.
+The values of the parameters can be accessed using the <cite>parameters</cite> attribute via three keys: ‘<cite>position</cite>’ and ‘<cite>scale</cite>’</p>
+<p>The power spectral density function is evaluated on an array of frequencies <span class="math notranslate nohighlight">\(f\)</span> using the <cite>calculate</cite> method.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>param_values</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span> <span class="pre">of</span> <span class="pre">float</span></code></span></dt><dd><p>Values of the parameters of the power spectral density function.</p>
+</dd>
+<dt><strong>free_parameters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>List of bool to indicate if the parameters are free or not. Default is <cite>[True,True]</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Overview</p>
+<table class="summarytable table" id="id10">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id10" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Matern32PSD.parameters" title="pioran.psd.Matern32PSD.parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameters</span></code></a></p></td>
+<td><p>Parameters of the power spectral density function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psd.Matern32PSD.expression" title="pioran.psd.Matern32PSD.expression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expression</span></code></a></p></td>
+<td><p>Expression of the power spectral density function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Matern32PSD.analytical" title="pioran.psd.Matern32PSD.analytical"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analytical</span></code></a></p></td>
+<td><p>If True, the power spectral density function is analytical, otherwise it is not.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="summarytable table" id="id11">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id11" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.Matern32PSD.calculate" title="pioran.psd.Matern32PSD.calculate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate</span></code></a>(f)</p></td>
+<td><p>Computes the power spectral density.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Members</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.Matern32PSD.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><span class="pre">pioran.parameters.ParametersModel</span></a></em><a class="reference internal" href="../../../_modules/pioran/psd.html#Matern32PSD.parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Matern32PSD.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Parameters of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.Matern32PSD.expression">
+<span class="sig-name descname"><span class="pre">expression</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'matern32psd'</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#Matern32PSD.expression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Matern32PSD.expression" title="Link to this definition">#</a></dt>
+<dd><p>Expression of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.Matern32PSD.analytical">
+<span class="sig-name descname"><span class="pre">analytical</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#Matern32PSD.analytical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Matern32PSD.analytical" title="Link to this definition">#</a></dt>
+<dd><p>If True, the power spectral density function is analytical, otherwise it is not.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psd.Matern32PSD.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><span class="pre">jax.Array</span></a></span></span><a class="reference internal" href="../../../_modules/pioran/psd.html#Matern32PSD.calculate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.Matern32PSD.calculate" title="Link to this definition">#</a></dt>
+<dd><p>Computes the power spectral density.</p>
+<p>The expression is given by Equation <a class="reference internal" href="#equation-matern32psd">(5)</a></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>f</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Power spectral density function evaluated on the array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pioran.psd.TwoBendPowerLaw">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pioran.psd.</span></span><span class="sig-name descname"><span class="pre">TwoBendPowerLaw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[False,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psd.html#TwoBendPowerLaw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.TwoBendPowerLaw" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../psd_base/index.html#pioran.psd_base.PowerSpectralDensity" title="pioran.psd_base.PowerSpectralDensity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pioran.psd_base.PowerSpectralDensity</span></code></a></p>
+<p>Two-bend power-law power spectral density.</p>
+<div class="math notranslate nohighlight" id="equation-twobendpowerlawpsd">
+<span class="eqno">(6)<a class="headerlink" href="#equation-twobendpowerlawpsd" title="Link to this equation">#</a></span>\[\mathcal{P}(f) = A\times (f/f_1)^{-\alpha_1} \frac{1}{1+(f/f_1)^{(\alpha_2-\alpha_1)}} \frac{1}{1+(f/f_2)^{(\alpha_3-\alpha_2)}}\]</div>
+<p>with the amplitude <span class="math notranslate nohighlight">\(A\ge 0\)</span>, the bend frequencies <span class="math notranslate nohighlight">\(f_1\ge 0\)</span>,:math:<cite>f_2ge f_1</cite> and the indices <span class="math notranslate nohighlight">\(\alpha_1,\alpha_2,\alpha_3\)</span>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>param_values</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Values of the parameters of the power spectral density function.
+In order: [norm, index_1, freq_1, index_2]</p>
+</dd>
+<dt><strong>free_parameters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>List of bool to indicate if the parameters are free or not. Default is <cite>[False, True, True,True]</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Overview</p>
+<table class="summarytable table" id="id12">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id12" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.TwoBendPowerLaw.expression" title="pioran.psd.TwoBendPowerLaw.expression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expression</span></code></a></p></td>
+<td><p>Expression of the power spectral density function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pioran.psd.TwoBendPowerLaw.parameters" title="pioran.psd.TwoBendPowerLaw.parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameters</span></code></a></p></td>
+<td><p>Parameters of the power spectral density function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.TwoBendPowerLaw.analytical" title="pioran.psd.TwoBendPowerLaw.analytical"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analytical</span></code></a></p></td>
+<td><p>If True, the power spectral density function is analytical, otherwise it is not.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="summarytable table" id="id13">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id13" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pioran.psd.TwoBendPowerLaw.calculate" title="pioran.psd.TwoBendPowerLaw.calculate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate</span></code></a>(f)</p></td>
+<td><p>Computes the power spectral density.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Members</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.TwoBendPowerLaw.expression">
+<span class="sig-name descname"><span class="pre">expression</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'twobend-powerlaw'</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#TwoBendPowerLaw.expression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.TwoBendPowerLaw.expression" title="Link to this definition">#</a></dt>
+<dd><p>Expression of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.TwoBendPowerLaw.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><span class="pre">pioran.parameters.ParametersModel</span></a></em><a class="reference internal" href="../../../_modules/pioran/psd.html#TwoBendPowerLaw.parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.TwoBendPowerLaw.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Parameters of the power spectral density function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pioran.psd.TwoBendPowerLaw.analytical">
+<span class="sig-name descname"><span class="pre">analytical</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../_modules/pioran/psd.html#TwoBendPowerLaw.analytical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.TwoBendPowerLaw.analytical" title="Link to this definition">#</a></dt>
+<dd><p>If True, the power spectral density function is analytical, otherwise it is not.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pioran.psd.TwoBendPowerLaw.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pioran/psd.html#TwoBendPowerLaw.calculate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pioran.psd.TwoBendPowerLaw.calculate" title="Link to this definition">#</a></dt>
+<dd><p>Computes the power spectral density.</p>
+<p>The expression is given by Equation <a class="reference internal" href="#equation-twobendpowerlawpsd">(6)</a></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>f</strong><span class="classifier"><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></span></dt><dd><p>Array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.Array.html#jax.Array" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.Array</span></code></a></dt><dd><p>Power spectral density function evaluated on the array of frequencies.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../priors/index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">priors</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../psd_base/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">psd_base</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Lorentzian"><code class="docutils literal notranslate"><span class="pre">Lorentzian</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Lorentzian.parameters"><code class="docutils literal notranslate"><span class="pre">Lorentzian.parameters</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Lorentzian.expression"><code class="docutils literal notranslate"><span class="pre">Lorentzian.expression</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Lorentzian.analytical"><code class="docutils literal notranslate"><span class="pre">Lorentzian.analytical</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Lorentzian.calculate"><code class="docutils literal notranslate"><span class="pre">Lorentzian.calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Gaussian"><code class="docutils literal notranslate"><span class="pre">Gaussian</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Gaussian.expression"><code class="docutils literal notranslate"><span class="pre">Gaussian.expression</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Gaussian.parameters"><code class="docutils literal notranslate"><span class="pre">Gaussian.parameters</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Gaussian.analytical"><code class="docutils literal notranslate"><span class="pre">Gaussian.analytical</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Gaussian.calculate"><code class="docutils literal notranslate"><span class="pre">Gaussian.calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.OneBendPowerLaw"><code class="docutils literal notranslate"><span class="pre">OneBendPowerLaw</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.OneBendPowerLaw.expression"><code class="docutils literal notranslate"><span class="pre">OneBendPowerLaw.expression</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.OneBendPowerLaw.parameters"><code class="docutils literal notranslate"><span class="pre">OneBendPowerLaw.parameters</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.OneBendPowerLaw.analytical"><code class="docutils literal notranslate"><span class="pre">OneBendPowerLaw.analytical</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.OneBendPowerLaw.calculate"><code class="docutils literal notranslate"><span class="pre">OneBendPowerLaw.calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.OneBendPowerLawBis"><code class="docutils literal notranslate"><span class="pre">OneBendPowerLawBis</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.OneBendPowerLawBis.expression"><code class="docutils literal notranslate"><span class="pre">OneBendPowerLawBis.expression</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.OneBendPowerLawBis.parameters"><code class="docutils literal notranslate"><span class="pre">OneBendPowerLawBis.parameters</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.OneBendPowerLawBis.analytical"><code class="docutils literal notranslate"><span class="pre">OneBendPowerLawBis.analytical</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.OneBendPowerLawBis.calculate"><code class="docutils literal notranslate"><span class="pre">OneBendPowerLawBis.calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Matern32PSD"><code class="docutils literal notranslate"><span class="pre">Matern32PSD</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Matern32PSD.parameters"><code class="docutils literal notranslate"><span class="pre">Matern32PSD.parameters</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Matern32PSD.expression"><code class="docutils literal notranslate"><span class="pre">Matern32PSD.expression</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Matern32PSD.analytical"><code class="docutils literal notranslate"><span class="pre">Matern32PSD.analytical</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.Matern32PSD.calculate"><code class="docutils literal notranslate"><span class="pre">Matern32PSD.calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.TwoBendPowerLaw"><code class="docutils literal notranslate"><span class="pre">TwoBendPowerLaw</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.TwoBendPowerLaw.expression"><code class="docutils literal notranslate"><span class="pre">TwoBendPowerLaw.expression</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.TwoBendPowerLaw.parameters"><code class="docutils literal notranslate"><span class="pre">TwoBendPowerLaw.parameters</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.TwoBendPowerLaw.analytical"><code class="docutils literal notranslate"><span class="pre">TwoBendPowerLaw.analytical</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pioran.psd.TwoBendPowerLaw.calculate"><code class="docutils literal notranslate"><span class="pre">TwoBendPowerLaw.calculate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../_sources/autoapi/pioran/psd/index.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Mehdy Lefkir.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

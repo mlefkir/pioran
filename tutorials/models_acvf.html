@@ -1,0 +1,696 @@
+
+<!DOCTYPE html>
+
+<html data-content_root="../" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Modelling with an autocovariance function — pioran</title>
+<script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+<!-- Loaded before other Sphinx assets -->
+<link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet"/>
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet"/>
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet"/>
+<link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" rel="preload" type="font/woff2"/>
+<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" rel="stylesheet" type="text/css"/>
+<link href="../_static/graphviz.css?v=eafc0fe6" rel="stylesheet" type="text/css"/>
+<link href="../_static/css/custom.css?v=ad57bd55" rel="stylesheet" type="text/css"/>
+<!-- Pre-loaded scripts that we'll load fully later -->
+<link as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" rel="preload"/>
+<link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" rel="preload"/>
+<script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../_static/doctools.js?v=888ff710"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=f281be69"></script>
+<script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+<script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/models_acvf';</script>
+<link href="../_static/favico.ico" rel="icon"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="models_psd.html" rel="next" title="Modelling with a power spectral density"/>
+<link href="Modelling.html" rel="prev" title="Modelling"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="en" name="docsearch:language"/>
+</head>
+<body data-bs-root-margin="0px 0px -60%" data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-default-mode="" data-offset="180">
+<a class="skip-link" href="#main-content" id="pst-skip-link">Skip to main content</a>
+<div id="pst-scroll-pixel-helper"></div>
+<button class="btn rounded-pill" id="pst-back-to-top" type="button">
+<i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+<input class="sidebar-toggle" id="__primary" name="__primary" type="checkbox"/>
+<label class="overlay overlay-primary" for="__primary"></label>
+<input class="sidebar-toggle" id="__secondary" name="__secondary" type="checkbox"/>
+<label class="overlay overlay-secondary" for="__secondary"></label>
+<div class="search-button__wrapper">
+<div class="search-button__overlay"></div>
+<div class="search-button__search-container">
+<form action="../search.html" class="bd-search d-flex align-items-center" method="get">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input aria-label="Search the docs ..." autocapitalize="off" autocomplete="off" autocorrect="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." spellcheck="false" type="search"/>
+<span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+</div>
+<header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+<label class="sidebar-toggle primary-toggle" for="__primary">
+<span class="fa-solid fa-bars"></span>
+</label>
+<div class="col-lg-3 navbar-header-items__start">
+<div class="navbar-item">
+<a class="navbar-brand logo" href="../index.html">
+<img alt="pioran - Home" class="logo__image only-light" src="../_static/logo_borderbis.png"/>
+<script>document.write(`<img src="../_static/logo_borderbis.png" class="logo__image only-dark" alt="pioran - Home"/>`);</script>
+</a></div>
+</div>
+<div class="col-lg-9 navbar-header-items">
+<div class="me-auto navbar-header-items__center">
+<div class="navbar-item">
+<nav class="navbar-nav">
+<ul class="bd-navbar-elements navbar-nav">
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../userguide/User.html">
+                        User Guide
+                      </a>
+</li>
+<li class="nav-item current active">
+<a class="nav-link nav-internal" href="Tutorials.html">
+                        Tutorials
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../references/references.html">
+                        References
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../autoapi/index.html">
+                        API Reference
+                      </a>
+</li>
+</ul>
+</nav></div>
+</div>
+<div class="navbar-header-items__end">
+<div class="navbar-item navbar-persistent--container">
+<script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+</div>
+<div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+</div>
+</div>
+<div class="navbar-persistent--mobile">
+<script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+</div>
+<label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+<span class="fa-solid fa-outdent"></span>
+</label>
+</div>
+</header>
+<div class="bd-container">
+<div class="bd-container__inner bd-page-width">
+<div class="bd-sidebar-primary bd-sidebar">
+<div class="sidebar-header-items sidebar-primary__section">
+<div class="sidebar-header-items__center">
+<div class="navbar-item">
+<nav class="navbar-nav">
+<ul class="bd-navbar-elements navbar-nav">
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../userguide/User.html">
+                        User Guide
+                      </a>
+</li>
+<li class="nav-item current active">
+<a class="nav-link nav-internal" href="Tutorials.html">
+                        Tutorials
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../references/references.html">
+                        References
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../autoapi/index.html">
+                        API Reference
+                      </a>
+</li>
+</ul>
+</nav></div>
+</div>
+<div class="sidebar-header-items__end">
+<div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+</div>
+</div>
+<div class="sidebar-primary-items__start sidebar-primary__section">
+<div class="sidebar-primary-item">
+<nav aria-label="Section Navigation" class="bd-docs-nav bd-links">
+<p aria-level="1" class="bd-links__title" role="heading">Section Navigation</p>
+<div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="Modelling.html">Modelling</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Modelling with an autocovariance function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models_psd.html">Modelling with a power spectral density</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="Simulations.html">Simulating time series</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="simulations_tk.html">Timmer and Koenig’s method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulations_acv.html">Gaussian process method</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+</div>
+<div class="sidebar-primary-items__end sidebar-primary__section">
+</div>
+<div id="rtd-footer-container"></div>
+</div>
+<main class="bd-main" id="main-content">
+<div class="bd-content">
+<div class="bd-article-container">
+<div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+<div class="header-article-items__start">
+<div class="header-article-item">
+<nav aria-label="Breadcrumb">
+<ul class="bd-breadcrumbs">
+<li class="breadcrumb-item breadcrumb-home">
+<a aria-label="Home" class="nav-link" href="../index.html">
+<i class="fa-solid fa-home"></i>
+</a>
+</li>
+<li class="breadcrumb-item"><a class="nav-link" href="Tutorials.html">Tutorials</a></li>
+<li class="breadcrumb-item"><a class="nav-link" href="Modelling.html">Modelling</a></li>
+<li aria-current="page" class="breadcrumb-item active">Modelling...</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+</div>
+<div id="searchbox"></div>
+<article class="bd-article">
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://jax.readthedocs.io/en/latest/jax.numpy.html#module-jax.numpy" title="jax.numpy"><span class="nn">jax.numpy</span></a> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://matplotlib.org/stable/api/pyplot_summary.html#module-matplotlib.pyplot" title="matplotlib.pyplot"><span class="nn">matplotlib.pyplot</span></a> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">"https://github.com/mlefkir/beauxgraphs/raw/main/beautifulgraphs_colblind.mplstyle"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<section class="tex2jax_ignore mathjax_ignore" id="modelling-with-an-autocovariance-function">
+<h1>Modelling with an autocovariance function<a class="headerlink" href="#modelling-with-an-autocovariance-function" title="Link to this heading">#</a></h1>
+<p>The autocovariance function of the time series is represented by the object <a class="reference internal" href="../autoapi/pioran/acvf_base/index.html#pioran.acvf_base.CovarianceFunction" title="pioran.acvf_base.CovarianceFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovarianceFunction</span></code></a>. More details about this class and the implemented models can be found in <a class="reference internal" href="../autoapi/pioran/acvf/index.html#module-pioran.acvf" title="pioran.acvf"><code class="xref py py-class docutils literal notranslate"><span class="pre">acvf</span></code></a>. We will describe how to use, combine and create models for the autocovariance function in the following sections.</p>
+<section id="a-first-model">
+<h2>A first model<a class="headerlink" href="#a-first-model" title="Link to this heading">#</a></h2>
+<p>We show how to use the models implemented in <a class="reference internal" href="../autoapi/pioran/acvf/index.html#module-pioran.acvf" title="pioran.acvf"><code class="xref py py-class docutils literal notranslate"><span class="pre">acvf</span></code></a> to compute the autocovariance at given time lags. We first define an instance of the chosen class. In this example, we create instances of the classes <a class="reference internal" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Exponential" title="pioran.acvf.Exponential"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exponential</span></code></a>and <a class="reference internal" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Matern32" title="pioran.acvf.Matern32"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matern32</span></code></a>.</p>
+<p>The values of the parameters of the models are given as a list of floats, during instantiation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#module-pioran.acvf" title="pioran.acvf"><span class="nn">pioran.acvf</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Exponential" title="pioran.acvf.Exponential"><span class="n">Exponential</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Matern32" title="pioran.acvf.Matern32"><span class="n">Matern32</span></a>
+
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Exponential" title="pioran.acvf.Exponential"><span class="n">Expo</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Exponential" title="pioran.acvf.Exponential"><span class="n">Exponential</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Matern32" title="pioran.acvf.Matern32"><span class="n">Mat32</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Matern32" title="pioran.acvf.Matern32"><span class="n">Matern32</span></a><span class="p">([</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">CovarianceFunction</span></code> object has a field <code class="docutils literal notranslate"><span class="pre">parameters</span></code> which an object of the class <a class="reference internal" href="../autoapi/pioran/parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParametersModel</span></code></a> storing for the parameters of the model. We can inspect the values of the parameters of the model by printing the <code class="docutils literal notranslate"><span class="pre">CovarianceFunction</span></code> object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Mat32</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Covariance function: matern32
+Number of parameters: 2
+============================================================================
+CID  ID   Name            Value          Status    Linked    Type            
+1    1    variance        1.2            Free      No        Hyper-parameter 
+1    2    length          0.5            Free      No        Hyper-parameter 
+
+Number of free parameters : 2
+</pre></div>
+</div>
+</div>
+</div>
+<p>If we want to change the values of the parameters of the model, we can use the method <code class="docutils literal notranslate"><span class="pre">set_free_values</span></code> on the attribute<code class="docutils literal notranslate"><span class="pre">CovarianceFunction.parameters</span></code>. The method takes as input a list of floats, which are the values of the free parameters of the model. Currently, it is not possible to change the values of the fixed parameters of the model after instantiation. To do so, we need to create a new instance of the model and set the parameters as free or fixed using the keyword argument <code class="docutils literal notranslate"><span class="pre">free_parameters</span></code>. More details about the class <a class="reference internal" href="../autoapi/pioran/parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParametersModel</span></code></a> can be found <a class="reference internal" href="../autoapi/pioran/parameters/index.html#module-pioran.parameters" title="pioran.parameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">parameters</span></code></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Mat32</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">set_free_values</span><span class="p">([</span><span class="mf">2.2</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Mat32</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Covariance function: matern32
+Number of parameters: 2
+============================================================================
+CID  ID   Name            Value          Status    Linked    Type            
+1    1    variance        2.2            Free      No        Hyper-parameter 
+1    2    length          1.5            Free      No        Hyper-parameter 
+
+Number of free parameters : 2
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can evaluate the autocovariance function at given time lags by calling the method <code class="docutils literal notranslate"><span class="pre">calculate</span></code> of the <code class="docutils literal notranslate"><span class="pre">CovarianceFunction</span></code> object. The method <code class="docutils literal notranslate"><span class="pre">calculate</span></code> takes as input a list of floats representing the time lags at which the autocovariance function is evaluated. The method returns a list of floats representing the values of the autocovariance function at the given time lags.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Expo</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Exponential"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Mat32</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Matern 3/2"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tau$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{Cov.calculate}</span><span class="s1">(\tau)$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/dcc5f35f4fa7aec9b033f83dd3cc69ac7db14d2c06a6d710d5103ea452499b08.png" src="../_images/dcc5f35f4fa7aec9b033f83dd3cc69ac7db14d2c06a6d710d5103ea452499b08.png"/>
+</div>
+</div>
+<p>The covariance matrix can be obtained by calling the method <a class="reference internal" href="../autoapi/pioran/acvf_base/index.html#pioran.acvf_base.CovarianceFunction.get_cov_matrix" title="pioran.acvf_base.CovarianceFunction.get_cov_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_cov_matrix()</span></code></a>. This method takes in input two arrays of shape <span class="math notranslate nohighlight">\((N,1)\)</span> and <span class="math notranslate nohighlight">\((M,1)\)</span> representing the time lags at which the covariance matrix is evaluated. The method returns a matrix of shape <span class="math notranslate nohighlight">\((N,M)\)</span> representing the covariance matrix at the given time lags.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K_Mat32</span> <span class="o">=</span> <span class="n">Mat32</span><span class="o">.</span><span class="n">get_cov_matrix</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">t</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">K_expo</span> <span class="o">=</span> <span class="n">Expo</span><span class="o">.</span><span class="n">get_cov_matrix</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">t</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">K_Mat32</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{i}</span><span class="s1">$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{j}</span><span class="s1">$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{Matern32}</span><span class="s1">$'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">K_expo</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{i}</span><span class="s1">$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{j}</span><span class="s1">$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{Exponential}</span><span class="s1">$'</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/85d0cf835c222a943565f1953d5bc3e139a32e4cdca4aea6f46f60f428123708.png" src="../_images/85d0cf835c222a943565f1953d5bc3e139a32e4cdca4aea6f46f60f428123708.png"/>
+</div>
+</div>
+</section>
+<section id="combining-autocovariance-functions">
+<h2>Combining autocovariance functions<a class="headerlink" href="#combining-autocovariance-functions" title="Link to this heading">#</a></h2>
+<p>In this section, we show how to combine autocovariance functions via arithmetic operations.</p>
+<p>In this example we create instances of the classes <a class="reference internal" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Exponential" title="pioran.acvf.Exponential"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exponential</span></code></a>, <a class="reference internal" href="../autoapi/pioran/acvf/index.html#pioran.acvf.SquaredExponential" title="pioran.acvf.SquaredExponential"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquaredExponential</span></code></a> and <a class="reference internal" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Matern32" title="pioran.acvf.Matern32"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matern32</span></code></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#module-pioran.acvf" title="pioran.acvf"><span class="nn">pioran.acvf</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Exponential" title="pioran.acvf.Exponential"><span class="n">Exponential</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Matern32" title="pioran.acvf.Matern32"><span class="n">Matern32</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.SquaredExponential" title="pioran.acvf.SquaredExponential"><span class="n">SquaredExponential</span></a>
+
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Exponential" title="pioran.acvf.Exponential"><span class="n">Expo</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Exponential" title="pioran.acvf.Exponential"><span class="n">Exponential</span></a><span class="p">([</span><span class="mf">1.68</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">])</span>
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Matern32" title="pioran.acvf.Matern32"><span class="n">Mat32</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.Matern32" title="pioran.acvf.Matern32"><span class="n">Matern32</span></a><span class="p">([</span><span class="mf">.33</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.SquaredExponential" title="pioran.acvf.SquaredExponential"><span class="n">SqExpo</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf/index.html#pioran.acvf.SquaredExponential" title="pioran.acvf.SquaredExponential"><span class="n">SquaredExponential</span></a><span class="p">([</span><span class="mf">1.45</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="sum-of-autocovariance-functions">
+<h3>Sum of autocovariance functions<a class="headerlink" href="#sum-of-autocovariance-functions" title="Link to this heading">#</a></h3>
+<p>We can create a model which is the sum of the three components by using the <code class="docutils literal notranslate"><span class="pre">+</span></code> operator. The result is a new instance of the class <a class="reference internal" href="../autoapi/pioran/acvf_base/index.html#pioran.acvf_base.CovarianceFunction" title="pioran.acvf_base.CovarianceFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovarianceFunction</span></code></a>. We can inspect the parameters of the model by printing the object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Model</span> <span class="o">=</span> <span class="n">Expo</span> <span class="o">+</span> <span class="n">Mat32</span> <span class="o">+</span> <span class="n">SqExpo</span>
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Covariance function: exponential + matern32 + squared_exponential
+Number of parameters: 6
+============================================================================
+CID  ID   Name            Value          Status    Linked    Type            
+1    1    variance        1.68           Free      No        Hyper-parameter 
+1    2    length          0.75           Free      No        Hyper-parameter 
+2    3    variance        0.33           Free      No        Hyper-parameter 
+2    4    length          1.5            Free      No        Hyper-parameter 
+3    5    variance        1.45           Free      No        Hyper-parameter 
+3    6    length          0.5            Free      No        Hyper-parameter 
+
+Number of free parameters : 6
+</pre></div>
+</div>
+</div>
+</div>
+<p>Because several parameters have identical names it is necessary to use the indices of the parameters to access them. <code class="docutils literal notranslate"><span class="pre">CID</span></code> gives the component index and <code class="docutils literal notranslate"><span class="pre">ID</span></code> gives the parameter index in the whole model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Model</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>3    5    variance        1.45           Free      No        Hyper-parameter 
+</pre></div>
+</div>
+</div>
+</div>
+<p>As previously, we can change the values of the free parameters:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">set_free_values</span><span class="p">([</span><span class="mf">13.68</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.339</span><span class="p">,</span> <span class="mf">1.95</span><span class="p">,</span> <span class="mf">1.345</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">])</span>
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Covariance function: exponential + matern32 + squared_exponential
+Number of parameters: 6
+============================================================================
+CID  ID   Name            Value          Status    Linked    Type            
+1    1    variance        13.68          Free      No        Hyper-parameter 
+1    2    length          0.975          Free      No        Hyper-parameter 
+2    3    variance        0.339          Free      No        Hyper-parameter 
+2    4    length          1.95           Free      No        Hyper-parameter 
+3    5    variance        1.345          Free      No        Hyper-parameter 
+3    6    length          3.5            Free      No        Hyper-parameter 
+
+Number of free parameters : 6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Expo</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Exponential"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Mat32</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Matern 3/2"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">SqExpo</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Squared Exponential"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Model</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Sum of the three"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tau$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{Cov.calculate}</span><span class="s1">(\tau)$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/9fdfa7169b66c01df1e9b42a9b64e1cfbb31f54b45baca9941ab17971f147d0b.png" src="../_images/9fdfa7169b66c01df1e9b42a9b64e1cfbb31f54b45baca9941ab17971f147d0b.png"/>
+</div>
+</div>
+</section>
+<section id="product-of-autocovariance-functions">
+<h3>Product of autocovariance functions<a class="headerlink" href="#product-of-autocovariance-functions" title="Link to this heading">#</a></h3>
+<p>We can create a model which is a product of covariance functions by using the <code class="docutils literal notranslate"><span class="pre">*</span></code> operator. The result is a new instance of the class <a class="reference internal" href="../autoapi/pioran/acvf_base/index.html#pioran.acvf_base.CovarianceFunction" title="pioran.acvf_base.CovarianceFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovarianceFunction</span></code></a>. We show an example with the product of the two first components plus the third component.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Expo</span> <span class="o">=</span> <span class="n">Exponential</span><span class="p">([</span><span class="mf">1.68</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">])</span>
+<span class="n">Mat32</span> <span class="o">=</span> <span class="n">Matern32</span><span class="p">([</span><span class="mf">.33</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<span class="n">SqExpo</span> <span class="o">=</span> <span class="n">SquaredExponential</span><span class="p">([</span><span class="mf">.45</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+
+<span class="n">Model</span> <span class="o">=</span> <span class="n">Expo</span> <span class="o">*</span> <span class="n">Mat32</span><span class="o">+</span> <span class="n">SqExpo</span>
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Covariance function: exponential * matern32 + squared_exponential
+Number of parameters: 6
+============================================================================
+CID  ID   Name            Value          Status    Linked    Type            
+1    1    variance        1.68           Free      No        Hyper-parameter 
+1    2    length          0.75           Free      No        Hyper-parameter 
+2    3    variance        0.33           Free      No        Hyper-parameter 
+2    4    length          1.5            Free      No        Hyper-parameter 
+3    5    variance        0.45           Free      No        Hyper-parameter 
+3    6    length          0.5            Free      No        Hyper-parameter 
+
+Number of free parameters : 6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Expo</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Exponential"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Mat32</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Matern 3/2"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">SqExpo</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Squared Exponential"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Model</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Expo * Matern 3/2 + Sq Expo"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tau$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{Cov.calculate}</span><span class="s1">(\tau)$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/56336b660210ea2d02ddc213869a71ea1e50bcd24ed08512add26e716dcdabe6.png" src="../_images/56336b660210ea2d02ddc213869a71ea1e50bcd24ed08512add26e716dcdabe6.png"/>
+</div>
+</div>
+</section>
+</section>
+<section id="writing-a-new-model">
+<h2>Writing a new model<a class="headerlink" href="#writing-a-new-model" title="Link to this heading">#</a></h2>
+<p>Here we show how to write a new model for the autocovariance function, which can be used like any models we have shown above.</p>
+<section id="creating-the-class-and-the-constructor">
+<h3>Creating the class and the constructor<a class="headerlink" href="#creating-the-class-and-the-constructor" title="Link to this heading">#</a></h3>
+<p>We write a new class <code class="docutils literal notranslate"><span class="pre">MyAutocovariance</span></code>, which inherits from <code class="docutils literal notranslate"><span class="pre">CovarianceFunction</span></code>. It is important to specify the attributes <code class="docutils literal notranslate"><span class="pre">parameters</span></code> and <code class="docutils literal notranslate"><span class="pre">expression</span></code> at the class level as <code class="docutils literal notranslate"><span class="pre">CovarianceFunction</span></code> inherits from <a class="reference external" href="https://docs.kidger.site/equinox/api/module/module/#equinox.Module" title="(in Equinox v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></a>. <code class="docutils literal notranslate"><span class="pre">parameters</span></code> is an object of the class <a class="reference internal" href="../autoapi/pioran/parameters/index.html#pioran.parameters.ParametersModel" title="pioran.parameters.ParametersModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParametersModel</span></code></a> which is a container for the parameters of the model. The constructor <code class="docutils literal notranslate"><span class="pre">__init__</span></code> must be defined as in the example and the names of the parameters are given in the <code class="docutils literal notranslate"><span class="pre">param_names</span></code> list.</p>
+</section>
+<section id="the-calculate-method">
+<h3>The <code class="docutils literal notranslate"><span class="pre">calculate</span></code> method<a class="headerlink" href="#the-calculate-method" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">calculate</span></code> method must be defined and it must return the autocovariance function evaluated at the time <code class="docutils literal notranslate"><span class="pre">t</span></code>. When writing the expression of the autocovariance function, the values of parameters of the model can be accessed using the attribute <code class="docutils literal notranslate"><span class="pre">self.parameters['name'].value</span></code> where <code class="docutils literal notranslate"><span class="pre">name</span></code> is the name of the parameter.</p>
+<p>This method is then called by the method <a class="reference internal" href="../autoapi/pioran/acvf_base/index.html#pioran.acvf_base.CovarianceFunction.get_cov_matrix" title="pioran.acvf_base.CovarianceFunction.get_cov_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_cov_matrix()</span></code></a> to compute for instance the likelihood or the posterior predictive distribution of a Gaussian process.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://jax.readthedocs.io/en/latest/jax.numpy.html#module-jax.numpy" title="jax.numpy"><span class="nn">jax.numpy</span></a> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">from</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/index.html#module-pioran" title="pioran"><span class="nn">pioran</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf_base/index.html#pioran.acvf_base.CovarianceFunction" title="pioran.acvf_base.CovarianceFunction"><span class="n">CovarianceFunction</span></a>
+<span class="kn">from</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/parameters/index.html#module-pioran.parameters" title="pioran.parameters"><span class="nn">pioran.parameters</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/parameters/parameters/index.html#pioran.parameters.parameters.ParametersModel" title="pioran.parameters.parameters.ParametersModel"><span class="n">ParametersModel</span></a>
+
+<span class="k">class</span> <span class="nc">MyAutocovariance</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="../autoapi/pioran/acvf_base/index.html#pioran.acvf_base.CovarianceFunction" title="pioran.acvf_base.CovarianceFunction"><span class="n">CovarianceFunction</span></a><span class="p">):</span>
+    <a class="sphinx-codeautolink-a" href="../autoapi/pioran/parameters/parameters/index.html#pioran.parameters.parameters.ParametersModel" title="pioran.parameters.parameters.ParametersModel"><span class="n">parameters</span></a><span class="p">:</span> <a class="sphinx-codeautolink-a" href="../autoapi/pioran/parameters/parameters/index.html#pioran.parameters.parameters.ParametersModel" title="pioran.parameters.parameters.ParametersModel"><span class="n">ParametersModel</span></a>
+    <span class="n">expression</span> <span class="o">=</span> <span class="s1">'name of the model'</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_values</span><span class="p">,</span> <span class="n">free_parameters</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">"""Constructor of the covariance function inherited </span>
+<span class="sd">        from the CovarianceFunction class.</span>
+<span class="sd">        """</span>
+        <span class="k">assert</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#len" title="len"><span class="nb">len</span></a><span class="p">(</span><span class="n">param_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">'The number of parameters must be 3'</span>
+        <span class="n">CovarianceFunction</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_values</span><span class="o">=</span><span class="n">param_values</span><span class="p">,</span> 
+        <span class="n">param_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'variance'</span><span class="p">,</span> <span class="s1">'length'</span><span class="p">,</span><span class="s1">'period'</span><span class="p">],</span> <span class="n">free_parameters</span><span class="o">=</span><span class="n">free_parameters</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns the autocovariance function evaluated at t.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span>  <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s1">'variance'</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span><a class="sphinx-codeautolink-a" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.numpy.exp.html#jax.numpy.exp" title="jax.numpy.exp"><span class="n">jnp</span><span class="o">.</span><span class="n">exp</span></a><span class="p">(</span><span class="o">-</span> <a class="sphinx-codeautolink-a" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.numpy.abs.html#jax.numpy.abs" title="jax.numpy.abs"><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s1">'length'</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">*</span><a class="sphinx-codeautolink-a" href="https://jax.readthedocs.io/en/latest/_autosummary/jax.numpy.cos.html#jax.numpy.cos" title="jax.numpy.cos"><span class="n">jnp</span><span class="o">.</span><span class="n">cos</span></a><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">jnp</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s1">'period'</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can use the newly defined model as any other models we have shown above:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Cov</span> <span class="o">=</span> <span class="n">MyAutocovariance</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span><span class="mf">.5</span><span class="p">])</span>
+<span class="n">taus</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">avc</span> <span class="o">=</span> <span class="n">Cov</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">taus</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">taus</span><span class="p">,</span> <span class="n">avc</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tau$'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\tt</span><span class="si">{Cov.calculate}</span><span class="s1">(\tau)$'</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/4d02378693fb49c690209c79c8ebf998174d83af22a147c64287a515d467b2d4.png" src="../_images/4d02378693fb49c690209c79c8ebf998174d83af22a147c64287a515d467b2d4.png"/>
+</div>
+</div>
+</section>
+</section>
+</section>
+</article>
+<footer class="prev-next-footer">
+<div class="prev-next-area">
+<a class="left-prev" href="Modelling.html" title="previous page">
+<i class="fa-solid fa-angle-left"></i>
+<div class="prev-next-info">
+<p class="prev-next-subtitle">previous</p>
+<p class="prev-next-title">Modelling</p>
+</div>
+</a>
+<a class="right-next" href="models_psd.html" title="next page">
+<div class="prev-next-info">
+<p class="prev-next-subtitle">next</p>
+<p class="prev-next-title">Modelling with a power spectral density</p>
+</div>
+<i class="fa-solid fa-angle-right"></i>
+</a>
+</div>
+</footer>
+</div>
+<div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+<div class="sidebar-secondary-item">
+<div class="page-toc tocsection onthispage" id="pst-page-navigation-heading-2">
+<i class="fa-solid fa-list"></i> On this page
+  </div>
+<nav aria-labelledby="pst-page-navigation-heading-2" class="bd-toc-nav page-toc">
+<ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-first-model">A first model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#combining-autocovariance-functions">Combining autocovariance functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sum-of-autocovariance-functions">Sum of autocovariance functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#product-of-autocovariance-functions">Product of autocovariance functions</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-a-new-model">Writing a new model</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-the-class-and-the-constructor">Creating the class and the constructor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-calculate-method">The <code class="docutils literal notranslate"><span class="pre">calculate</span></code> method</a></li>
+</ul>
+</li>
+</ul>
+</nav></div>
+<div class="sidebar-secondary-item">
+<div class="tocsection sourcelink">
+<a href="../_sources/tutorials/models_acvf.ipynb.txt">
+<i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+</div>
+</div></div>
+</div>
+<footer class="bd-footer-content">
+</footer>
+</main>
+</div>
+</div>
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
+<script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+<footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+<div class="footer-items__start">
+<div class="footer-item">
+<p class="copyright">
+    
+      © Copyright 2023, Mehdy Lefkir.
+      <br/>
+</p>
+</div>
+<div class="footer-item">
+<p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+</p>
+</div>
+</div>
+<div class="footer-items__end">
+<div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+</div>
+</div>
+</footer>
+</body>
+</html>
