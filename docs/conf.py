@@ -73,7 +73,8 @@ tikz_latex_preamble = r'''\usepackage{amsmath}\usepackage{amssymb}'''
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'furo'
+# html_theme = 'furo'
+html_theme = 'pydata_sphinx_theme'
 html_title = "pioran"
 html_short_title = "pioran"
 html_logo = '_static/logo_borderbis.png'
@@ -82,13 +83,13 @@ html_favicon = '_static/favico.ico'
 html_css_files = [
     "css/custom.css",
 ]
-html_theme_options = {
-    'navigation_with_keys': True,
-    "light_css_variables": {
-        "color-brand-primary": "#0077bb",
-        "color-brand-content": "#0077bb",
-    },
-}
+# html_theme_options = {
+#     'navigation_with_keys': True,
+#     "light_css_variables": {
+#         "color-brand-primary": "#0077bb",
+#         "color-brand-content": "#0077bb",
+#     },
+# }
 html_static_path = ['_static']
 
 
