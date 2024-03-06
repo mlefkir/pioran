@@ -6,7 +6,8 @@
 Welcome to pioran's documentation!
 ==================================
 
-`pioran` is a Python package for the analysis of time series data.
+`pioran` is a Python package for the analysis of irregularly sampled time series data using Gaussian processes.
+
 
 .. toctree::
    :maxdepth: 2
