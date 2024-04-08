@@ -322,7 +322,7 @@ class Visualisations:
         self,
         samples: jax.Array,
         plot_PSD: bool = True,
-        plot_ACVF: bool = True,
+        plot_ACVF: bool = False,
         **kwargs,
     ):
         """Plot the posterior predictive checks.
@@ -619,7 +619,10 @@ class Visualisations:
                             ]
                         )
             elif isinstance(self.process.model, PSDToACV):
-                pass
+                raise NotImplementedError(
+                    "Posterior predictive ACFs are not implemented for PSD models."
+                )
+                # pass
                 # if self.process.estimate_variance:
                 #         posterior_ACVF = []
                 #         for it in range(samples.shape[0]):
