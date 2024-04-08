@@ -530,7 +530,7 @@ class Visualisations:
                         norm = lambda a, f: jnp.sum(a * f)
                     elif self.process.model.method == "DRWCelerite":
                         Power_spectrum_model = DRWCelerite_power_spectrum
-                        norm = (lambda a, f: jnp.sum(a * f * 2 * jnp.pi / 3),)
+                        norm = lambda a, f: jnp.sum(a * f * 2 * jnp.pi / 3)
 
                     print("Plotting posterior predictive PSDs with tinygp...")
                     fc = self.process.model.spectral_points
