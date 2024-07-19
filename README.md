@@ -1,7 +1,6 @@
 # Pioran
 
 Power spectrum Inference Of RANdom time series
-<!-- Gaussian Processes Regression on irregularly sampled time series  -->
 
 ## Installation
 
